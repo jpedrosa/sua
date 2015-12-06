@@ -10,10 +10,6 @@ class Stopwatch {
 
   var stopped = false
 
-  init() {
-    startTime = timespec();
-  }
-
   func start() {
     clock_gettime(CLOCK_REALTIME, &startTime)
     stopped = false
