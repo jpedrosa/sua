@@ -185,14 +185,6 @@ class Constraint {
 
 }
 
-func ==(lhs: Constraint, rhs: Constraint) -> Bool {
-  return lhs.strength.value == rhs.strength.value
-}
-
-func !=(lhs: Constraint, rhs: Constraint) -> Bool {
-  return lhs.strength.value != rhs.strength.value
-}
-
 // Abstract superclass for constraints having a single possible output variable.
 class UnaryConstraint: Constraint {
 
@@ -489,9 +481,9 @@ class Variable {
 
   // Removes all traces of c from this variable.
   func removeConstraint(constraint: Constraint) {
-    constraints = constraints.filter({ $0 != constraint })
+    constraints = constraints.filter({ $0 !== constraint })
     if let c = determinedBy {
-      if (c == constraint) {
+      if (c === constraint) {
         determinedBy = nil
       }
     }
@@ -671,7 +663,7 @@ class Planner {
 
       if let determining = v.determinedBy {
         for next in v.constraints {
-          if next != determining && next.isSatisfied {
+          if next !== determining && next.isSatisfied {
             next.recalculate()
             todo.append(next.output)
           }
@@ -685,7 +677,7 @@ class Planner {
   func addConstraintsConsumingTo(v: Variable, inout coll: [Constraint]) {
     if let determining = v.determinedBy {
       for constraint in v.constraints {
-        if constraint != determining && constraint.isSatisfied {
+        if constraint !== determining && constraint.isSatisfied {
           coll.append(constraint)
         }
       }
@@ -784,7 +776,6 @@ func projectionTest(n: Int) {
   change(dst, newValue: 1050)
 
   total = total + src.value
-  print("Help swift: \(total)")
   if src.value != 5 {
     print("Projection 2 failed")
   }
