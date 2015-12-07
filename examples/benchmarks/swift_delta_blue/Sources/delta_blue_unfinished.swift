@@ -72,10 +72,6 @@ class Strength {
 
 }
 
-func ==(lhs: Strength, rhs: Strength) -> Bool {
-  return lhs.value == rhs.value
-}
-
 // Compile time computed constants.
 let REQUIRED        = Strength(value: 0, name: "required")
 let STRONG_REFERRED = Strength(value: 1, name: "strongPreferred")
@@ -140,7 +136,7 @@ class Constraint {
   func satisfy(mark: Int) -> Constraint? {
     chooseMethod(mark)
     if (!isSatisfied) {
-      if (strength == REQUIRED) {
+      if (strength === REQUIRED) {
         print("Could not satisfy a required constraint!")
       }
       return nil
@@ -555,12 +551,12 @@ class Planner {
     var strength = REQUIRED
     while (true) {
       for u in unsatisfied {
-        if (u.strength == strength) {
+        if (u.strength === strength) {
           incrementalAdd(u)
         }
       }
       strength = strength.nextWeaker
-      if (strength == WEAKEST) {
+      if (strength === WEAKEST) {
         break
       }
     }
