@@ -703,7 +703,7 @@ func chainTest(n: Int) {
   for i in 0...n {
     let v = Variable(name: "v", value: 0)
     if let p = prev {
-      EqualityConstraint(v1: p, v2: v, strength: REQUIRED)
+      let _ = EqualityConstraint(v1: p, v2: v, strength: REQUIRED)
     }
     if i == 0 {
       vfirst = v
@@ -717,7 +717,7 @@ func chainTest(n: Int) {
   let first = vfirst!
   let last = vlast!
 
-  StayConstraint(variable: last, strength: STRONG_DEFAULT)
+  let _ = StayConstraint(variable: last, strength: STRONG_DEFAULT)
   let edit = EditConstraint(variable: first, strength: PREFERRED)
   let plan = planner.extractPlanFromConstraints([edit])
   for i in 0..<100 {
@@ -754,9 +754,9 @@ func projectionTest(n: Int) {
     vsrc = Variable(name: "src", value: i)
     vdst = Variable(name: "dst", value: i)
     dests.append(vdst!)
-    StayConstraint(variable: vsrc!, strength: NORMAL)
-    ScaleConstraint(src: vsrc!, scale: scale, offset: offset, dest: vdst!,
-        strength: REQUIRED)
+    let _ = StayConstraint(variable: vsrc!, strength: NORMAL)
+    let _ = ScaleConstraint(src: vsrc!, scale: scale, offset: offset,
+        dest: vdst!, strength: REQUIRED)
   }
 
   let src = vsrc!
