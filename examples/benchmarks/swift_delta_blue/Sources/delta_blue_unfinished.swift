@@ -657,12 +657,11 @@ class Planner {
         }
       }
 
-      if let determining = v.determinedBy {
-        for next in v.constraints {
-          if next !== determining && next.isSatisfied {
-            next.recalculate()
-            todo.append(next.output)
-          }
+      let determining = v.determinedBy
+      for next in v.constraints {
+        if next !== determining && next.isSatisfied {
+          next.recalculate()
+          todo.append(next.output)
         }
       }
     }
