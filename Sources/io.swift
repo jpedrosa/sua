@@ -22,4 +22,8 @@ public class IO {
     nativeSleep(n)
   }
 
+  public static func flush() {
+    fflush(UnsafeMutablePointer<FILE>(bitPattern: 0))
+  }
+
 }
