@@ -12,5 +12,7 @@ public func inspect(o: Any) -> String {
 }
 
 public func p(a: Any...) {
-  debugPrint(a)
+  for e in a {
+    debugPrint(e)
+  }
 }
