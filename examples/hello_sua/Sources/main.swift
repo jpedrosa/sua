@@ -4,7 +4,7 @@ import Sua
 
 p("Hello, Sua!")
 
-let a = "|/-\\".characters
+let a = "|/-\\|/-\\".characters
 var iterations = 10
 
 func label(c: Character) {
