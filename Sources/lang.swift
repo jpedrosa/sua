@@ -24,12 +24,10 @@ func inspect(o: Int) -> String {
 }
 
 func inspect(o: CustomStringConvertible) -> String {
-  print("ever")
   return o.description
 }
 
 func inspect(o: Any?) -> String {
-  print("ever more")
   return String(o)
 }
 
