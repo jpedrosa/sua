@@ -11,6 +11,10 @@ public extension String {
         **Note**: if the range includes a null value (0), since the String
         will be generated using a null-delimited C String function, the
         String may be truncated at the null value instead.
+        Ex:
+            var a: [CChar] = [72, 101, 108, 108, 111]
+            print(String.fromCharCodes(a)) // Prints Hello
+            print(String.fromCharCodes(a, start: 1, end: 3)) // Prints ell
     */
     static func fromCharCodes(charCodes: [CChar], start: Int = 0,
         end: Int = -1) -> String {
