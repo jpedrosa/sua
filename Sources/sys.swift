@@ -7,8 +7,9 @@ public enum SysError: ErrorType {
     case InvalidOpenFileOperation(operation: String)
 }
 
-let _fflush = fflush;
-let _getpid = getpid;
+let _fflush = fflush
+let _getpid = getpid
+let _close = close
 
 public class PosixSys {
 
@@ -16,6 +17,10 @@ public class PosixSys {
 
   public static let DEFAULT_FILE_MODE = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP |
       S_IROTH
+
+  public func open(path: String, flags: Int32, mode: UInt32) -> Int32 {
+    return retry({ csua_open(path, flags, mode) })
+  }
 
   public func openFile(filePath: String, operation: String = "r",
       mode: UInt32 = DEFAULT_FILE_MODE) throws -> Int32 {
@@ -30,7 +35,15 @@ public class PosixSys {
       throw SysError.InvalidOpenFileOperation(operation: operation)
     }
     flags |= O_CLOEXEC
-    return retry({ csua_open(filePath, flags, mode) })
+    return open(filePath, flags: flags, mode: mode)
+  }
+
+  public func doOpenDir(dirPath: String) -> Int32 {
+    return open(dirPath, flags: O_RDONLY | O_DIRECTORY, mode: 0)
+  }
+
+  public func close(fd: Int32) -> Int32 {
+    return retry({ _close(fd) })
   }
 
   public func fflush(stream: UnsafeMutablePointer<FILE> = nil) -> Int32 {
