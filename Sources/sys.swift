@@ -3,18 +3,21 @@ import CSua
 import Glibc
 
 
-enum SysError: ErrorType {
+public enum SysError: ErrorType {
     case InvalidOpenFileOperation(operation: String)
 }
 
-class Sys {
+let _fflush = fflush;
+let _getpid = getpid;
 
-  static let DEFAULT_DIR_MODE = S_IRWXU | S_IRWXG | S_IRWXO
+public class PosixSys {
 
-  static let DEFAULT_FILE_MODE = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP |
+  public static let DEFAULT_DIR_MODE = S_IRWXU | S_IRWXG | S_IRWXO
+
+  public static let DEFAULT_FILE_MODE = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP |
       S_IROTH
 
-  static func openFile(filePath: String, operation: String = "r",
+  public func openFile(filePath: String, operation: String = "r",
       mode: UInt32 = DEFAULT_FILE_MODE) throws -> Int32 {
     var flags: Int32 = 0
     if operation == "r" {
@@ -26,15 +29,19 @@ class Sys {
     } else {
       throw SysError.InvalidOpenFileOperation(operation: operation)
     }
-    flags |= O_CLOEXEC;
-    let fd = retry({ csua_open(filePath, flags, mode) })
-    //ForeignMemory cPath = new ForeignMemory.fromStringAsUTF8(filePath);
-    //int fd = _retry(() => _open.icall$3(cPath, flags, mode));
-    //cPath.free();
-    return fd;
+    flags |= O_CLOEXEC
+    return retry({ csua_open(filePath, flags, mode) })
   }
 
-  static func retry(fn: () -> Int32) -> Int32 {
+  public func fflush(stream: UnsafeMutablePointer<FILE> = nil) -> Int32 {
+    return _fflush(stream)
+  }
+
+  public func getpid() -> Int32 {
+    return _getpid()
+  }
+
+  public func retry(fn: () -> Int32) -> Int32 {
     var value = fn()
     while value == -1 {
       if (errno != EINTR) { break }
@@ -44,3 +51,5 @@ class Sys {
   }
 
 }
+
+let Sys = PosixSys()
