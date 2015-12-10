@@ -10,6 +10,8 @@ public enum SysError: ErrorType {
 let _fflush = fflush
 let _getpid = getpid
 let _close = close
+let _mkdir = mkdir
+let _read = read
 
 public class PosixSys {
 
@@ -42,6 +44,15 @@ public class PosixSys {
     return open(dirPath, flags: O_RDONLY | O_DIRECTORY, mode: 0)
   }
 
+  public func mkdir(dirPath: String, mode: UInt32 = DEFAULT_DIR_MODE) -> Int32 {
+    return retry({ _mkdir(dirPath, mode) })
+  }
+
+  public func read(fd: Int32, address: UnsafeMutablePointer<Void>,
+      length: Int) -> Int {
+    return retry({ _read(fd, address, length) })
+  }
+
   public func close(fd: Int32) -> Int32 {
     return retry({ _close(fd) })
   }
@@ -55,6 +66,15 @@ public class PosixSys {
   }
 
   public func retry(fn: () -> Int32) -> Int32 {
+    var value = fn()
+    while value == -1 {
+      if (errno != EINTR) { break }
+      value = fn()
+    }
+    return value
+  }
+
+  public func retry(fn: () -> Int) -> Int {
     var value = fn()
     while value == -1 {
       if (errno != EINTR) { break }
