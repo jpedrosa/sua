@@ -26,4 +26,41 @@ public class IO {
     fflush(UnsafeMutablePointer<FILE>(bitPattern: 0))
   }
 
+  public static func read(filePath: String) throws -> String {
+    var s: String?
+    try File.open(filePath, mode: "r", fn: { f in s = try! f.read() })
+    return s!
+  }
+
+  public static func readLines(filePath: String) throws -> [String] {
+    var a: [String]?
+    try File.open(filePath, mode: "r", fn: { f in a = try! f.readLines() })
+    return a!
+  }
+
+  public static func readBytes(filePath: String) throws -> [CChar] {
+    var a: [CChar]?
+    try File.open(filePath, mode: "r", fn: { f in a = try! f.readBytes() })
+    return a!
+  }
+
+  public static func readWholeBuffer(filePath: String) throws -> [CChar] {
+    var b: [CChar]?
+    try File.open(filePath, mode: "r",
+        fn: { f in b = try! f.readWholeBuffer() })
+    return b!
+  }
+
+  public static func write(filePath: String, string: String) throws {
+    try File.open(filePath, mode: "w", fn: { f in f.write(string) })
+  }
+
+  public static func writeBytes(filePath: String, bytes: [CChar]) throws {
+    try File.open(filePath, mode: "w", fn: { f in f.writeBytes(bytes) })
+  }
+
+//  public static void writeBuffer(String filePath, ByteBuffer buffer) {
+//    File.open(filePath, 'w', (f) => f.writeBuffer(buffer));
+//  }
+
 }
