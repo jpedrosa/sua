@@ -68,7 +68,7 @@ public class File: CustomStringConvertible {
     var si = 0
     for i in 0..<a.count {
       if a[i] == 10 {
-        r.append(String.fromCharCodes(a, start: si, end: i + 1))
+        r.append(String.fromCharCodes(a, start: si, end: i))
         si = i + 1
       }
     }
