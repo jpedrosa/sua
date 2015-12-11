@@ -6,15 +6,26 @@ func formatDouble(f: Double, precision: Int = 2) -> String{
   for _ in 0..<precision {
     p *= 10
   }
-  let si = "\(Int(round((f * Double(p)))))"
+  let neutral = abs(Int(round((f * Double(p)))))
   var s = ""
-  let a = si.characters
+  let a = "\(neutral)".characters
   let len = a.count
-  let dot = len - precision
+  var dot = len - precision
+  if f < 0 {
+    s += "-"
+  }
+  if dot <= 0 {
+    dot = 1
+  }
+  let pad = precision - len
   var i = 0
+  while i <= pad {
+    s += i == dot ? ".0" : "0"
+    i += 1
+  }
   for c in a {
     if i == dot {
-      s += (i == 0 || (i == 1 && f < 0)) ? "0." : "."
+      s += "."
     }
     s.append(c)
     i += 1
@@ -42,3 +53,8 @@ runBatch(12.3456789)
 runBatch(0.123456789)
 runBatch(-0.123456789)
 runBatch(-1.23456789)
+runBatch(1.0)
+runBatch(0.00123456789)
+runBatch(-0.00123456789)
+runBatch(765210.00123456789)
+runBatch(-8765210.00123456789)
