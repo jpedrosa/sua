@@ -15,6 +15,7 @@ let _read = read
 let _lseek = lseek
 let _rename = rename
 let _unlink = unlink
+let _getcwd = getcwd
 
 public class PosixSys {
 
@@ -82,6 +83,15 @@ public class PosixSys {
 
   public func unlink(path: String) -> Int32 {
     return _unlink(path)
+  }
+
+  public func getcwd() -> String? {
+    var a = [CChar](count:256, repeatedValue: 0)
+    let i = _getcwd(&a, 255)
+    if i != nil {
+      return String.fromCharCodes(a)
+    }
+    return nil
   }
 
   public func retry(fn: () -> Int32) -> Int32 {
