@@ -127,4 +127,4 @@ public class PosixSys {
 
 }
 
-let Sys = PosixSys()
+public let Sys = PosixSys()

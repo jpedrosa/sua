@@ -20,7 +20,7 @@ public extension String {
           print(String.fromCharCodes(a)) // Prints Hello
           print(String.fromCharCodes(a, start: 1, end: 3)) // Prints ell
     */
-    static func fromCharCodes(charCodes: [CChar], start: Int = 0,
+    public static func fromCharCodes(charCodes: [CChar], start: Int = 0,
         end: Int = -1) -> String {
       let len = charCodes.count
       let lasti = len - 1
