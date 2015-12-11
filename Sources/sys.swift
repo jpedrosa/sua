@@ -13,6 +13,7 @@ let _close = close
 let _mkdir = mkdir
 let _read = read
 let _lseek = lseek
+let _rename = rename
 
 public class PosixSys {
 
@@ -72,6 +73,10 @@ public class PosixSys {
 
   public func getpid() -> Int32 {
     return _getpid()
+  }
+
+  public func rename(oldPath: String, newPath: String) -> Int32 {
+    return _rename(oldPath, newPath)
   }
 
   public func retry(fn: () -> Int32) -> Int32 {
