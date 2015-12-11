@@ -7,6 +7,7 @@ public enum SysError: ErrorType {
   case InvalidOpenFileOperation(operation: String)
 }
 
+
 let _fflush = fflush
 let _getpid = getpid
 let _close = close
@@ -17,6 +18,7 @@ let _lseek = lseek
 let _rename = rename
 let _unlink = unlink
 let _getcwd = getcwd
+
 
 public class PosixSys {
 
