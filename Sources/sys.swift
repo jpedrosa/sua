@@ -14,6 +14,7 @@ let _mkdir = mkdir
 let _read = read
 let _lseek = lseek
 let _rename = rename
+let _unlink = unlink
 
 public class PosixSys {
 
@@ -77,6 +78,10 @@ public class PosixSys {
 
   public func rename(oldPath: String, newPath: String) -> Int32 {
     return _rename(oldPath, newPath)
+  }
+
+  public func unlink(path: String) -> Int32 {
+    return _unlink(path)
   }
 
   public func retry(fn: () -> Int32) -> Int32 {
