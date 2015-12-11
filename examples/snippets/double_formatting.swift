@@ -14,7 +14,7 @@ func formatDouble(f: Double, precision: Int = 2) -> String{
   var i = 0
   for c in a {
     if i == dot {
-      s += (i == 0 || i == 1 && f < 0) ? "0." : "."
+      s += (i == 0 || (i == 1 && f < 0)) ? "0." : "."
     }
     s.append(c)
     i += 1
