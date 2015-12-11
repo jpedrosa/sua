@@ -12,6 +12,7 @@ let _getpid = getpid
 let _close = close
 let _mkdir = mkdir
 let _read = read
+let _write = write
 let _lseek = lseek
 let _rename = rename
 let _unlink = unlink
@@ -59,6 +60,16 @@ public class PosixSys {
   public func read(fd: Int32, address: UnsafeMutablePointer<Void>,
       length: Int) -> Int {
     return retry({ _read(fd, address, length) })
+  }
+
+  public func write(fd: Int32, address: UnsafePointer<Void>,
+      length: Int) -> Int {
+    return retry({ _write(fd, address, length) })
+  }
+
+  public func writeString(fd: Int32, string: String) -> Int {
+    var a: [CChar] = string.utf8.map { CChar($0) }
+    return write(fd, address: &a, length: a.count)
   }
 
   public func close(fd: Int32) -> Int32 {
