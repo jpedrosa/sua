@@ -51,12 +51,17 @@ public class IO {
     return b!
   }
 
-  public static func write(filePath: String, string: String) throws {
-    try File.open(filePath, mode: "w", fn: { f in f.write(string) })
+  public static func write(filePath: String, string: String) throws -> Int {
+    var n: Int? = -1
+    try File.open(filePath, mode: "w", fn: { f in n = f.write(string) })
+    return n!
   }
 
-  public static func writeBytes(filePath: String, bytes: [CChar]) throws {
-    try File.open(filePath, mode: "w", fn: { f in f.writeBytes(bytes) })
+  public static func writeBytes(filePath: String,
+      bytes: [CChar]) throws -> Int {
+    var n: Int? = -1
+    try File.open(filePath, mode: "w", fn: { f in n = f.writeBytes(bytes) })
+    return n!
   }
 
 //  public static void writeBuffer(String filePath, ByteBuffer buffer) {

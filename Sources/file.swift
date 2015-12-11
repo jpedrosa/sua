@@ -79,12 +79,12 @@ public class File: CustomStringConvertible {
     return try doRead(length)
   }
 
-  public func write(string: String) {
-    Sys.writeString(fd, string: string)
+  public func write(string: String) -> Int {
+    return Sys.writeString(fd, string: string)
   }
 
-  public func writeBytes(bytes: [CChar]) {
-    Sys.write(fd, address: bytes, length: bytes.count)
+  public func writeBytes(bytes: [CChar]) -> Int {
+    return Sys.write(fd, address: bytes, length: bytes.count)
   }
 
   /*func writeBuffer(ByteBuffer buffer, [int offset = 0, int length = -1]) {
