@@ -3,14 +3,18 @@
 public extension String {
 
     /**
-      fromCharCodes can take an array of char codes from which a new
-      String will be generated.
+      fromCharCodes takes an array of char codes from which a new String will
+      be generated.
+
       The start and end parameters can be omitted.
+
       The end parameter is inclusive. If the end parameter is negative,
       the end will be interpreted to be the value of the count of the array.
+
       **Note**: if the range includes a null value (0), since the String
       will be generated using a null-delimited C String function, the
       String may be truncated at the null value instead.
+
       E.g.:
           var a: [CChar] = [72, 101, 108, 108, 111]
           print(String.fromCharCodes(a)) // Prints Hello
