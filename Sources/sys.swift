@@ -30,7 +30,7 @@ public class PosixSys {
   public static let SEEK_END: Int32 = 2
 
   public func open(path: String, flags: Int32, mode: UInt32) -> Int32 {
-    return retry{ csua_open(path, flags, mode) }
+    return retry { csua_open(path, flags, mode) }
   }
 
   public func openFile(filePath: String, operation: String = "r",
@@ -54,17 +54,17 @@ public class PosixSys {
   }
 
   public func mkdir(dirPath: String, mode: UInt32 = DEFAULT_DIR_MODE) -> Int32 {
-    return retry{ _mkdir(dirPath, mode) }
+    return retry { _mkdir(dirPath, mode) }
   }
 
   public func read(fd: Int32, address: UnsafeMutablePointer<Void>,
       length: Int) -> Int {
-    return retry{ _read(fd, address, length) }
+    return retry { _read(fd, address, length) }
   }
 
   public func write(fd: Int32, address: UnsafePointer<Void>,
       length: Int) -> Int {
-    return retry{ _write(fd, address, length) }
+    return retry { _write(fd, address, length) }
   }
 
   public func writeString(fd: Int32, string: String) -> Int {
@@ -73,7 +73,7 @@ public class PosixSys {
   }
 
   public func close(fd: Int32) -> Int32 {
-    return retry{ _close(fd) }
+    return retry { _close(fd) }
   }
 
   public func fflush(stream: UnsafeMutablePointer<FILE> = nil) -> Int32 {
@@ -81,7 +81,7 @@ public class PosixSys {
   }
 
   public func lseek(fd: Int32, offset: Int, whence: Int32) -> Int {
-    return retry{ _lseek(fd, offset, whence) }
+    return retry { _lseek(fd, offset, whence) }
   }
 
   public func getpid() -> Int32 {
