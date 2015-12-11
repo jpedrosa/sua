@@ -4,7 +4,7 @@ import Glibc
 
 
 public enum SysError: ErrorType {
-    case InvalidOpenFileOperation(operation: String)
+  case InvalidOpenFileOperation(operation: String)
 }
 
 let _fflush = fflush
@@ -12,6 +12,7 @@ let _getpid = getpid
 let _close = close
 let _mkdir = mkdir
 let _read = read
+let _lseek = lseek
 
 public class PosixSys {
 
@@ -19,6 +20,10 @@ public class PosixSys {
 
   public static let DEFAULT_FILE_MODE = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP |
       S_IROTH
+
+  public static let SEEK_SET: Int32 = 0
+  public static let SEEK_CUR: Int32 = 1
+  public static let SEEK_END: Int32 = 2
 
   public func open(path: String, flags: Int32, mode: UInt32) -> Int32 {
     return retry({ csua_open(path, flags, mode) })
@@ -59,6 +64,10 @@ public class PosixSys {
 
   public func fflush(stream: UnsafeMutablePointer<FILE> = nil) -> Int32 {
     return _fflush(stream)
+  }
+
+  public func lseek(fd: Int32, offset: Int, whence: Int32) -> Int {
+    return retry({ _lseek(fd, offset, whence) })
   }
 
   public func getpid() -> Int32 {
