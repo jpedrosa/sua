@@ -54,7 +54,7 @@ p(Sys.getcwd())
 
 let wfd = Sys.openFile("/home/dewd/t_/newspaper.txt", operation: .W)
 
-var sample: [CChar] = "sayugara".utf8.map { CChar($0) }
+var sample = Array("sayugara".utf8)
 
 p(Sys.write(wfd, address: &sample, length: sample.count))
 

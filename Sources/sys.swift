@@ -75,7 +75,7 @@ public class PosixSys {
   }
 
   public func writeString(fd: Int32, string: String) -> Int {
-    var a: [CChar] = string.utf8.map { CChar($0) }
+    var a = Array(string.utf8)
     return write(fd, address: &a, length: a.count)
   }
 
