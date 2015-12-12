@@ -22,10 +22,9 @@ public extension String {
   */
   public static func fromCharCodes(charCodes: [CChar], start: Int = 0,
       end: Int = -1) -> String {
-    let len = charCodes.count
-    let lasti = len - 1
+    let lasti = charCodes.count - 1
     let ei = end < 0 ? lasti : end
-    if (ei < start) {
+    if ei < start {
       return ""
     } else {
       var a: [CChar]
