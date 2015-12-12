@@ -63,6 +63,13 @@ public class IO {
     return n!
   }
 
+  public static func writeBytes(filePath: String,
+      bytes: [UInt8]) throws -> Int {
+    var n: Int? = -1
+    try File.open(filePath, mode: .W) { f in n = f.writeBytes(bytes) }
+    return n!
+  }
+
 //  public static void writeBuffer(String filePath, ByteBuffer buffer) {
 //    File.open(filePath, 'w', (f) => f.writeBuffer(buffer));
 //  }

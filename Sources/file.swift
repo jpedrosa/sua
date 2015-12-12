@@ -87,6 +87,10 @@ public class File: CustomStringConvertible {
     return Sys.write(fd, address: bytes, length: bytes.count)
   }
 
+  public func writeBytes(bytes: [UInt8]) -> Int {
+    return Sys.write(fd, address: bytes, length: bytes.count)
+  }
+
   /*func writeBuffer(ByteBuffer buffer, [int offset = 0, int length = -1]) {
     if (length < 0) {
       length = buffer.lengthInBytes;
