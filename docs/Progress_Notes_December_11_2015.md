@@ -53,18 +53,18 @@ var a: [CChar] = [72, 101, 108, 108, 111]
 print(String.fromCharCodes(a))
 print(String.fromCharCodes(a, start: 1, end: 3))
 
-try File.open("/home/dewd/t_/sample.txt", mode: "r", fn: {f in p(f) })
+try File.open("/home/dewd/t_/sample.txt", mode: .R, fn: {f in p(f) })
 
-try File.open("/home/dewd/t_/sample.txt", mode: "r",
+try File.open("/home/dewd/t_/sample.txt", mode: .R,
     fn: { f in p(try! f.readLines()) })
 
-try File.open("/home/dewd/t_/nope_new.txt", mode: "w",
+try File.open("/home/dewd/t_/nope_new.txt", mode: .W,
     fn: {f in f.write("Heart Swift\n") })
 
-try File.open("/home/dewd/t_/nope_new.txt", mode: "r",
+try File.open("/home/dewd/t_/nope_new.txt", mode: .R,
     fn: {f in p(try! f.readWholeBuffer()) })
 
-try File.open("/home/dewd/t_/nope_new.txt", mode: "r",
+try File.open("/home/dewd/t_/nope_new.txt", mode: .R,
     fn: {f in p(try! f.read()) })
 
 p(try! IO.readLines("/home/dewd/t_/sample.txt"))
@@ -85,4 +85,3 @@ year we got our gift even earlier with Swift! Merry Xmas!
 
 BTW, if you need help interoping with C, have a look [at this outstanding](https://github.com/apple/swift/blob/8d9ef80304d7b36e13619ea50e6e76f3ec9221ba/docs/proposals/C%20Pointer%20Interop%20Language%20Model.rst) Swift
 article for some reassurance.
-
