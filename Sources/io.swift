@@ -28,39 +28,38 @@ public class IO {
 
   public static func read(filePath: String) throws -> String {
     var s: String?
-    try File.open(filePath, mode: .R, fn: { f in s = try! f.read() })
+    try File.open(filePath, mode: .R) { f in s = try! f.read() }
     return s!
   }
 
   public static func readLines(filePath: String) throws -> [String] {
     var a: [String]?
-    try File.open(filePath, mode: .R, fn: { f in a = try! f.readLines() })
+    try File.open(filePath, mode: .R) { f in a = try! f.readLines() }
     return a!
   }
 
   public static func readBytes(filePath: String) throws -> [CChar] {
     var a: [CChar]?
-    try File.open(filePath, mode: .R, fn: { f in a = try! f.readBytes() })
+    try File.open(filePath, mode: .R) { f in a = try! f.readBytes() }
     return a!
   }
 
   public static func readWholeBuffer(filePath: String) throws -> [CChar] {
     var b: [CChar]?
-    try File.open(filePath, mode: .R,
-        fn: { f in b = try! f.readWholeBuffer() })
+    try File.open(filePath, mode: .R) { f in b = try! f.readWholeBuffer() }
     return b!
   }
 
   public static func write(filePath: String, string: String) throws -> Int {
     var n: Int? = -1
-    try File.open(filePath, mode: .W, fn: { f in n = f.write(string) })
+    try File.open(filePath, mode: .W) { f in n = f.write(string) }
     return n!
   }
 
   public static func writeBytes(filePath: String,
       bytes: [CChar]) throws -> Int {
     var n: Int? = -1
-    try File.open(filePath, mode: .W, fn: { f in n = f.writeBytes(bytes) })
+    try File.open(filePath, mode: .W) { f in n = f.writeBytes(bytes) }
     return n!
   }
 
