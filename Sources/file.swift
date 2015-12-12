@@ -5,8 +5,8 @@ public class File: CustomStringConvertible {
   var fd: Int32
   let filePath: String
 
-  init(filePath: String, mode: String = "r") throws {
-    fd = try Sys.openFile(filePath, operation: mode)
+  init(filePath: String, mode: FileOperation = .R) throws {
+    fd = Sys.openFile(filePath, operation: mode)
     if (fd == -1) {
       throw FileError.FileException(message: "Failed to open file.")
     }
@@ -141,7 +141,7 @@ public class File: CustomStringConvertible {
 
   public var path: String { return filePath }
 
-  public static func open(filePath: String, mode: String = "r",
+  public static func open(filePath: String, mode: FileOperation = .R,
       fn: ((f: File) -> Void )?) throws -> File {
     let f = try File(filePath: filePath, mode: mode)
     defer {

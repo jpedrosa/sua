@@ -3,10 +3,9 @@ import Glibc
 import Sua
 import CSua
 
-
 p("let's go")
 
-let fd = try Sys.openFile("/home/dewd/t_/sample.txt")
+let fd = Sys.openFile("/home/dewd/t_/sample.txt")
 
 p("fd", fd)
 
@@ -53,7 +52,7 @@ p(Sys.unlink("/home/dewd/t_/yuyu.txt"))
 
 p(Sys.getcwd())
 
-let wfd = try Sys.openFile("/home/dewd/t_/newspaper.txt", operation: "w")
+let wfd = Sys.openFile("/home/dewd/t_/newspaper.txt", operation: .W)
 
 var sample: [CChar] = "sayugara".utf8.map { CChar($0) }
 
@@ -61,20 +60,20 @@ p(Sys.write(wfd, address: &sample, length: sample.count))
 
 p(Sys.writeString(wfd, string: "hello"))
 
-try File.open("/home/dewd/t_/sample.txt", mode: "r", fn: {f in p(f) })
+try File.open("/home/dewd/t_/sample.txt", mode: .R, fn: {f in p(f) })
 
-try File.open("/home/dewd/t_/sample.txt", mode: "r",
+try File.open("/home/dewd/t_/sample.txt", mode: .R,
     fn: { f in p(try! f.readLines()) })
 
-try File.open("/home/dewd/t_/sample.txt", mode: "r", fn: {f in p(f.length) })
+try File.open("/home/dewd/t_/sample.txt", mode: .R, fn: {f in p(f.length) })
 
-try File.open("/home/dewd/t_/nope_new.txt", mode: "w",
+try File.open("/home/dewd/t_/nope_new.txt", mode: .W,
     fn: {f in f.write("Heart Swift\n") })
 
-try File.open("/home/dewd/t_/nope_new.txt", mode: "r",
+try File.open("/home/dewd/t_/nope_new.txt", mode: .R,
     fn: {f in p(try! f.readWholeBuffer()) })
 
-try File.open("/home/dewd/t_/nope_new.txt", mode: "r",
+try File.open("/home/dewd/t_/nope_new.txt", mode: .R,
     fn: {f in p(try! f.read()) })
 
 p(try! IO.readLines("/home/dewd/t_/sample.txt"))

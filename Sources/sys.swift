@@ -20,6 +20,15 @@ let _unlink = unlink
 let _getcwd = getcwd
 
 
+public enum FileOperation: Int {
+  case R
+  case W
+  case A
+  case Read
+  case Write
+  case Append
+}
+
 public class PosixSys {
 
   public static let DEFAULT_DIR_MODE = S_IRWXU | S_IRWXG | S_IRWXO
@@ -35,17 +44,13 @@ public class PosixSys {
     return retry { csua_open(path, flags, mode) }
   }
 
-  public func openFile(filePath: String, operation: String = "r",
-      mode: UInt32 = DEFAULT_FILE_MODE) throws -> Int32 {
+  public func openFile(filePath: String, operation: FileOperation = .R,
+      mode: UInt32 = DEFAULT_FILE_MODE) -> Int32 {
     var flags: Int32 = 0
-    if operation == "r" {
-      flags = O_RDONLY
-    } else if operation == "w" {
-      flags = O_RDWR | O_CREAT | O_TRUNC
-    } else if operation == "a" {
-      flags = O_RDWR | O_CREAT | O_APPEND
-    } else {
-      throw SysError.InvalidOpenFileOperation(operation: operation)
+    switch operation {
+      case .R, .Read: flags = O_RDONLY
+      case .W, .Write: flags = O_RDWR | O_CREAT | O_TRUNC
+      case .A, .Append: flags = O_RDWR | O_CREAT | O_APPEND
     }
     flags |= O_CLOEXEC
     return open(filePath, flags: flags, mode: mode)
