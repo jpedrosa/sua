@@ -13,7 +13,7 @@ made up of a csua.c, csua.h, CMakeLists.txt, Package.swift and module.modulemap
 files only. CMake helps to build it and install the files into /usr/local for
 system-wide reference by the package manager. The problem for now with external
 module dependencies is that we have to keep importing them into the project
-files in order to help the linker with the needed libraries. One of the examples
+files in order to help the linker with the needed libraries. [One of the examples](../examples/file_and_io/Sources/main.swift)
 now has code like this:
 
 ```swift
