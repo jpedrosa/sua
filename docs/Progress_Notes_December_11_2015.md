@@ -55,16 +55,16 @@ print(String.fromCharCodes(a, start: 1, end: 3))
 
 try File.open("/home/dewd/t_/sample.txt", mode: .R) { f in p(f) }
 
-try File.open("/home/dewd/t_/sample.txt", mode: .R) {
-  f in p(try! f.readLines())
+try File.open("/home/dewd/t_/sample.txt", mode: .R) { f in
+  p(try! f.readLines())
 }
 
-try File.open("/home/dewd/t_/nope_new.txt", mode: .W) {
-  f in f.write("Heart Swift\n")
+try File.open("/home/dewd/t_/nope_new.txt", mode: .W) { f in
+  f.write("Heart Swift\n")
 }
 
-try File.open("/home/dewd/t_/nope_new.txt", mode: .R) {
-  f in p(try! f.readWholeBuffer())
+try File.open("/home/dewd/t_/nope_new.txt", mode: .R) { f in
+  p(try! f.readWholeBuffer())
 }
 
 try File.open("/home/dewd/t_/nope_new.txt", mode: .R) { f in p(try! f.read()) }
