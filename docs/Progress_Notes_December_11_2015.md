@@ -82,3 +82,7 @@ always helps!
 
 Ruby always had the tradition of releasing new versions around Christmas. This
 year we got our gift even earlier with Swift! Merry Xmas!
+
+BTW, if you need help interoping with C, have a look [at this outstanding](https://github.com/apple/swift/blob/8d9ef80304d7b36e13619ea50e6e76f3ec9221ba/docs/proposals/C%20Pointer%20Interop%20Language%20Model.rst) Swift
+article for some reassurance.
+
