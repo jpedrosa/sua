@@ -1,35 +1,3 @@
-Sua Swift
----------
-
-Sua Swift is a project to experiment with Swift on Ubuntu/Linux.
-
-Swift has recently been released as open source and is supported on Ubuntu. But
-it seems as though that the main APIs are still too heavily dependent on OSX,
-even if there are signs that they may be reimplementing many of the APIs on
-Swift itself and they may be more portable then.
-
-While Swift may come with standard libraries, the fact that Swift has great
-support for calling C libraries directly means that it is easy to experiment
-with new libraries and APIs for Swift. The combination of Swift + Linux will
-be explored for many years to come and it may give rise to many such libraries,
-until a major project based on them takes over the scene.
-
-With Sua Swift, I start on that path for leaner APIs for Swift. The examples
-that I come up with may help to document Swift further, if anything.
-
-Sua is a Portuguese word that means "yours". Sua Swift means "your Swift". It
-also is a play on how both words are pronounced, both beginning with about the
-same sound. Sua also resembles another programming word in Portuguese that is
-well known, "Lua" of the Lua programming language fame.
-
-Given how short the Sua word is, it could also be used as a prefix in some words
-to help to avoid name conflicts with more standard APIs.
-
-License
--------
-
-Same as Swift's.
-
 Progress Notes
 --------------
 
@@ -76,3 +44,41 @@ way of quicker turnaround, so finding ways around it can be more than helpful,
 while we give the time for the Swift tools to mature for open source needs.
 
 I also use the Atom editor for Swift too. It's quite handy!
+
+Here are some examples of code that Sua includes now:
+
+```swift
+var a: [CChar] = [72, 101, 108, 108, 111]
+
+print(String.fromCharCodes(a))
+print(String.fromCharCodes(a, start: 1, end: 3))
+
+try File.open("/home/dewd/t_/sample.txt", mode: "r", fn: {f in p(f) })
+
+try File.open("/home/dewd/t_/sample.txt", mode: "r",
+    fn: { f in p(try! f.readLines()) })
+
+try File.open("/home/dewd/t_/nope_new.txt", mode: "w",
+    fn: {f in f.write("Heart Swift\n") })
+
+try File.open("/home/dewd/t_/nope_new.txt", mode: "r",
+    fn: {f in p(try! f.readWholeBuffer()) })
+
+try File.open("/home/dewd/t_/nope_new.txt", mode: "r",
+    fn: {f in p(try! f.read()) })
+
+p(try! IO.readLines("/home/dewd/t_/sample.txt"))
+
+p(try IO.writeBytes("/home/dewd/t_/many_tries.txt", bytes: a))
+```
+
+I have used code like that in Dart and Ruby. From Dart I borrowed the
+String.fromCharCodes concept. And from Ruby, the File IO stuff.
+
+I'm still trying to get used to code like ```try``` and ```try!``` I'm not sure
+I like it too much. But I can't complain about the results too much, either.
+Swift has proven to be quite good, and being related to the C family of tools
+always helps!
+
+Ruby always had the tradition of releasing new versions around Christmas. This
+year we got our gift even earlier with Swift! Merry Xmas!
