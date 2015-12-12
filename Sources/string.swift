@@ -26,18 +26,17 @@ public extension String {
     let lasti = len - 1
     let ei = end < 0 ? lasti : end
     if (ei < start) {
-      return String()
+      return ""
     } else {
+      var a: [CChar]
       if ei < lasti {
-        let zi = ei + 1
-        var a = [CChar](charCodes[start...zi])
+        a = [CChar](charCodes[start...ei + 1])
         a[a.count - 1] = 0
-        return String.fromCString(&a)!
       } else {
-        var a = [CChar](charCodes[start...lasti])
+        a = [CChar](charCodes[start...lasti])
         a.append(0)
-        return String.fromCString(&a)!
       }
+      return String.fromCString(&a)!
     }
   }
 
