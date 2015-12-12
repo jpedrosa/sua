@@ -50,7 +50,7 @@ p(Sys.rename("/home/dewd/t_/aaa.txt", newPath: "/home/dewd/t_/bbb.txt"))
 
 p(Sys.unlink("/home/dewd/t_/yuyu.txt"))
 
-p(Sys.getcwd())
+p(Sys.cwd)
 
 let wfd = Sys.openFile("/home/dewd/t_/newspaper.txt", operation: .W)
 
@@ -81,3 +81,5 @@ try File.open("/home/dewd/t_/nope_new.txt", mode: .R) { f in p(try! f.read()) }
 p(try! IO.readLines("/home/dewd/t_/sample.txt"))
 
 p(try IO.writeBytes("/home/dewd/t_/many_tries.txt", bytes: a))
+
+p(Dir.pwd)

@@ -91,7 +91,7 @@ public class PosixSys {
     return retry { _lseek(fd, offset, whence) }
   }
 
-  public func getpid() -> Int32 {
+  public var pid: Int32 {
     return _getpid()
   }
 
@@ -103,7 +103,7 @@ public class PosixSys {
     return _unlink(path)
   }
 
-  public func getcwd() -> String? {
+  public var cwd: String? {
     var a = [CChar](count:256, repeatedValue: 0)
     let i = _getcwd(&a, 255)
     if i != nil {
