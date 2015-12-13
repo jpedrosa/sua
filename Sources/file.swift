@@ -105,7 +105,7 @@ public class File: CustomStringConvertible {
     fd = -1
   }
 
-  var isOpen: Bool { return fd != -1 }
+  public var isOpen: Bool { return fd != -1 }
 
   func doRead(maxBytes: Int) throws -> [CChar] {
     var a = [CChar](count: maxBytes, repeatedValue: 0)
@@ -179,6 +179,6 @@ public class File: CustomStringConvertible {
 }
 
 
-enum FileError: ErrorType {
+public enum FileError: ErrorType {
   case FileException(message: String)
 }
