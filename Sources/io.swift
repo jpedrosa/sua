@@ -57,10 +57,10 @@ public class IO {
     return n!
   }
 
-  public static func writeBytes(filePath: String,
+  public static func writeUInt8(filePath: String,
       bytes: [UInt8]) throws -> Int {
     var n: Int? = -1
-    try File.open(filePath, mode: .W) { f in n = f.writeBytes(bytes) }
+    try File.open(filePath, mode: .W) { f in n = f.writeUInt8(bytes) }
     return n!
   }
 

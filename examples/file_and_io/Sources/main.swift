@@ -100,7 +100,7 @@ p(try! IO.readBytes("/home/dewd/t_/swift_playground/a.out"))
 
 let jug: [UInt8] = [255, 244, 50, 120, 0]
 
-p(try IO.writeBytes("/home/dewd/t_/byte_depot.txt", bytes: jug))
+p(try IO.writeUInt8("/home/dewd/t_/byte_depot.txt", bytes: jug))
 
 }
 

@@ -53,13 +53,22 @@ public class File: CustomStringConvertible {
     write(v)
   }
 
-  public func read(length: Int = -1) throws -> String {
-    let a = try doRead(length < 0 ? self.length : length)
+  public func read(maxBytes: Int = -1) throws -> String {
+    let a = try doRead(maxBytes < 0 ? length : maxBytes)
     return String.fromCharCodes(a)
   }
 
-  public func readBytes(length: Int = -1) throws -> [CChar] {
-    return try doRead(length < 0 ? self.length : length)
+  public func readBytes(maxBytes: Int = -1) throws -> [CChar] {
+    return try doRead(maxBytes < 0 ? length : maxBytes)
+  }
+
+  public func readUInt8(maxBytes: Int = -1) throws -> [UInt8] {
+    var a = [UInt8](count: maxBytes, repeatedValue: 0)
+    let n = try read(&a, maxBytes: maxBytes)
+    if n < maxBytes {
+      a = a[0..<n].map { UInt8($0) }
+    }
+    return a
   }
 
   public func readLines() throws -> [String] {
@@ -83,7 +92,7 @@ public class File: CustomStringConvertible {
     return Sys.write(fd, address: bytes, length: bytes.count)
   }
 
-  public func writeBytes(bytes: [UInt8]) -> Int {
+  public func writeUInt8(bytes: [UInt8]) -> Int {
     return Sys.write(fd, address: bytes, length: bytes.count)
   }
 
@@ -107,12 +116,18 @@ public class File: CustomStringConvertible {
 
   public var isOpen: Bool { return fd != -1 }
 
-  func doRead(maxBytes: Int) throws -> [CChar] {
-    var a = [CChar](count: maxBytes, repeatedValue: 0)
-    let n = Sys.read(fd, address: &a, length: maxBytes)
+  public func read(address: UnsafeMutablePointer<Void>, maxBytes: Int) throws
+      -> Int {
+    let n = Sys.read(fd, address: address, length: maxBytes)
     if n == -1 {
       try _error("Failed to read from file")
     }
+    return n
+  }
+
+  func doRead(maxBytes: Int) throws -> [CChar] {
+    var a = [CChar](count: maxBytes, repeatedValue: 0)
+    let n = try read(&a, maxBytes: maxBytes)
     if n < maxBytes {
       a = a[0..<n].map { CChar($0) }
     }
