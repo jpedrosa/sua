@@ -93,7 +93,7 @@ public class File: CustomStringConvertible {
     return Sys.write(_fd, address: bytes, length: bytes.count)
   }
 
-  public func writeUInt8(bytes: [UInt8]) -> Int {
+  public func writeCChar(bytes: [CChar]) -> Int {
     return Sys.write(_fd, address: bytes, length: bytes.count)
   }
 
