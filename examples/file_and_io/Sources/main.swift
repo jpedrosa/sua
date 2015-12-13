@@ -3,21 +3,27 @@ import Glibc
 import Sua
 import CSua
 
+func gusto() throws {
+
 p("let's go")
 
 let fd = Sys.openFile("/home/dewd/t_/sample.txt")
+
+defer {
+  Sys.close(fd)
+}
 
 p("fd", fd)
 
 var z = [CChar](count: 1024, repeatedValue: 0)
 
-let r = Sys.read(fd, address: &z, length: 1023)
+Sys.read(fd, address: &z, length: 1023)
 
 p(z)
 
 p(String.fromCString(&z) ?? "")
 
-var range = z[2..<4]
+let range = z[2..<4]
 
 p(range)
 
@@ -37,7 +43,7 @@ p(String.fromCharCodes(z, start: 2))
 
 p(String.fromCharCodes(z, start: 3, end: -1))
 
-var a: [CChar] = [72, 101, 108, 108, 111]
+let a: [CChar] = [72, 101, 108, 108, 111]
 
 print(String.fromCharCodes(a))
 print(String.fromCharCodes(a, start: 1, end: 3))
@@ -53,6 +59,10 @@ p(Sys.unlink("/home/dewd/t_/yuyu.txt"))
 p(Sys.cwd)
 
 let wfd = Sys.openFile("/home/dewd/t_/newspaper.txt", operation: .W)
+
+defer {
+  Sys.close(wfd)
+}
 
 var sample = Array("sayugara".utf8)
 
@@ -83,3 +93,19 @@ p(try! IO.readLines("/home/dewd/t_/sample.txt"))
 p(try IO.writeBytes("/home/dewd/t_/many_tries.txt", bytes: a))
 
 p(Dir.pwd)
+
+//p(try! IO.readLines("/home/dewd/repo/github/sua_swift/.build/debug/Suaa"))
+
+p(try! IO.readWholeBuffer("/home/dewd/t_/swift_playground/a.out"))
+
+let jug: [UInt8] = [255, 244, 50, 120, 0]
+
+p(try IO.writeBytes("/home/dewd/t_/byte_depot.txt", bytes: jug))
+
+}
+
+for i in 0..<1000 {
+  p("iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii \(i)")
+  try gusto()
+  IO.sleep(0.05)
+}
