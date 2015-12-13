@@ -39,4 +39,24 @@ public extension String {
     }
   }
 
+  public static func fromCharCodes(charCodes: [UInt8], start: Int = 0,
+      end: Int = -1) -> String {
+    let lasti = charCodes.count - 1
+    let ei = end < 0 ? lasti : end
+    if ei < start {
+      return ""
+    } else {
+      var a: [UInt8]
+      if ei < lasti {
+        a = [UInt8](charCodes[start...ei + 1])
+        a[a.count - 1] = 0
+      } else {
+        a = [UInt8](charCodes[start...lasti])
+        a.append(0)
+      }
+      let ap = UnsafePointer<CChar>(a)
+      return String.fromCString(ap)!
+    }
+  }
+
 }
