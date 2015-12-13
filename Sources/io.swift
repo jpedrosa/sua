@@ -44,6 +44,12 @@ public class IO {
     return a!
   }
 
+  public static func readUInt8(filePath: String) throws -> [UInt8] {
+    var a: [UInt8]?
+    try File.open(filePath, mode: .R) { f in a = try! f.readUInt8() }
+    return a!
+  }
+
   public static func write(filePath: String, string: String) throws -> Int {
     var n: Int? = -1
     try File.open(filePath, mode: .W) { f in n = f.write(string) }
