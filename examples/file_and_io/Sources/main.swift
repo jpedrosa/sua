@@ -83,7 +83,7 @@ try File.open("/home/dewd/t_/nope_new.txt", mode: .W) { f in
 }
 
 try File.open("/home/dewd/t_/nope_new.txt", mode: .R) { f in
-  p(try! f.readWholeBuffer())
+  p(try! f.readBytes())
 }
 
 try File.open("/home/dewd/t_/nope_new.txt", mode: .R) { f in p(try! f.read()) }
@@ -96,7 +96,7 @@ p(Dir.pwd)
 
 //p(try! IO.readLines("/home/dewd/repo/github/sua_swift/.build/debug/Suaa"))
 
-p(try! IO.readWholeBuffer("/home/dewd/t_/swift_playground/a.out"))
+p(try! IO.readBytes("/home/dewd/t_/swift_playground/a.out"))
 
 let jug: [UInt8] = [255, 244, 50, 120, 0]
 

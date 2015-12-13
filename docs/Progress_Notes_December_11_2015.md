@@ -64,7 +64,7 @@ try File.open("/home/dewd/t_/nope_new.txt", mode: .W) { f in
 }
 
 try File.open("/home/dewd/t_/nope_new.txt", mode: .R) { f in
-  p(try! f.readWholeBuffer())
+  p(try! f.readBytes())
 }
 
 try File.open("/home/dewd/t_/nope_new.txt", mode: .R) { f in p(try! f.read()) }

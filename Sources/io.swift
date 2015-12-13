@@ -44,12 +44,6 @@ public class IO {
     return a!
   }
 
-  public static func readWholeBuffer(filePath: String) throws -> [CChar] {
-    var b: [CChar]?
-    try File.open(filePath, mode: .R) { f in b = try! f.readWholeBuffer() }
-    return b!
-  }
-
   public static func write(filePath: String, string: String) throws -> Int {
     var n: Int? = -1
     try File.open(filePath, mode: .W) { f in n = f.write(string) }

@@ -75,10 +75,6 @@ public class File: CustomStringConvertible {
     return r
   }
 
-  public func readWholeBuffer() throws -> [CChar] {
-    return try doRead(length)
-  }
-
   public func write(string: String) -> Int {
     return Sys.writeString(fd, string: string)
   }
