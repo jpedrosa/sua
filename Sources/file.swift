@@ -54,12 +54,18 @@ public class File: CustomStringConvertible {
   }
 
   public func read(maxBytes: Int = -1) throws -> String {
-    let a = try doRead(maxBytes < 0 ? length : maxBytes)
+    let a = try readCChar(maxBytes < 0 ? length : maxBytes)
     return String.fromCharCodes(a)
   }
 
-  public func readBytes(maxBytes: Int = -1) throws -> [CChar] {
-    return try doRead(maxBytes < 0 ? length : maxBytes)
+  public func readBytes(maxBytes: Int = -1) throws -> [UInt8] {
+    let len = maxBytes < 0 ? length : maxBytes
+    var a = [UInt8](count: len, repeatedValue: 0)
+    let n = try read(&a, maxBytes: len)
+    if n < maxBytes {
+      a = a[0..<n].map { UInt8($0) }
+    }
+    return a
   }
 
   public func readCChar(maxBytes: Int = -1) throws -> [CChar] {
@@ -74,7 +80,7 @@ public class File: CustomStringConvertible {
 
   public func readLines() throws -> [String] {
     var r: [String] = []
-    let a = try readBytes()
+    let a = try readCChar()
     var si = 0
     for i in 0..<a.count {
       if a[i] == 10 {
@@ -89,7 +95,7 @@ public class File: CustomStringConvertible {
     return Sys.writeString(_fd, string: string)
   }
 
-  public func writeBytes(bytes: [CChar]) -> Int {
+  public func writeBytes(bytes: [UInt8]) -> Int {
     return Sys.write(_fd, address: bytes, length: bytes.count)
   }
 
@@ -129,15 +135,6 @@ public class File: CustomStringConvertible {
       try _error("Failed to read from file")
     }
     return n
-  }
-
-  func doRead(maxBytes: Int) throws -> [CChar] {
-    var a = [CChar](count: maxBytes, repeatedValue: 0)
-    let n = try read(&a, maxBytes: maxBytes)
-    if n < maxBytes {
-      a = a[0..<n].map { CChar($0) }
-    }
-    return a
   }
 
   func seek(offset: Int, whence: Int32) -> Int {

@@ -38,8 +38,8 @@ public class IO {
     return a!
   }
 
-  public static func readBytes(filePath: String) throws -> [CChar] {
-    var a: [CChar]?
+  public static func readBytes(filePath: String) throws -> [UInt8] {
+    var a: [UInt8]?
     try File.open(filePath, mode: .R) { f in a = try! f.readBytes() }
     return a!
   }
@@ -57,7 +57,7 @@ public class IO {
   }
 
   public static func writeBytes(filePath: String,
-      bytes: [CChar]) throws -> Int {
+      bytes: [UInt8]) throws -> Int {
     var n: Int? = -1
     try File.open(filePath, mode: .W) { f in n = f.writeBytes(bytes) }
     return n!
