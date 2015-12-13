@@ -140,12 +140,16 @@ public class File: CustomStringConvertible {
     return a
   }
 
+  func seek(offset: Int, whence: Int32) -> Int {
+    return Sys.lseek(_fd, offset: offset, whence: whence)
+  }
+
   public var position: Int {
     get {
-      return Sys.lseek(_fd, offset: 0, whence: PosixSys.SEEK_CUR)
+      return seek(0, whence: PosixSys.SEEK_CUR)
     }
     set(value) {
-      Sys.lseek(_fd, offset: value, whence: PosixSys.SEEK_SET)
+      seek(value, whence: PosixSys.SEEK_SET)
     }
   }
 
@@ -154,7 +158,7 @@ public class File: CustomStringConvertible {
     if current == -1 {
       return -1
     } else {
-      let end = Sys.lseek(_fd, offset: 0, whence: PosixSys.SEEK_END)
+      let end = seek(0, whence: PosixSys.SEEK_END)
       position = current
       return end
     }
