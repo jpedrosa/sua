@@ -44,9 +44,9 @@ public class IO {
     return a!
   }
 
-  public static func readUInt8(filePath: String) throws -> [UInt8] {
-    var a: [UInt8]?
-    try File.open(filePath, mode: .R) { f in a = try! f.readUInt8() }
+  public static func readCChar(filePath: String) throws -> [CChar] {
+    var a: [CChar]?
+    try File.open(filePath, mode: .R) { f in a = try! f.readCChar() }
     return a!
   }
 

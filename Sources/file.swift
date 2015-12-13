@@ -62,12 +62,12 @@ public class File: CustomStringConvertible {
     return try doRead(maxBytes < 0 ? length : maxBytes)
   }
 
-  public func readUInt8(maxBytes: Int = -1) throws -> [UInt8] {
+  public func readCChar(maxBytes: Int = -1) throws -> [CChar] {
     let len = maxBytes < 0 ? length : maxBytes
-    var a = [UInt8](count: len, repeatedValue: 0)
+    var a = [CChar](count: len, repeatedValue: 0)
     let n = try read(&a, maxBytes: len)
     if n < maxBytes {
-      a = a[0..<n].map { UInt8($0) }
+      a = a[0..<n].map { CChar($0) }
     }
     return a
   }
