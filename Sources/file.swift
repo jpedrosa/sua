@@ -2,15 +2,15 @@
 
 public class File: CustomStringConvertible {
 
-  var fd: Int32
-  let filePath: String
+  var _fd: Int32
+  public let path: String
 
-  init(filePath: String, mode: FileOperation = .R) throws {
-    fd = Sys.openFile(filePath, operation: mode)
-    if (fd == -1) {
+  init(path: String, mode: FileOperation = .R) throws {
+    self.path = path
+    _fd = Sys.openFile(path, operation: mode)
+    if _fd == -1 {
       throw FileError.FileException(message: "Failed to open file.")
     }
-    self.filePath = filePath
   }
 
   public static let NEW_LINE = "\n"
@@ -86,15 +86,15 @@ public class File: CustomStringConvertible {
   }
 
   public func write(string: String) -> Int {
-    return Sys.writeString(fd, string: string)
+    return Sys.writeString(_fd, string: string)
   }
 
   public func writeBytes(bytes: [CChar]) -> Int {
-    return Sys.write(fd, address: bytes, length: bytes.count)
+    return Sys.write(_fd, address: bytes, length: bytes.count)
   }
 
   public func writeUInt8(bytes: [UInt8]) -> Int {
-    return Sys.write(fd, address: bytes, length: bytes.count)
+    return Sys.write(_fd, address: bytes, length: bytes.count)
   }
 
   /*func writeBuffer(ByteBuffer buffer, [int offset = 0, int length = -1]) {
@@ -109,20 +109,22 @@ public class File: CustomStringConvertible {
   }
 
   public func close() {
-    if fd != -1 {
-      Sys.close(fd)
+    if _fd != -1 {
+      Sys.close(_fd)
     }
-    fd = -1
+    _fd = -1
   }
 
-  public var isOpen: Bool { return fd != -1 }
+  public var isOpen: Bool { return _fd != -1 }
+
+  public var fd: Int32 { return _fd }
 
   public func read(address: UnsafeMutablePointer<Void>, maxBytes: Int) throws
       -> Int {
     if maxBytes < 0 {
       try _error("Wrong read parameter value: negative maxBytes")
     }
-    let n = Sys.read(fd, address: address, length: maxBytes)
+    let n = Sys.read(_fd, address: address, length: maxBytes)
     if n == -1 {
       try _error("Failed to read from file")
     }
@@ -140,10 +142,10 @@ public class File: CustomStringConvertible {
 
   public var position: Int {
     get {
-      return Sys.lseek(fd, offset: 0, whence: PosixSys.SEEK_CUR)
+      return Sys.lseek(_fd, offset: 0, whence: PosixSys.SEEK_CUR)
     }
     set(value) {
-      Sys.lseek(fd, offset: value, whence: PosixSys.SEEK_SET)
+      Sys.lseek(_fd, offset: value, whence: PosixSys.SEEK_SET)
     }
   }
 
@@ -152,17 +154,15 @@ public class File: CustomStringConvertible {
     if current == -1 {
       return -1
     } else {
-      let end = Sys.lseek(fd, offset: 0, whence: PosixSys.SEEK_END)
+      let end = Sys.lseek(_fd, offset: 0, whence: PosixSys.SEEK_END)
       position = current
       return end
     }
   }
 
-  public var path: String { return filePath }
-
-  public static func open(filePath: String, mode: FileOperation = .R,
+  public static func open(path: String, mode: FileOperation = .R,
       fn: ((f: File) -> Void )?) throws -> File {
-    let f = try File(filePath: filePath, mode: mode)
+    let f = try File(path: path, mode: mode)
     defer {
       f.close()
     }
