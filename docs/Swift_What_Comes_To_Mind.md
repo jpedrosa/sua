@@ -238,10 +238,10 @@ For reference, see this
 [quote by Jordan Rose](https://lists.swift.org/pipermail/swift-evolution/Week-of-Mon-20151207/001199.html)
 , one of the Swift developers:
 
-```
-Swift does support overloading on return type, but the downside is you need to always provide context, which makes it harder to break things up into multiple statements. So we generally avoid it unless there's a compelling reason.
-- Jordan Rose
-```
+
+> Swift does support overloading on return type, but the downside is you need to always provide context, which makes it harder to break things up into multiple statements. So we generally avoid it unless there's a compelling reason.
+>
+> -- Jordan Rose
 
 Performance is like Clockwork
 -----------------------------
