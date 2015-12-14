@@ -117,7 +117,7 @@ language to be sandboxed like JavaScript is. In the future, they may hope to
 further develop the interpreter so that it could be better sandboxed and they
 would retain most other Swift features. But that is the kind of holy grail that
 we have yet to see anyone conquer. Sandboxed languages can be slow and boring
-for some needs that better take of the platforms.
+for some needs that better take advantage of the platforms.
 
 Kids, pick the ingredients the chef will use to cook you dinner
 ---------------------------------------------------------------
