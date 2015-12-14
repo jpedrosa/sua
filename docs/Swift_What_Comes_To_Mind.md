@@ -7,7 +7,7 @@ programming language a lot more.
 First, because I am impressed by what they have created in Swift. Second,
 because it seems that the world is still largely unaware of what Swift provides.
 
-Still, there is a nagging feeling in the back of my mine
+Still, there is a nagging feeling in the back of my mind
 [humming](https://www.youtube.com/watch?v=FRR9ud__QtI) "Shut Up and
 Code!" Not that there is any music about that that I know of. :-)
 
