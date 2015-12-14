@@ -132,7 +132,7 @@ The kids chose these ingredients for Swift: Objective-C, C++, C, LLVM, Ruby,
 JavaScript, Python, Haskell, Rust, Go, REPL, interpreter, compiler, package
 manager, immutable, non-null by default, exceptions, Unicode, OOP, functional,
 closures, native, conciseness, pattern matching, Scala, Java, Apple Script,
-descriptive names, Smalltalk, named parameters, default parameter names, enum,
+descriptive names, Smalltalk, named parameters, default parameter values, enum,
 struct, class, debugger, tuples, reference counting, type inference and in the
 future ABI compatibility...
 
