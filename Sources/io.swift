@@ -23,7 +23,7 @@ public class IO {
   }
 
   public static func flush() {
-    fflush(UnsafeMutablePointer<FILE>(bitPattern: 0))
+    Sys.fflush()
   }
 
   public static func read(filePath: String) throws -> String {
