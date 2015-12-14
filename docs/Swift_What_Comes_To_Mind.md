@@ -251,7 +251,7 @@ set with a repeat timer of 0.05 seconds to repeat this function a 1000 times.
 This program would deal with files, print some of their content to output, print
 some other file related content to output, some strings, overwrite some files
 etc. The program itself was of no particular use, except that I have been using
-it to develop a Swift [library](../) with.
+it to develop a Swift [library](https://github.com/jpedrosa/sua_swift) with.
 
 While testing it, I had the Linux "top" command open in another tab and I used
 it to watch the program's process memory and CPU usage, as I watched the
