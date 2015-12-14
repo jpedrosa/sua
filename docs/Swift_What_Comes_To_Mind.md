@@ -220,9 +220,9 @@ methods in, say, a closure that is often concise, you want to use the type
 inferencing so that the code can continue to be concise. But what if the
 compiler cannot tell which of the 2 methods you are calling? It cannot infer it
 based only on the return types, so now the compiler complains that the type
-is ambiguous. So it can be better to have 2 different named methods if they only
-different on their return types. Likewise, sometimes calling into methods
-different only in their parameter types could end up being concerning. Just
+is ambiguous. So that it can be better to have 2 different named methods if they
+only different on their return types. Likewise, sometimes calling into methods that
+are different only in their parameter types could end up being concerning. Just
 because we can overload them, it does not mean that we should. Perhaps we should
 take a page from more dynamic languages and have different method names for
 slightly different purposes and sometimes add to the method name's the type
