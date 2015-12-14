@@ -205,7 +205,7 @@ the end-users' computers.
 
 Type Inference is one of those features that come more from the functional
 language side of the spectrum. Together with Type Inference, the use of
-Optionals to wrap values that can be null, easily obtained closures, patterm
+Optionals to wrap values that can be null, easily obtained closures, pattern
 matching and probably more features also come from this functional language
 heritage.
 
