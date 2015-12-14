@@ -211,7 +211,7 @@ heritage.
 
 Swift has overloading of methods based on the types of the parameters and even
 based on the types of the return values of the functions. While that is a
-powerful feature, sometimes we may choose to abuse them and opt for methods with
+powerful feature, sometimes we may choose not to abuse them and opt for methods with
 different names instead, which also helps with the type inferencing.
 
 If 2 methods differ only on the type of their returns, having both the same name
