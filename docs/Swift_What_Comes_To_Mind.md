@@ -340,7 +340,7 @@ Where is the love?
 
 It is hard to love programming languages. I don't think that I love Swift. I
 used to say that I loved Ruby. I have since used other languages like the Dart
-programming languages. Swift to me has been energizing. Being able to create
+programming language. Swift to me has been energizing. Being able to create
 native programs while using a language with a scripting language feel to it is
 remarkable. To me, it's better than Python, Go, etc. I have tried many languages
 like them but never really grew fond of them. I need my OOP. I need my dynamic
