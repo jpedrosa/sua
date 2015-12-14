@@ -48,7 +48,7 @@ I also use the Atom editor for Swift too. It's quite handy!
 Here are some examples of code that Sua includes now:
 
 ```swift
-var a: [CChar] = [72, 101, 108, 108, 111]
+var a: [UInt8] = [72, 101, 108, 108, 111]
 
 print(String.fromCharCodes(a))
 print(String.fromCharCodes(a, start: 1, end: 3))

@@ -1,4 +1,6 @@
 
+import Glibc
+
 
 public extension String {
 
@@ -33,7 +35,9 @@ public extension String {
         a[a.count - 1] = 0
       } else {
         a = [CChar](charCodes[start...lasti])
-        a.append(0)
+        if a[a.count - 1] != 0 {
+          a.append(0)
+        }
       }
       return String.fromCString(&a)!
     }
@@ -52,7 +56,9 @@ public extension String {
         a[a.count - 1] = 0
       } else {
         a = [UInt8](charCodes[start...lasti])
-        a.append(0)
+        if a[a.count - 1] != 0 {
+          a.append(0)
+        }
       }
       let ap = UnsafePointer<CChar>(a)
       return String.fromCString(ap)!
