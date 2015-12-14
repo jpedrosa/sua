@@ -261,7 +261,7 @@ that "top" command. Which is by itself rather cool. Second, the program
 was consuming a fixed amount of memory and the CPU with the help of the timer
 was stuck at 30% usage. It was not even breaking a sweat. The memory was not
 increasing like it would have in other garbage collected languages. It was quick
-and non-chalant. And I could even keep playing a game on another browser window
+and nonchalant. And I could even keep playing a game on another browser window
 if I wanted to while it was running, as it was not monopolizing the resources.
 
 It is true that modern computers have a lot of resources available to them, and
