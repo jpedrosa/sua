@@ -174,7 +174,8 @@ public class File: CustomStringConvertible {
   }
 
   public static func exists(path: String) -> Bool {
-    return Sys.doStat(path) == 0
+    var buf = Sys.statBuffer()
+    return Sys.doStat(path, buffer: &buf) == 0
   }
 
   public static func delete(path: String) throws {
