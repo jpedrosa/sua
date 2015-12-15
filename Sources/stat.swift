@@ -1,9 +1,11 @@
 
+import Glibc
+
 
 public class StatBuffer: CustomStringConvertible {
 
   var buffer = Sys.statBuffer()
-  //StatMode _statMode;
+  var _statMode = StatMode()
 
   init() {
     buffer = Sys.statBuffer()
@@ -37,90 +39,89 @@ public class StatBuffer: CustomStringConvertible {
 
   public var blocks: Int { return buffer.st_blocks }
 
-  /*// atime_nsec starts at 36.
-  int get atime => _bufferForeign.getInt32(32); // Unix time is signed.
+  public var atime: timespec { return buffer.st_atim }
 
-  // mtime_nsec starts at 44.
-  int get mtime => _bufferForeign.getInt32(40);
+  public var mtime: timespec { return buffer.st_mtim }
 
-  // ctime_nsec starts at 52.
-  int get ctime => _bufferForeign.getInt32(48);
+  public var ctime: timespec { return buffer.st_ctim }
 
-  bool get isRegularFile => (mode & MoreSys.S_IFMT) == MoreSys.S_IFREG;
+  public var isRegularFile: Bool { return (mode & S_IFMT) == S_IFREG }
 
-  bool get isDirectory => (mode & MoreSys.S_IFMT) == MoreSys.S_IFDIR;
+  public var isDirectory: Bool { return (mode & S_IFMT) == S_IFDIR }
 
-  bool get isSymlink => (mode & MoreSys.S_IFMT) == MoreSys.S_IFLNK;
+  public var isSymlink: Bool { return (mode & S_IFMT) == S_IFLNK }
 
-  get statMode {
-    if (_statMode == null) {
-      _statMode = new StatMode(mode);
-    } else {
-      _statMode.mode = mode;
-    }
-    return _statMode;
-  }*/
+  public var statMode: StatMode {
+    _statMode.mode = mode
+    return _statMode
+  }
 
   public var description: String {
     return "StatBuffer(dev: \(dev), ino: \(ino), mode: \(mode), " +
         "nlink: \(nlink), uid: \(uid), gid: \(gid), rdev: \(rdev), " +
-        "size: \(size), blksize: \(blksize), blocks: \(blocks), "/* +
+        "size: \(size), blksize: \(blksize), blocks: \(blocks), " +
         "atime: \(atime), mtime: \(mtime), ctime: \(ctime), " +
-        "statMode: \(statMode))"*/
+        "statMode: \(statMode))"
   }
 
 }
 
 
-/*class StatMode {
+public class StatMode: CustomStringConvertible {
 
-  int mode;
+  var mode: UInt32
 
-  StatMode([int this.mode = 0]);
+  init(mode: UInt32 = 0) {
+    self.mode = mode
+  }
 
-  bool get isRegularFile => (mode & MoreSys.S_IFMT) == MoreSys.S_IFREG;
+  public var isRegularFile: Bool { return (mode & S_IFMT) == S_IFREG }
 
-  bool get isDirectory => (mode & MoreSys.S_IFMT) == MoreSys.S_IFDIR;
+  public var isDirectory: Bool { return (mode & S_IFMT) == S_IFDIR }
 
-  bool get isSymlink => (mode & MoreSys.S_IFMT) == MoreSys.S_IFLNK;
+  public var isSymlink: Bool { return (mode & S_IFMT) == S_IFLNK }
 
-  bool get isSocket => (mode & MoreSys.S_IFMT) == MoreSys.S_IFSOCK;
+  public var isSocket: Bool { return (mode & S_IFMT) == S_IFSOCK }
 
-  bool get isFifo => (mode & MoreSys.S_IFMT) == MoreSys.S_IFIFO;
+  public var isFifo: Bool { return (mode & S_IFMT) == S_IFIFO }
 
-  bool get isBlockDevice => (mode & MoreSys.S_IFMT) == MoreSys.S_IFBLK;
+  public var isBlockDevice: Bool { return (mode & S_IFMT) == S_IFBLK }
 
-  bool get isCharacterDevice => (mode & MoreSys.S_IFMT) == MoreSys.S_IFCHR;
+  public var isCharacterDevice: Bool { return (mode & S_IFMT) == S_IFCHR }
 
-  String get modeTranslated {
-    switch (mode & MoreSys.S_IFMT) {
-      case MoreSys.S_IFREG: return "Regular File";
-      case MoreSys.S_IFDIR: return "Directory";
-      case MoreSys.S_IFLNK: return "Symlink";
-      case MoreSys.S_IFSOCK: return "Socket";
-      case MoreSys.S_IFIFO: return "FIFO/pipe";
-      case MoreSys.S_IFBLK: return "Block Device";
-      case MoreSys.S_IFCHR: return "Character Device";
-      default: return "Unknown";
+  public var modeTranslated: String {
+    switch mode & S_IFMT {
+      case S_IFREG: return "Regular File"
+      case S_IFDIR: return "Directory"
+      case S_IFLNK: return "Symlink"
+      case S_IFSOCK: return "Socket"
+      case S_IFIFO: return "FIFO/pipe"
+      case S_IFBLK: return "Block Device"
+      case S_IFCHR: return "Character Device"
+      default: return "Unknown"
     }
   }
 
-  String get octal {
-    var a = [], i = mode, s;
-    while (i > 7) {
-      a.add(i.remainder(8));
-      i = i ~/ 8;
+  public var octal: String {
+    var a: [UInt32] = []
+    var i = mode
+    var s = ""
+    while i > 7 {
+      a.append(i % 8)
+      i = i / 8
     }
-    s = i.toString();
-    for (i = a.length - 1; i >= 0; i--) {
-      s += a[i].toString();
+    s = String(i)
+    var j = a.count - 1
+    while j >= 0 {
+      s += String(a[j])
+      j--
     }
-    return s;
+    return s
   }
 
-  String toString() {
-    return "StatMode(modeTranslated: ${inspect(modeTranslated)}, "
-        "octal: ${inspect(octal)})";
+  public var description: String {
+    return "StatMode(modeTranslated: \(inspect(modeTranslated)), " +
+        "octal: \(inspect(octal)))"
   }
 
-}*/
+}
