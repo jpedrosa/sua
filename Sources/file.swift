@@ -173,9 +173,9 @@ public class File: CustomStringConvertible {
     return f
   }
 
-  //public static exists(filePath: String) -> Bool {
-  //  return Sys.stat(filePath) == 0
-  //}
+  public static func exists(path: String) -> Bool {
+    return Sys.doStat(path) == 0
+  }
 
   public static func delete(path: String) throws {
     if Sys.unlink(path) == -1 {

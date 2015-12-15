@@ -18,6 +18,8 @@ let _lseek = lseek
 let _rename = rename
 let _unlink = unlink
 let _getcwd = getcwd
+let _stat = stat
+let _lstat = lstat
 
 
 public enum FileOperation: Int {
@@ -110,6 +112,28 @@ public class PosixSys {
       return String.fromCharCodes(a)
     }
     return nil
+  }
+
+  // Named with a do prefix to avoid conflict with functions and types of
+  // name stat.
+  public func doStat(path: String, buffer: UnsafeMutablePointer<stat> = nil)
+      -> Int32 {
+    if buffer != nil {
+      return _stat(path, buffer)
+    } else {
+      var buf = stat()
+      return _stat(path, &buf)
+    }
+  }
+
+  public func lstat(path: String, buffer: UnsafeMutablePointer<stat> = nil)
+      -> Int32 {
+    if buffer != nil {
+      return _lstat(path, buffer)
+    } else {
+      var buf = stat()
+      return _lstat(path, &buf)
+    }
   }
 
   public func retry(fn: () -> Int32) -> Int32 {
