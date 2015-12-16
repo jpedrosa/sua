@@ -70,6 +70,11 @@ public class IO {
     return n!
   }
 
+  public static func popen(command: String, lineLength: Int32 = 80,
+      fn: (string: String) -> Void) throws {
+    try PopenStream.readLines(command, lineLength: lineLength, fn: fn)
+  }
+
 //  public static void writeBuffer(String filePath, ByteBuffer buffer) {
 //    File.open(filePath, 'w', (f) => f.writeBuffer(buffer));
 //  }
