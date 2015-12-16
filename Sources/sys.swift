@@ -23,6 +23,7 @@ let _lstat = lstat
 let _readdir = readdir
 let _opendir = opendir
 let _closedir = closedir
+let _fgets = fgets
 let _popen = popen
 let _pclose = pclose
 
@@ -155,6 +156,11 @@ public class PosixSys {
 
   public func closedir(dirp: COpaquePointer) -> Int32 {
     return retry { _closedir(dirp) }
+  }
+
+  public func fgets(buffer: UnsafeMutablePointer<CChar>, length: Int32,
+      fp: UnsafeMutablePointer<FILE>) -> UnsafeMutablePointer<CChar> {
+    return _fgets(buffer, length, fp)
   }
 
   public func popen(command: String, operation: PopenOperation = .R)
