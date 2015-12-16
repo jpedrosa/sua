@@ -7,7 +7,7 @@ public class StatBuffer: CustomStringConvertible {
   var buffer = Sys.statBuffer()
   var _statMode = StatMode()
 
-  init() {
+  public init() {
     buffer = Sys.statBuffer()
   }
 
@@ -71,7 +71,7 @@ public class StatMode: CustomStringConvertible {
 
   var mode: UInt32
 
-  init(mode: UInt32 = 0) {
+  public init(mode: UInt32 = 0) {
     self.mode = mode
   }
 
