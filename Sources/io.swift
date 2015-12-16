@@ -75,8 +75,4 @@ public class IO {
     try PopenStream.readLines(command, lineLength: lineLength, fn: fn)
   }
 
-//  public static void writeBuffer(String filePath, ByteBuffer buffer) {
-//    File.open(filePath, 'w', (f) => f.writeBuffer(buffer));
-//  }
-
 }
