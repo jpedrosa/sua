@@ -20,6 +20,9 @@ let _unlink = unlink
 let _getcwd = getcwd
 let _stat = stat
 let _lstat = lstat
+let _readdir = readdir
+let _opendir = opendir
+let _closedir = closedir
 
 
 public enum FileOperation: Int {
@@ -127,6 +130,18 @@ public class PosixSys {
 
   public func statBuffer() -> stat {
     return stat()
+  }
+
+  public func readdir(dirp: COpaquePointer) -> UnsafeMutablePointer<dirent> {
+    return dirp != nil ? _readdir(dirp) : nil
+  }
+
+  public func opendir(dirPath: String) -> COpaquePointer {
+    return _opendir(dirPath)
+  }
+
+  public func closedir(dirp: COpaquePointer) -> Int32 {
+    return retry { _closedir(dirp) }
   }
 
   public func retry(fn: () -> Int32) -> Int32 {
