@@ -32,8 +32,8 @@ public class IO {
     return s!
   }
 
-  public static func readLines(filePath: String) throws -> [String] {
-    var a: [String]?
+  public static func readLines(filePath: String) throws -> [String?] {
+    var a: [String?]?
     try File.open(filePath, mode: .R) { f in a = try! f.readLines() }
     return a!
   }
@@ -71,7 +71,7 @@ public class IO {
   }
 
   public static func popen(command: String, lineLength: Int32 = 80,
-      fn: (string: String) -> Void) throws {
+      fn: (string: String?) -> Void) throws {
     try PopenStream.readLines(command, lineLength: lineLength, fn: fn)
   }
 

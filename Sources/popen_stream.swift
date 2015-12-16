@@ -3,7 +3,7 @@
 public class PopenStream {
 
   public static func readLines(command: String, lineLength: Int32 = 80,
-      fn: (string: String) -> Void) throws {
+      fn: (string: String?) -> Void) throws {
     var fp = Sys.popen(command)
     if fp == nil {
       PopenError.FailedToStart()

@@ -53,7 +53,7 @@ public class File: CustomStringConvertible {
     write(v)
   }
 
-  public func read(maxBytes: Int = -1) throws -> String {
+  public func read(maxBytes: Int = -1) throws -> String? {
     let a = try readCChar(maxBytes < 0 ? length : maxBytes)
     return String.fromCharCodes(a)
   }
@@ -78,8 +78,8 @@ public class File: CustomStringConvertible {
     return a
   }
 
-  public func readLines() throws -> [String] {
-    var r: [String] = []
+  public func readLines() throws -> [String?] {
+    var r: [String?] = []
     let a = try readCChar()
     var si = 0
     for i in 0..<a.count {

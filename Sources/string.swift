@@ -23,11 +23,11 @@ public extension String {
         print(String.fromCharCodes(a, start: 1, end: 3)) // Prints ell
   */
   public static func fromCharCodes(charCodes: [CChar], start: Int = 0,
-      end: Int = -1) -> String {
+      end: Int = -1) -> String? {
     let lasti = charCodes.count - 1
     let ei = end < 0 ? lasti : end
     if ei < start {
-      return ""
+      return nil
     } else {
       var a: [CChar]
       if ei < lasti {
@@ -39,16 +39,16 @@ public extension String {
           a.append(0)
         }
       }
-      return String.fromCString(&a)!
+      return String.fromCString(&a)
     }
   }
 
   public static func fromCharCodes(charCodes: [UInt8], start: Int = 0,
-      end: Int = -1) -> String {
+      end: Int = -1) -> String? {
     let lasti = charCodes.count - 1
     let ei = end < 0 ? lasti : end
     if ei < start {
-      return ""
+      return nil
     } else {
       var a: [UInt8]
       if ei < lasti {
@@ -61,7 +61,7 @@ public extension String {
         }
       }
       let ap = UnsafePointer<CChar>(a)
-      return String.fromCString(ap)!
+      return String.fromCString(ap)
     }
   }
 
