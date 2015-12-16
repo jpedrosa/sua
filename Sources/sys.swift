@@ -23,6 +23,8 @@ let _lstat = lstat
 let _readdir = readdir
 let _opendir = opendir
 let _closedir = closedir
+let _popen = popen
+let _pclose = pclose
 
 
 public enum FileOperation: Int {
@@ -32,6 +34,17 @@ public enum FileOperation: Int {
   case Read
   case Write
   case Append
+}
+
+public enum PopenOperation: String {
+  case R
+  case W
+  case RE
+  case WE
+  case Read
+  case Write
+  case ReadWithCloexec
+  case WriteWithCloexec
 }
 
 public class PosixSys {
@@ -142,6 +155,22 @@ public class PosixSys {
 
   public func closedir(dirp: COpaquePointer) -> Int32 {
     return retry { _closedir(dirp) }
+  }
+
+  public func popen(command: String, operation: PopenOperation = .R)
+      -> UnsafeMutablePointer<FILE> {
+    var op = "r"
+    switch operation {
+      case .R, .Read: op = "r"
+      case .W, .Write: op = "w"
+      case .RE, .ReadWithCloexec: op = "re"
+      case .WE, .WriteWithCloexec: op = "we"
+    }
+    return _popen(command, op)
+  }
+
+  public func pclose(fp: UnsafeMutablePointer<FILE>) -> Int32 {
+    return _pclose(fp)
   }
 
   public func retry(fn: () -> Int32) -> Int32 {
