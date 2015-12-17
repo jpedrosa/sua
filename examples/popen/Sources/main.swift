@@ -1,5 +1,7 @@
 
 import Glibc
+import Sua
+import CSua
 
 
 try PopenStream.readLines("ls -l /home/dewd/t_") { s in
