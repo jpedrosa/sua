@@ -191,6 +191,8 @@ public class PosixSys {
     return vp != nil ? String.fromCString(a) : nil
   }
 
+  // The environ variable is made available by the CSua sister project
+  // dependency.
   public var environment: [String: String] {
     var env = [String: String]()
     var i = 0
