@@ -75,4 +75,9 @@ public class IO {
     try PopenStream.readLines(command, lineLength: lineLength, fn: fn)
   }
 
+  public static func popenBytes(command: String, maxBytes: Int = 80,
+      fn: (bytes: [UInt8], length: Int) -> Void) throws {
+    try PopenStream.readBytes(command, maxBytes: maxBytes, fn: fn)
+  }
+
 }
