@@ -27,6 +27,7 @@ let _fgets = fgets
 let _popen = popen
 let _pclose = pclose
 let _fread = fread
+let _getenv = getenv
 
 
 public enum FileOperation: Int {
@@ -183,6 +184,37 @@ public class PosixSys {
 
   public func pclose(fp: UnsafeMutablePointer<FILE>) -> Int32 {
     return _pclose(fp)
+  }
+
+  public func getenv(key: String) -> String? {
+    let vp = _getenv(key)
+    return vp != nil ? String.fromCString(a) : nil
+  }
+
+  public var environment: [String: String] {
+    var env = [String: String]()
+    var i = 0
+    while true {
+      let nm = (environ + i).memory
+      if nm == nil {
+        break
+      }
+      let np = UnsafePointer<CChar>(nm)
+      if let s = String.fromCString(np) {
+        var b: [CChar] = s.utf8.map { CChar($0) }
+        let lasti = b.count - 1
+        for m in 0...lasti {
+          if b[m] == 61 {
+            if let k = String.fromCharCodes(b, start: 0, end: m - 1) {
+              env[k] = String.fromCharCodes(b, start: m + 1, end: lasti) ?? ""
+            }
+            break
+          }
+        }
+      }
+      i++
+    }
+    return env
   }
 
   public func retry(fn: () -> Int32) -> Int32 {
