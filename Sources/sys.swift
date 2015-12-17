@@ -188,7 +188,7 @@ public class PosixSys {
 
   public func getenv(key: String) -> String? {
     let vp = _getenv(key)
-    return vp != nil ? String.fromCString(a) : nil
+    return vp != nil ? String.fromCString(vp) : nil
   }
 
   // The environ variable is made available by the CSua sister project
