@@ -26,6 +26,7 @@ let _closedir = closedir
 let _fgets = fgets
 let _popen = popen
 let _pclose = pclose
+let _fread = fread
 
 
 public enum FileOperation: Int {
@@ -161,6 +162,11 @@ public class PosixSys {
   public func fgets(buffer: UnsafeMutablePointer<CChar>, length: Int32,
       fp: UnsafeMutablePointer<FILE>) -> UnsafeMutablePointer<CChar> {
     return _fgets(buffer, length, fp)
+  }
+
+  public func fread(buffer: UnsafeMutablePointer<Void>, size: Int,
+      nmemb: Int, fp: UnsafeMutablePointer<FILE>) -> Int {
+    return _fread(buffer, size, nmemb, fp)
   }
 
   public func popen(command: String, operation: PopenOperation = .R)
