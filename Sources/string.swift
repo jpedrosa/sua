@@ -19,8 +19,8 @@ public extension String {
 
     E.g.:
         var a: [CChar] = [72, 101, 108, 108, 111]
-        print(String.fromCharCodes(a)) // Prints Hello
-        print(String.fromCharCodes(a, start: 1, end: 3)) // Prints ell
+        print(String.fromCharCodes(a) ?? "") // Prints Hello
+        print(String.fromCharCodes(a, start: 1, end: 3) ?? "") // Prints ell
   */
   public static func fromCharCodes(charCodes: [CChar], start: Int = 0,
       end: Int = -1) -> String? {
