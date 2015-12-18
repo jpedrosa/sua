@@ -36,16 +36,18 @@ public class MurmurHash3 {
 
     // remainder
     switch maxBytes & 3 { // `len % 4'
-      case 3: k ^= UInt32(tail[2] << 16)
+      case 3:
+          k ^= UInt32(tail[2]) << 16
           fallthrough
-      case 2: k ^= UInt32(tail[1] << 8)
+      case 2:
+          k ^= UInt32(tail[1]) << 8
           fallthrough
       case 1:
-        k ^= UInt32(tail[0])
-        k = k &* c1
-        k = (k << r1) | (k >> (32 - r1))
-        k = k &* c2
-        hash ^= k
+          k ^= UInt32(tail[0])
+          k = k &* c1
+          k = (k << r1) | (k >> (32 - r1))
+          k = k &* c2
+          hash ^= k
       default: () // Ignore.
     }
 
