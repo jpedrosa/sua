@@ -33,7 +33,7 @@ UnsafePointer data type, I think. Let me check. Yes, fromCString takes an
 UnsafePointer\<CChar\> type as parameter.
 
 While it is possible to convert types from one kind to another sometimes
-relatively easy, it may require enough mental gymnastics to make it an unwelcome
+relatively easily, it may require enough mental gymnastics to make it an unwelcome
 thought. As such, I still like to support those different data types when I can.
 Even though I'm not sure supporting the CChar everywhere is a good idea
 necessarily.
