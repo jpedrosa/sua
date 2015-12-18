@@ -54,6 +54,16 @@ public class RNG {
     }
   }
 
+  // Returns a random Double number between 0.0 and 1.0.
+  // Referenced code in V8 and in this Mozilla thread:
+  // https://bugzilla.mozilla.org/show_bug.cgi?id=322529
+  public func nextDouble() -> Double {
+    xorShift128()
+    let u = state0 &+ state1
+    let n = Double(u & ((UInt64(1) << 53) - 1))
+    return n / Double(UInt64(1) << 53)
+  }
+
   func next(bits: Int) -> Int {
     xorShift128()
     let b = 64 - bits
