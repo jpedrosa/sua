@@ -6,7 +6,7 @@ imported via Glibc calls. Swift types can be passed to C functions very easily.
 And sometimes Swift has to deal with types resulting from these calls to C
 functions.
 
-String is one of the most import data types. It's perhaps the most user visible
+String is one of the most important data types. It's perhaps the most user visible
 one. As such, it is a good idea to make the String type well-supported by giving
 it the attention it deserves. One of the ideas for the String type is to give it
 the shortest method names. While Swift supports overloading based on types, it's
