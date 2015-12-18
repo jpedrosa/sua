@@ -6,7 +6,8 @@ public class MurmurHash3 {
   // * https://github.com/jwerle/murmurhash.c
   // * https://en.wikipedia.org/wiki/MurmurHash
 
-  public static func hash32(key: [CChar], len: Int, seed: UInt32) -> UInt32 {
+  public static func doHash32(key: UnsafePointer<UInt8>, maxBytes: Int,
+      seed: UInt32 = 0) -> UInt32 {
     let c1: UInt32 = 0xcc9e2d51
     let c2: UInt32 = 0x1b873593
     let r1: UInt32 = 15
@@ -15,7 +16,7 @@ public class MurmurHash3 {
     let n: UInt32 = 0xe6546b64
     var hash: UInt32 = seed
     var k: UInt32 = 0
-    let l = len / 4 // chunk length
+    let l = maxBytes / 4 // chunk length
 
     let chunks = UnsafeBufferPointer<UInt32>(
           start: UnsafePointer<UInt32>(key), count: l)
@@ -34,7 +35,7 @@ public class MurmurHash3 {
     k = 0
 
     // remainder
-    switch len & 3 { // `len % 4'
+    switch maxBytes & 3 { // `len % 4'
       case 3: k ^= UInt32(tail[2] << 16)
       case 2: k ^= UInt32(tail[1] << 8)
       case 1:
@@ -46,7 +47,7 @@ public class MurmurHash3 {
       default: () // Ignore.
     }
 
-    hash ^= UInt32(len)
+    hash ^= UInt32(maxBytes)
 
     hash ^= hash >> 16
     hash = hash &* 0x85ebca6b
@@ -55,6 +56,23 @@ public class MurmurHash3 {
     hash ^= hash >> 16
 
     return hash
+  }
+
+  public static func hash32(key: String, seed: UInt32 = 0) -> UInt32 {
+    var a = [UInt8](key.utf8)
+    return doHash32(&a, maxBytes: a.count, seed: seed)
+  }
+
+  public static func hash32CChar(key: [CChar], maxBytes: Int,
+      seed: UInt32 = 0) -> UInt32 {
+    let ap = UnsafePointer<UInt8>(key)
+    return doHash32(ap, maxBytes: maxBytes, seed: seed)
+  }
+
+  public static func hash32Bytes(key: [UInt8], maxBytes: Int,
+      seed: UInt32 = 0) -> UInt32 {
+    var a = key
+    return doHash32(&a, maxBytes: maxBytes, seed: seed)
   }
 
 }
