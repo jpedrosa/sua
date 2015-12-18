@@ -32,5 +32,7 @@ Same as Swift's.
 
 Progress Notes
 --------------
+*LATEST*
 
+* [Data Types](docs/Data_Types.md]
 * [December 11, 2015](docs/Progress_Notes_December_11_2015.md)
