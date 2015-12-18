@@ -43,7 +43,7 @@ Swift takes Unicode very seriously for its Strings, which means that a malformed
 Unicode String or some such may not work well in Swift. That's also why when
 converting data to Strings, given that the conversion may fail, we have to
 support the Optional String type. It ensures that if the conversion fails, the
-program has a chance to recover from it somehow. Rather than silencing taking
+program has a chance to recover from it somehow. Rather than silently taking
 up empty or truncated Strings in case of error.
 
 For data, dealing with data in UInt8 format may be more forgiving. It's an extra
