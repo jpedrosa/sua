@@ -30,7 +30,7 @@ In IO code we can find methods like writeBytes for UInt8 data.
 CChar is the type for dealing with C strings. I first came across it in Swift
 when calling the String.fromCString method. Even though it supported an
 UnsafePointer data type, I think. Let me check. Yes, fromCString takes an
-UnsafePointer<CChar> type as parameter.
+UnsafePointer\<CChar\> type as parameter.
 
 While it is possible to convert types from one kind to another sometimes
 relatively easy, it may require enough mental gymnastics to make it an unwelcome
