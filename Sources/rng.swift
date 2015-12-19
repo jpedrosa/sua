@@ -8,7 +8,7 @@ import Glibc
 
 public class RNG {
 
-  init() {
+  public init() {
     var seed: UInt64 = 0
     var ts: timespec = timespec()
     clock_gettime(CLOCK_REALTIME, &ts)

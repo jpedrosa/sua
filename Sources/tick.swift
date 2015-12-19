@@ -26,6 +26,9 @@ public class Stopwatch: CustomStringConvertible {
 
   var stopped = true
 
+  // Make the constructor public.
+  public init() { }
+
   public func start() {
     startTime = Tick.millis
     sliceTime = startTime
