@@ -2,14 +2,14 @@
 import Glibc
 
 
-class Tick {
+public class Tick {
 
   // Alias for millis.
-  static var millisecondsSinceEpoch: Int {
+  public static var millisecondsSinceEpoch: Int {
     return millis
   }
 
-  static var millis: Int {
+  public static var millis: Int {
     var ts = timespec()
     clock_gettime(CLOCK_REALTIME, &ts)
     return (ts.tv_sec * 1000) + Int(ts.tv_nsec / 1000000)
@@ -18,7 +18,7 @@ class Tick {
 }
 
 
-class Stopwatch {
+public class Stopwatch: CustomStringConvertible {
 
   var startTime: Int = 0
 
@@ -26,13 +26,13 @@ class Stopwatch {
 
   var stopped = true
 
-  func start() {
+  public func start() {
     startTime = Tick.millis
     sliceTime = startTime
     stopped = false
   }
 
-  func stop() {
+  public func stop() {
     doSlice()
     stopped = true
   }
@@ -42,30 +42,20 @@ class Stopwatch {
   }
 
   // Alias for millis.
-  var elapsedMilliseconds: Int {
+  public var elapsedMilliseconds: Int {
     return millis
   }
 
-  var millis: Int {
+  public var millis: Int {
     if (!stopped) {
       doSlice()
     }
     return sliceTime - startTime
   }
 
+  public var description: String {
+    return "Stopwatch(startTime: \(startTime), sliceTime: \(sliceTime), " +
+        "stopped: \(stopped))"
+  }
+
 }
-
-
-var sw = Stopwatch()
-
-print("Elapsed: \(sw.millis)")
-
-sw.start()
-sleep(1)
-sw.stop()
-print("Elapsed: \(sw.millis)")
-sw.start()
-sleep(2)
-print("Elapsed: \(sw.millis)")
-sleep(3)
-print("Elapsed: \(sw.millis)")
