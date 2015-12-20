@@ -1,4 +1,8 @@
 
+
+typealias FirstCharTable = [[[UInt8]]?]
+
+
 public class CodeUnitStream: CustomStringConvertible {
 
   public var currentIndex = 0
@@ -1628,11 +1632,11 @@ public class CodeUnitStream: CustomStringConvertible {
     return r
   }
 
-  func eatKeywordFromList(firstCharTable: [[[UInt8]]?]) -> Bool {
+  func eatKeywordFromList(firstCharTable: FirstCharTable) -> Bool {
     return matchKeywordFromList(firstCharTable, consume: true) >= 0
   }
 
-  func matchKeywordFromList(firstCharTable: [[[UInt8]]?],
+  func matchKeywordFromList(firstCharTable: FirstCharTable,
       consume: Bool = false) -> Int {
     var r = -1
     let i = currentIndex
@@ -1717,9 +1721,9 @@ public class CodeUnitStream: CustomStringConvertible {
 
   // String list matching
 
-  func makeFirstCharTable(strings: [String]) -> [[[UInt8]]?] {
+  func makeFirstCharTable(strings: [String]) -> FirstCharTable {
     let len = strings.count
-    var a = [[[UInt8]]?](count: 256, repeatedValue: nil)
+    var a = FirstCharTable(count: 256, repeatedValue: nil)
     for i in 0..<len {
       let za = [UInt8](strings[i].utf8)
       let c = za[0]
@@ -1734,11 +1738,11 @@ public class CodeUnitStream: CustomStringConvertible {
     return a
   }
 
-  func eatStringFromList(firstCharTable: [[[UInt8]]?]) -> Bool {
+  func eatStringFromList(firstCharTable: FirstCharTable) -> Bool {
     return matchStringFromList(firstCharTable, consume: true) >= 0
   }
 
-  func matchStringFromList(firstCharTable: [[[UInt8]]?],
+  func matchStringFromList(firstCharTable: FirstCharTable,
       consume: Bool = false) -> Int {
     var r = -1
     let i = currentIndex
@@ -1777,11 +1781,11 @@ public class CodeUnitStream: CustomStringConvertible {
     return r
   }
 
-  func eatUntilIncludingStringFromList(firstCharTable: [[[UInt8]]?]) -> Bool {
+  func eatUntilIncludingStringFromList(firstCharTable: FirstCharTable) -> Bool {
     return matchUntilIncludingStringFromList(firstCharTable, consume: true) >= 0
   }
 
-  func matchUntilIncludingStringFromList(firstCharTable: [[[UInt8]]?],
+  func matchUntilIncludingStringFromList(firstCharTable: FirstCharTable,
       consume: Bool = false) -> Int {
     var r = -1
     var i = currentIndex
@@ -1879,11 +1883,11 @@ public class CodeUnitStream: CustomStringConvertible {
     return r
   }*/
 
-  func eatWhileNotStringFromList(firstCharTable: [[[UInt8]]?]) -> Bool {
+  func eatWhileNotStringFromList(firstCharTable: FirstCharTable) -> Bool {
     return matchWhileNotStringFromList(firstCharTable, consume: true) >= 0
   }
 
-  func matchWhileNotStringFromList(firstCharTable: [[[UInt8]]?],
+  func matchWhileNotStringFromList(firstCharTable: FirstCharTable,
       consume: Bool = false) -> Int {
     var r = -1
     var i = currentIndex
@@ -1928,11 +1932,11 @@ public class CodeUnitStream: CustomStringConvertible {
     return r
   }
 
-  func eatWhileStringFromList(firstCharTable: [[[UInt8]]?]) -> Bool {
+  func eatWhileStringFromList(firstCharTable: FirstCharTable) -> Bool {
     return matchWhileStringFromList(firstCharTable, consume: true) >= 0
   }
 
-  func matchWhileStringFromList(firstCharTable: [[[UInt8]]?],
+  func matchWhileStringFromList(firstCharTable: FirstCharTable,
       consume: Bool = false) -> Int {
     var r = -1
     var i = currentIndex
