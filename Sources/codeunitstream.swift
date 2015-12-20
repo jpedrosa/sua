@@ -81,18 +81,16 @@ public class CodeUnitStream: CustomStringConvertible {
   }
 
   func eatOne(c: UInt8) -> Bool {
-    return matchOne(c, consume: true) != nil
+    return matchOne(c, consume: true)
   }
 
-  func matchOne(c: UInt8, consume: Bool = false) -> UInt8? {
-    var r: UInt8?
+  func matchOne(c: UInt8, consume: Bool = false) -> Bool {
+    var r = false
     let i = currentIndex
-    if i < lineEndIndex {
-      if c == _codeUnits[i] {
-        r = c
-        if consume {
-          currentIndex = i + 1
-        }
+    if i < lineEndIndex && c == _codeUnits[i] {
+      r = true
+      if consume {
+        currentIndex = i + 1
       }
     }
     return r
@@ -1193,281 +1191,281 @@ public class CodeUnitStream: CustomStringConvertible {
   // One-off symbols
 
   func eatOpenParen() -> Bool {
-    return matchOpenParen(true) != nil
+    return matchOpenParen(true)
   }
 
   // (
-  func matchOpenParen(consume: Bool = false) -> UInt8? {
+  func matchOpenParen(consume: Bool = false) -> Bool {
     return matchOne(40, consume: consume) // (
   }
 
   func eatCloseParen() -> Bool {
-    return matchCloseParen(true) != nil
+    return matchCloseParen(true)
   }
 
   // )
-  func matchCloseParen(consume: Bool = false) -> UInt8? {
+  func matchCloseParen(consume: Bool = false) -> Bool {
     return matchOne(41, consume: consume) // )
   }
 
   func eatLessThan() -> Bool {
-    return matchLessThan(true) != nil
+    return matchLessThan(true)
   }
 
   // <
-  func matchLessThan(consume: Bool = false) -> UInt8? {
+  func matchLessThan(consume: Bool = false) -> Bool {
     return matchOne(60, consume: consume) // <
   }
 
   func eatGreaterThan() -> Bool {
-    return matchGreaterThan(true) != nil
+    return matchGreaterThan(true)
   }
 
   // >
-  func matchGreaterThan(consume: Bool = false) -> UInt8? {
+  func matchGreaterThan(consume: Bool = false) -> Bool {
     return matchOne(62, consume: consume) // >
   }
 
   func eatOpenBracket() -> Bool {
-    return matchOpenBracket(true) != nil
+    return matchOpenBracket(true)
   }
 
   // [
-  func matchOpenBracket(consume: Bool = false) -> UInt8? {
+  func matchOpenBracket(consume: Bool = false) -> Bool {
     return matchOne(91, consume: consume) // [
   }
 
   func eatCloseBracket() -> Bool {
-    return matchCloseBracket(true) != nil
+    return matchCloseBracket(true)
   }
 
   // ]
-  func matchCloseBracket(consume: Bool = false) -> UInt8? {
+  func matchCloseBracket(consume: Bool = false) -> Bool {
     return matchOne(93, consume: consume) // ]
   }
 
   func eatOpenBrace() -> Bool {
-    return matchOpenBrace(true) != nil
+    return matchOpenBrace(true)
   }
 
   // {
-  func matchOpenBrace(consume: Bool = false) -> UInt8? {
+  func matchOpenBrace(consume: Bool = false) -> Bool {
     return matchOne(123, consume: consume) // {
   }
 
   func eatCloseBrace() -> Bool {
-    return matchCloseBrace(true) != nil
+    return matchCloseBrace(true)
   }
 
   // }
-  func matchCloseBrace(consume: Bool = false) -> UInt8? {
+  func matchCloseBrace(consume: Bool = false) -> Bool {
     return matchOne(125, consume: consume) // }
   }
 
   func eatEqual() -> Bool {
-    return matchEqual(true) != nil
+    return matchEqual(true)
   }
 
   // =
-  func matchEqual(consume: Bool = false) -> UInt8? {
+  func matchEqual(consume: Bool = false) -> Bool {
     return matchOne(61, consume: consume) // =
   }
 
   func eatPlus() -> Bool {
-    return matchPlus(true) != nil
+    return matchPlus(true)
   }
 
   // +
-  func matchPlus(consume: Bool = false) -> UInt8? {
+  func matchPlus(consume: Bool = false) -> Bool {
     return matchOne(43, consume: consume) // +
   }
 
   func eatMinus() -> Bool {
-    return matchMinus(true) != nil
+    return matchMinus(true)
   }
 
   // -
-  func matchMinus(consume: Bool = false) -> UInt8? {
+  func matchMinus(consume: Bool = false) -> Bool {
     return matchOne(45, consume: consume) // -
   }
 
   func eatExclamation() -> Bool {
-    return matchExclamation(true) != nil
+    return matchExclamation(true)
   }
 
   // !
-  func matchExclamation(consume: Bool = false) -> UInt8? {
+  func matchExclamation(consume: Bool = false) -> Bool {
     return matchOne(33, consume: consume) // !
   }
 
   func eatQuestionMark() -> Bool {
-    return matchQuestionMark(true) != nil
+    return matchQuestionMark(true)
   }
 
   // ?
-  func matchQuestionMark(consume: Bool = false) -> UInt8? {
+  func matchQuestionMark(consume: Bool = false) -> Bool {
     return matchOne(63, consume: consume) // ?
   }
 
   func eatAmpersand() -> Bool {
-    return matchAmpersand(true) != nil
+    return matchAmpersand(true)
   }
 
   // &
-  func matchAmpersand(consume: Bool = false) -> UInt8? {
+  func matchAmpersand(consume: Bool = false) -> Bool {
     return matchOne(38, consume: consume) // &
   }
 
   func eatSemicolon() -> Bool {
-    return matchSemicolon(true) != nil
+    return matchSemicolon(true)
   }
 
   // ;
-  func matchSemicolon(consume: Bool = false) -> UInt8? {
+  func matchSemicolon(consume: Bool = false) -> Bool {
     return matchOne(59, consume: consume) // ;
   }
 
   func eatColon() -> Bool {
-    return matchColon(true) != nil
+    return matchColon(true)
   }
 
   // :
-  func matchColon(consume: Bool = false) -> UInt8? {
+  func matchColon(consume: Bool = false) -> Bool {
     return matchOne(58, consume: consume) // :
   }
 
   func eatPoint() -> Bool {
-    return matchPoint(true) != nil
+    return matchPoint(true)
   }
 
   // .
-  func matchPoint(consume: Bool = false) -> UInt8? {
+  func matchPoint(consume: Bool = false) -> Bool {
     return matchOne(46, consume: consume) // .
   }
 
   func eatComma() -> Bool {
-    return matchComma(true) != nil
+    return matchComma(true)
   }
 
   // ,
-  func matchComma(consume: Bool = false) -> UInt8? {
+  func matchComma(consume: Bool = false) -> Bool {
     return matchOne(44, consume: consume) // ,
   }
 
   func eatAsterisk() -> Bool {
-    return matchAsterisk(true) != nil
+    return matchAsterisk(true)
   }
 
   // *
-  func matchAsterisk(consume: Bool = false) -> UInt8? {
+  func matchAsterisk(consume: Bool = false) -> Bool {
     return matchOne(42, consume: consume) // *
   }
 
   func eatSlash() -> Bool {
-    return matchSlash(true) != nil
+    return matchSlash(true)
   }
 
   // /
-  func matchSlash(consume: Bool = false) -> UInt8? {
+  func matchSlash(consume: Bool = false) -> Bool {
     return matchOne(47, consume: consume) // /
   }
 
   func eatBackslash() -> Bool {
-    return matchBackslash(true) != nil
+    return matchBackslash(true)
   }
 
   // \.
-  func matchBackslash(consume: Bool = false) -> UInt8? {
+  func matchBackslash(consume: Bool = false) -> Bool {
     return matchOne(92, consume: consume) // \.
   }
 
   func eatAt() -> Bool {
-    return matchAt(true) != nil
+    return matchAt(true)
   }
 
   // @
-  func matchAt(consume: Bool = false) -> UInt8? {
+  func matchAt(consume: Bool = false) -> Bool {
     return matchOne(64, consume: consume) // @
   }
 
   func eatTilde() -> Bool {
-    return matchTilde(true) != nil
+    return matchTilde(true)
   }
 
   // ~
-  func matchTilde(consume: Bool = false) -> UInt8? {
+  func matchTilde(consume: Bool = false) -> Bool {
     return matchOne(126, consume: consume) // ~
   }
 
   func eatUnderline() -> Bool {
-    return matchUnderline(true) != nil
+    return matchUnderline(true)
   }
 
   // _
-  func matchUnderline(consume: Bool = false) -> UInt8? {
+  func matchUnderline(consume: Bool = false) -> Bool {
     return matchOne(95, consume: consume) // _
   }
 
   func eatPercent() -> Bool {
-    return matchPercent(true) != nil
+    return matchPercent(true)
   }
 
   // %
-  func matchPercent(consume: Bool = false) -> UInt8? {
+  func matchPercent(consume: Bool = false) -> Bool {
     return matchOne(37, consume: consume) // %
   }
 
   func eatDollar() -> Bool {
-    return matchDollar(true) != nil
+    return matchDollar(true)
   }
 
   // $
-  func matchDollar(consume: Bool = false) -> UInt8? {
+  func matchDollar(consume: Bool = false) -> Bool {
     return matchOne(36, consume: consume) // $
   }
 
   func eatSingleQuote() -> Bool {
-    return matchSingleQuote(true) != nil
+    return matchSingleQuote(true)
   }
 
   // '
-  func matchSingleQuote(consume: Bool = false) -> UInt8? {
+  func matchSingleQuote(consume: Bool = false) -> Bool {
     return matchOne(39, consume: consume) // '
   }
 
   func eatDoubleQuote() -> Bool {
-    return matchDoubleQuote(true) != nil
+    return matchDoubleQuote(true)
   }
 
   // "
-  func matchDoubleQuote(consume: Bool = false) -> UInt8? {
+  func matchDoubleQuote(consume: Bool = false) -> Bool {
     return matchOne(34, consume: consume) // "
   }
 
   func eatHash() -> Bool {
-    return matchHash(true) != nil
+    return matchHash(true)
   }
 
   // #
-  func matchHash(consume: Bool = false) -> UInt8? {
+  func matchHash(consume: Bool = false) -> Bool {
     return matchOne(35, consume: consume) // #
   }
 
   func eatPipe() -> Bool {
-    return matchPipe(true) != nil
+    return matchPipe(true)
   }
 
   // |
-  func matchPipe(consume: Bool = false) -> UInt8? {
+  func matchPipe(consume: Bool = false) -> Bool {
     return matchOne(124, consume: consume) // |
   }
 
   func eatCircumflex() -> Bool {
-    return matchCircumflex(true) != nil
+    return matchCircumflex(true)
   }
 
   // ^
-  func matchCircumflex(consume: Bool = false) -> UInt8? {
+  func matchCircumflex(consume: Bool = false) -> Bool {
     return matchOne(94, consume: consume) // ^
   }
 
