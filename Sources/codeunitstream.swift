@@ -62,16 +62,16 @@ public class CodeUnitStream: CustomStringConvertible {
   }
 
   func eat(fn: (c: UInt8) -> Bool) -> Bool {
-    return match(true, fn: fn) != nil
+    return match(true, fn: fn)
   }
 
-  func match(consume: Bool = false, fn: (c: UInt8) -> Bool) -> UInt8? {
-    var r: UInt8?
+  func match(consume: Bool = false, fn: (c: UInt8) -> Bool) -> Bool {
+    var r = false
     let i = currentIndex
     if i < lineEndIndex {
       let c = _codeUnits[i]
       if fn(c: c) {
-        r = c
+        r = true
         if consume {
           currentIndex = i + 1
         }
