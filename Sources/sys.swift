@@ -28,6 +28,7 @@ let _popen = popen
 let _pclose = pclose
 let _fread = fread
 let _getenv = getenv
+let _isatty = isatty
 
 
 public enum FileOperation: Int {
@@ -189,6 +190,10 @@ public class PosixSys {
   public func getenv(key: String) -> String? {
     let vp = _getenv(key)
     return vp != nil ? String.fromCString(vp) : nil
+  }
+
+  public func isatty(fd: Int32) -> Bool {
+    return _isatty(fd) == 1
   }
 
   // The environ variable is made available by the CSua sister project
