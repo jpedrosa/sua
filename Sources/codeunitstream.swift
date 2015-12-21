@@ -8,14 +8,12 @@ public class CodeUnitStream: CustomStringConvertible {
   public var currentIndex = 0
   public var startIndex = 0
   public var _codeUnits: [UInt8] = []
-  public var lineStartIndex = 0
   public var lineEndIndex = 0
   public var milestoneIndex = 0
 
   public init(codeUnits: [UInt8] = [], startIndex: Int = 0,
-      lineStartIndex: Int = 0, lineEndIndex: Int = 0) {
+      lineEndIndex: Int = 0) {
     self.startIndex = startIndex
-    self.lineStartIndex = lineStartIndex
     self.lineEndIndex = lineEndIndex
     _codeUnits = codeUnits
     currentIndex = startIndex
@@ -30,7 +28,6 @@ public class CodeUnitStream: CustomStringConvertible {
       _codeUnits = newValue
       currentIndex = 0
       startIndex = 0
-      lineStartIndex = 0
       lineEndIndex = newValue.count
     }
   }
@@ -38,13 +35,10 @@ public class CodeUnitStream: CustomStringConvertible {
   public func reset() {
     currentIndex = 0
     startIndex = 0
-    lineStartIndex = 0
     lineEndIndex = _codeUnits.count
   }
 
   var isEol: Bool { return currentIndex >= lineEndIndex }
-
-  var isBol: Bool { return currentIndex == lineStartIndex }
 
   var current: UInt8 { return _codeUnits[currentIndex] }
 
@@ -237,7 +231,7 @@ public class CodeUnitStream: CustomStringConvertible {
 
   func skipTo(c: UInt8) -> Int {
     let r = findIndexOfCodeUnit(c, startAt: currentIndex)
-    if r >= lineStartIndex && r < lineEndIndex {
+    if r >= startIndex && r < lineEndIndex {
       currentIndex = r
     }
     return r
@@ -382,13 +376,12 @@ public class CodeUnitStream: CustomStringConvertible {
       let o = _pool.removeLast()
       o._codeUnits = po._codeUnits // Could clone it too.
       o.startIndex = po.startIndex
-      o.lineStartIndex = po.lineStartIndex
       o.lineEndIndex = po.lineEndIndex
       o.currentIndex = po.currentIndex
       return o
     } else {
-      let o = CodeUnitStream(codeUnits: po._codeUnits, startIndex: po.startIndex,
-          lineStartIndex: po.lineStartIndex, lineEndIndex: po.lineEndIndex)
+      let o = CodeUnitStream(codeUnits: po._codeUnits,
+          startIndex: po.startIndex, lineEndIndex: po.lineEndIndex)
       o.currentIndex = po.currentIndex
       return o
     }
@@ -396,7 +389,7 @@ public class CodeUnitStream: CustomStringConvertible {
 
   func clone() -> CodeUnitStream {
     let o = CodeUnitStream(codeUnits: _codeUnits, startIndex: startIndex,
-      lineStartIndex: lineStartIndex, lineEndIndex: lineEndIndex)
+        lineEndIndex: lineEndIndex)
     o.currentIndex = currentIndex
     return o
   }
@@ -1984,7 +1977,7 @@ public class CodeUnitStream: CustomStringConvertible {
   public var description: String {
     return "CodeUnitStream(currentIndex: \(currentIndex), " +
       "startIndex: \(startIndex), codeUnits: \(inspect(_codeUnits)), " +
-      "lineStartIndex: \(lineStartIndex), lineEndIndex: \(lineEndIndex))"
+      "lineEndIndex: \(lineEndIndex))"
   }
 
 }
