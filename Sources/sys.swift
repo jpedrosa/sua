@@ -62,6 +62,10 @@ public class PosixSys {
   public static let SEEK_CUR: Int32 = 1
   public static let SEEK_END: Int32 = 2
 
+  public static let STDIN_FD: Int32 = 0
+  public static let STDOUT_FD: Int32 = 1
+  public static let STDERR_FD: Int32 = 2
+
   public func open(path: String, flags: Int32, mode: UInt32) -> Int32 {
     return retry { csua_open(path, flags, mode) }
   }

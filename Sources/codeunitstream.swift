@@ -232,7 +232,7 @@ public struct CodeUnitStream {
 
   public mutating func skipTo(c: UInt8) -> Int {
     let r = findIndex(c, startAt: currentIndex)
-    if r >= startIndex && r < lineEndIndex {
+    if r < lineEndIndex {
       currentIndex = r
     }
     return r
