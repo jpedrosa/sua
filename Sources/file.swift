@@ -61,7 +61,7 @@ public class File: CustomStringConvertible {
   public func readBytes(maxBytes: Int = -1) throws -> [UInt8] {
     let len = maxBytes < 0 ? length : maxBytes
     var a = [UInt8](count: len, repeatedValue: 0)
-    let n = try read(&a, maxBytes: len)
+    let n = try doRead(&a, maxBytes: len)
     if n < maxBytes {
       a = a[0..<n].map { UInt8($0) }
     }
@@ -71,7 +71,7 @@ public class File: CustomStringConvertible {
   public func readCChar(maxBytes: Int = -1) throws -> [CChar] {
     let len = maxBytes < 0 ? length : maxBytes
     var a = [CChar](count: len, repeatedValue: 0)
-    let n = try read(&a, maxBytes: len)
+    let n = try doRead(&a, maxBytes: len)
     if n < maxBytes {
       a = a[0..<n].map { CChar($0) }
     }
@@ -118,7 +118,7 @@ public class File: CustomStringConvertible {
 
   public var fd: Int32 { return _fd }
 
-  public func read(address: UnsafeMutablePointer<Void>, maxBytes: Int) throws
+  public func doRead(address: UnsafeMutablePointer<Void>, maxBytes: Int) throws
       -> Int {
     if maxBytes < 0 {
       try _error("Wrong read parameter value: negative maxBytes")
