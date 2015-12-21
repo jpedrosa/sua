@@ -208,7 +208,7 @@ public struct CodeUnitStream {
     return true
   }
 
-  public func findIndexOfCodeUnit(c: UInt8, startAt: Int = 0) -> Int {
+  public func findIndex(c: UInt8, startAt: Int = 0) -> Int {
     var r = -1
     let len = _codeUnits.count
     let lim = len - 2
@@ -231,7 +231,7 @@ public struct CodeUnitStream {
   }
 
   public mutating func skipTo(c: UInt8) -> Int {
-    let r = findIndexOfCodeUnit(c, startAt: currentIndex)
+    let r = findIndex(c, startAt: currentIndex)
     if r >= startIndex && r < lineEndIndex {
       currentIndex = r
     }
