@@ -1620,7 +1620,8 @@ public struct CodeUnitStream {
     return matchKeyword(string, consume: true) >= 0
   }
 
-  public mutating func matchKeyword(string: String, consume: Bool = false) -> Int {
+  public mutating func matchKeyword(string: String, consume: Bool = false)
+      -> Int {
     var r = -1
     let sa = [UInt8](string.utf8)
     let len = sa.count
@@ -1792,8 +1793,8 @@ public struct CodeUnitStream {
     return r
   }
 
-  public mutating func eatUntilIncludingStringFromList(firstCharTable: FirstCharTable)
-      -> Bool {
+  public mutating func eatUntilIncludingStringFromList(
+      firstCharTable: FirstCharTable) -> Bool {
     return matchUntilIncludingStringFromList(firstCharTable, consume: true) >= 0
   }
 
