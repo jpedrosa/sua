@@ -1,6 +1,6 @@
 
 
-typealias FirstCharTable = [[[UInt8]]?]
+public typealias FirstCharTable = [[[UInt8]]?]
 
 
 public struct CodeUnitStream {
@@ -38,15 +38,15 @@ public struct CodeUnitStream {
     lineEndIndex = _codeUnits.count
   }
 
-  var isEol: Bool { return currentIndex >= lineEndIndex }
+  public var isEol: Bool { return currentIndex >= lineEndIndex }
 
-  var current: UInt8 { return _codeUnits[currentIndex] }
+  public var current: UInt8 { return _codeUnits[currentIndex] }
 
-  func peek() -> UInt8? {
+  public func peek() -> UInt8? {
     return currentIndex < lineEndIndex ? _codeUnits[currentIndex] : nil
   }
 
-  mutating func next() -> UInt8? {
+  public mutating func next() -> UInt8? {
     var r: UInt8?
     if currentIndex < lineEndIndex {
       r = _codeUnits[currentIndex]
@@ -55,11 +55,12 @@ public struct CodeUnitStream {
     return r
   }
 
-  mutating func eat(fn: (c: UInt8) -> Bool) -> Bool {
+  public mutating func eat(fn: (c: UInt8) -> Bool) -> Bool {
     return match(true, fn: fn)
   }
 
-  mutating func match(consume: Bool = false, fn: (c: UInt8) -> Bool) -> Bool {
+  public mutating func match(consume: Bool = false, fn: (c: UInt8) -> Bool)
+      -> Bool {
     var r = false
     let i = currentIndex
     if i < lineEndIndex {
@@ -74,11 +75,11 @@ public struct CodeUnitStream {
     return r
   }
 
-  mutating func eatOne(c: UInt8) -> Bool {
+  public mutating func eatOne(c: UInt8) -> Bool {
     return matchOne(c, consume: true)
   }
 
-  mutating func matchOne(c: UInt8, consume: Bool = false) -> Bool {
+  public mutating func matchOne(c: UInt8, consume: Bool = false) -> Bool {
     var r = false
     let i = currentIndex
     if i < lineEndIndex && c == _codeUnits[i] {
@@ -90,11 +91,11 @@ public struct CodeUnitStream {
     return r
   }
 
-  mutating func eatWhileOne(c: UInt8) -> Bool {
+  public mutating func eatWhileOne(c: UInt8) -> Bool {
     return matchWhileOne(c, consume: true) >= 0
   }
 
-  mutating func matchWhileOne(c: UInt8, consume: Bool = false) -> Int {
+  public mutating func matchWhileOne(c: UInt8, consume: Bool = false) -> Int {
     var r = -1
     var i = currentIndex
     let savei = i
@@ -114,15 +115,15 @@ public struct CodeUnitStream {
     return r
   }
 
-  mutating func eatSpace() -> Bool {
+  public mutating func eatSpace() -> Bool {
     return matchSpace(true) >= 0
   }
 
-  mutating func eatWhileSpace() -> Bool {
+  public mutating func eatWhileSpace() -> Bool {
     return matchWhileSpace(true) >= 0
   }
 
-  mutating func matchSpace(consume: Bool = false) -> UInt8? {
+  public mutating func matchSpace(consume: Bool = false) -> UInt8? {
     var r: UInt8?
     let i = currentIndex
     if i < lineEndIndex {
@@ -137,7 +138,7 @@ public struct CodeUnitStream {
     return r
   }
 
-  mutating func matchWhileSpace(consume: Bool = false) -> Int {
+  public mutating func matchWhileSpace(consume: Bool = false) -> Int {
     var r = -1
     var i = currentIndex
     let savei = i
@@ -158,15 +159,15 @@ public struct CodeUnitStream {
     return r
   }
 
-  mutating func eatSpaceTab() -> Bool {
+  public mutating func eatSpaceTab() -> Bool {
     return matchSpaceTab(true) != nil
   }
 
-  mutating func eatWhileSpaceTab() -> Bool {
+  public mutating func eatWhileSpaceTab() -> Bool {
     return matchWhileSpaceTab(true) >= 0
   }
 
-  mutating func matchSpaceTab(consume: Bool = false) -> UInt8? {
+  public mutating func matchSpaceTab(consume: Bool = false) -> UInt8? {
     var r: UInt8?
     let i = currentIndex
     if i < lineEndIndex {
@@ -181,7 +182,7 @@ public struct CodeUnitStream {
     return r
   }
 
-  mutating func matchWhileSpaceTab(consume: Bool = false) -> Int {
+  public mutating func matchWhileSpaceTab(consume: Bool = false) -> Int {
     var r = -1
     var i = currentIndex
     let savei = i
@@ -202,12 +203,12 @@ public struct CodeUnitStream {
     return r
   }
 
-  mutating func skipToEnd() -> Bool {
+  public mutating func skipToEnd() -> Bool {
     currentIndex = lineEndIndex
     return true
   }
 
-  func findIndexOfCodeUnit(c: UInt8, startAt: Int = 0) -> Int {
+  public func findIndexOfCodeUnit(c: UInt8, startAt: Int = 0) -> Int {
     var r = -1
     let len = _codeUnits.count
     let lim = len - 2
@@ -229,7 +230,7 @@ public struct CodeUnitStream {
     return r
   }
 
-  mutating func skipTo(c: UInt8) -> Int {
+  public mutating func skipTo(c: UInt8) -> Int {
     let r = findIndexOfCodeUnit(c, startAt: currentIndex)
     if r >= startIndex && r < lineEndIndex {
       currentIndex = r
@@ -237,11 +238,11 @@ public struct CodeUnitStream {
     return r
   }
 
-  mutating func backUp(n: Int) {
+  public mutating func backUp(n: Int) {
     currentIndex -= n
   }
 
-  mutating func keepMilestoneIfNot(fn: () -> Bool) -> Bool {
+  public mutating func keepMilestoneIfNot(fn: () -> Bool) -> Bool {
     let r = fn()
     if !r {
       milestoneIndex = currentIndex + 1
@@ -249,18 +250,19 @@ public struct CodeUnitStream {
     return r
   }
 
-  mutating func yankMilestoneIfNot(fn: () -> Bool) -> Bool {
+  public mutating func yankMilestoneIfNot(fn: () -> Bool) -> Bool {
     if !fn() {
       milestoneIndex = currentIndex + 1
     }
     return false
   }
 
-  mutating func eatUntil(fn: (c: UInt8) -> Bool) -> Bool {
+  public mutating func eatUntil(fn: (c: UInt8) -> Bool) -> Bool {
     return matchUntil(true, fn: fn) >= 0
   }
 
-  mutating func matchUntil(consume: Bool = false, fn: (c: UInt8) -> Bool) -> Int {
+  public mutating func matchUntil(consume: Bool = false, fn: (c: UInt8) -> Bool)
+      -> Int {
     var r = -1
     var i = currentIndex
     let savei = i
@@ -280,11 +282,12 @@ public struct CodeUnitStream {
     return r
   }
 
-  mutating func eatWhile(fn: (c: UInt8) -> Bool) -> Bool {
+  public mutating func eatWhile(fn: (c: UInt8) -> Bool) -> Bool {
     return matchWhile(true, fn: fn) >= 0
   }
 
-  mutating func matchWhile(consume: Bool = false, fn: (c: UInt8) -> Bool) -> Int {
+  public mutating func matchWhile(consume: Bool = false, fn: (c: UInt8) -> Bool)
+      -> Int {
     var r = -1
     var i = currentIndex
     let savei = i
@@ -304,11 +307,12 @@ public struct CodeUnitStream {
     return r
   }
 
-  mutating func seekContext(fn: (c: UInt8) -> Bool) -> Bool {
+  public mutating func seekContext(fn: (c: UInt8) -> Bool) -> Bool {
     return matchContext(true, fn: fn) >= 0
   }
 
-  mutating func matchContext(consume: Bool = false, fn: (c: UInt8) -> Bool) -> Int {
+  public mutating func matchContext(consume: Bool = false,
+      fn: (c: UInt8) -> Bool) -> Int {
     var r = -1
     var i = currentIndex
     let len = lineEndIndex
@@ -326,11 +330,11 @@ public struct CodeUnitStream {
     return r
   }
 
-  mutating func maybeEat(fn: (ctx: CodeUnitStream) -> Bool) -> Bool {
+  public mutating func maybeEat(fn: (ctx: CodeUnitStream) -> Bool) -> Bool {
     return maybeMatch(fn) >= 0
   }
 
-  mutating func maybeMatch(fn: (ctx: CodeUnitStream) -> Bool) -> Int {
+  public mutating func maybeMatch(fn: (ctx: CodeUnitStream) -> Bool) -> Int {
     var r = -1
     let savei = currentIndex
     if fn(ctx: self) {
@@ -344,7 +348,7 @@ public struct CodeUnitStream {
     return r
   }
 
-  mutating func nestMatch(fn: (ctx: CodeUnitStream) -> Bool) -> Int {
+  public mutating func nestMatch(fn: (ctx: CodeUnitStream) -> Bool) -> Int {
     var ctx = CodeUnitStream._cloneFromPool(self)
     var r = -1
     let savei = currentIndex
@@ -359,7 +363,7 @@ public struct CodeUnitStream {
     return r
   }
 
-  mutating func collectTokenString() -> String? {
+  public mutating func collectTokenString() -> String? {
     let s = currentTokenString
     startIndex = currentIndex
     return s
@@ -387,18 +391,19 @@ public struct CodeUnitStream {
     }
   }
 
-  func clone() -> CodeUnitStream {
+  public func clone() -> CodeUnitStream {
     var o = CodeUnitStream(codeUnits: _codeUnits, startIndex: startIndex,
         lineEndIndex: lineEndIndex)
     o.currentIndex = currentIndex
     return o
   }
 
-  mutating func eatString(string: String) -> Bool {
+  public mutating func eatString(string: String) -> Bool {
     return matchString(string, consume: true) >= 0
   }
 
-  mutating func matchString(string: String, consume: Bool = false) -> Int {
+  public mutating func matchString(string: String, consume: Bool = false)
+      -> Int {
     var r = -1
     let i = currentIndex
     let savei = i
@@ -422,12 +427,13 @@ public struct CodeUnitStream {
     return r
   }
 
-  mutating func eatOnEitherString(string1: String, string2: String) -> Bool {
+  public mutating func eatOnEitherString(string1: String, string2: String)
+      -> Bool {
     return matchOnEitherString(string1, string2: string2, consume: true) >= 0
   }
 
   // Used for case insensitive matching
-  mutating func matchOnEitherString(string1: String, string2: String,
+  public mutating func matchOnEitherString(string1: String, string2: String,
       consume: Bool = false) -> Int {
     var r = -1
     var s1a = [UInt8](string1.utf8)
@@ -453,11 +459,12 @@ public struct CodeUnitStream {
     return r
   }
 
-  mutating func eatUntilString(string: String) -> Bool {
+  public mutating func eatUntilString(string: String) -> Bool {
     return matchUntilString(string, consume: true) >= 0
   }
 
-  mutating func matchUntilString(string: String, consume: Bool = false) -> Int {
+  public mutating func matchUntilString(string: String, consume: Bool = false)
+      -> Int {
     var r = -1
     var i = currentIndex
     let savei = i
@@ -495,11 +502,11 @@ public struct CodeUnitStream {
   }
 
   // Triple quotes sequence
-  mutating func eatUntilThree(c1: UInt8, c2: UInt8, c3: UInt8) -> Bool {
+  public mutating func eatUntilThree(c1: UInt8, c2: UInt8, c3: UInt8) -> Bool {
     return matchUntilThree(c1, c2: c2, c3: c3, consume: true) >= 0
   }
 
-  mutating func matchUntilThree(c1: UInt8, c2: UInt8, c3: UInt8,
+  public mutating func matchUntilThree(c1: UInt8, c2: UInt8, c3: UInt8,
       consume: Bool = false) -> Int {
     var r = -1
     var i = currentIndex
@@ -524,11 +531,12 @@ public struct CodeUnitStream {
     return r
   }
 
-  mutating func eatTwo(c1: UInt8, c2: UInt8) -> Bool {
+  public mutating func eatTwo(c1: UInt8, c2: UInt8) -> Bool {
     return matchTwo(c1, c2: c2, consume: true)
   }
 
-  mutating func matchTwo(c1: UInt8, c2: UInt8, consume: Bool = false) -> Bool {
+  public mutating func matchTwo(c1: UInt8, c2: UInt8, consume: Bool = false)
+      -> Bool {
     var r = false
     let i = currentIndex
     if i < lineEndIndex - 1 && _codeUnits[i] == c1 &&
@@ -541,11 +549,11 @@ public struct CodeUnitStream {
     return r
   }
 
-  mutating func eatThree(c1: UInt8, c2: UInt8, c3: UInt8) -> Bool {
+  public mutating func eatThree(c1: UInt8, c2: UInt8, c3: UInt8) -> Bool {
     return matchThree(c1, c2: c2, c3: c3, consume: true)
   }
 
-  mutating func matchThree(c1: UInt8, c2: UInt8, c3: UInt8,
+  public mutating func matchThree(c1: UInt8, c2: UInt8, c3: UInt8,
       consume: Bool = false) -> Bool {
     var r = false
     let i = currentIndex
@@ -559,11 +567,11 @@ public struct CodeUnitStream {
     return r
   }
 
-  mutating func eatUntilOne(c: UInt8) -> Bool {
+  public mutating func eatUntilOne(c: UInt8) -> Bool {
     return matchUntilOne(c, consume: true) >= 0
   }
 
-  mutating func matchUntilOne(mc: UInt8, consume: Bool = false) -> Int {
+  public mutating func matchUntilOne(mc: UInt8, consume: Bool = false) -> Int {
     var r = -1
     var i = currentIndex
     let savei = i
@@ -583,11 +591,11 @@ public struct CodeUnitStream {
     return r
   }
 
-  mutating func eatWhileNeitherTwo(c1: UInt8, c2: UInt8) -> Bool {
+  public mutating func eatWhileNeitherTwo(c1: UInt8, c2: UInt8) -> Bool {
     return matchWhileNeitherTwo(c1, c2: c2, consume: true) >= 0
   }
 
-  mutating func matchWhileNeitherTwo(c1: UInt8, c2: UInt8,
+  public mutating func matchWhileNeitherTwo(c1: UInt8, c2: UInt8,
       consume: Bool = false) -> Int {
     var r = -1
     var i = currentIndex
@@ -609,11 +617,12 @@ public struct CodeUnitStream {
     return r
   }
 
-  mutating func eatWhileNeitherThree(c1: UInt8, c2: UInt8, c3: UInt8) -> Bool {
+  public mutating func eatWhileNeitherThree(c1: UInt8, c2: UInt8, c3: UInt8)
+      -> Bool {
     return matchWhileNeitherThree(c1, c2: c2, c3: c3, consume: true) >= 0
   }
 
-  mutating func matchWhileNeitherThree(c1: UInt8, c2: UInt8, c3: UInt8,
+  public mutating func matchWhileNeitherThree(c1: UInt8, c2: UInt8, c3: UInt8,
       consume: Bool = false) -> Int {
     var r = -1
     var i = currentIndex
@@ -635,12 +644,12 @@ public struct CodeUnitStream {
     return r
   }
 
-  mutating func eatWhileNeitherFour(c1: UInt8, c2: UInt8, c3: UInt8,
+  public mutating func eatWhileNeitherFour(c1: UInt8, c2: UInt8, c3: UInt8,
       c4: UInt8) -> Bool {
     return matchWhileNeitherFour(c1, c2: c2, c3: c3, c4: c4, consume: true) >= 0
   }
 
-  mutating func matchWhileNeitherFour(c1: UInt8, c2: UInt8, c3: UInt8,
+  public mutating func matchWhileNeitherFour(c1: UInt8, c2: UInt8, c3: UInt8,
       c4: UInt8, consume: Bool = false) -> Int {
     var r = -1
     var i = currentIndex
@@ -662,14 +671,14 @@ public struct CodeUnitStream {
     return r
   }
 
-  mutating func eatWhileNeitherFive(c1: UInt8, c2: UInt8, c3: UInt8, c4: UInt8,
-      c5: UInt8) -> Bool {
+  public mutating func eatWhileNeitherFive(c1: UInt8, c2: UInt8, c3: UInt8,
+      c4: UInt8, c5: UInt8) -> Bool {
     return matchWhileNeitherFive(c1, c2: c2, c3: c3, c4: c4, c5: c5,
         consume: true) >= 0
   }
 
-  mutating func matchWhileNeitherFive(c1: UInt8, c2: UInt8, c3: UInt8, c4: UInt8,
-      c5: UInt8, consume: Bool = false) -> Int {
+  public mutating func matchWhileNeitherFive(c1: UInt8, c2: UInt8, c3: UInt8,
+      c4: UInt8, c5: UInt8, consume: Bool = false) -> Int {
     var r = -1
     var i = currentIndex
     let savei = i
@@ -690,14 +699,14 @@ public struct CodeUnitStream {
     return r
   }
 
-  mutating func eatWhileNeitherSix(c1: UInt8, c2: UInt8, c3: UInt8, c4: UInt8,
-      c5: UInt8, c6: UInt8) -> Bool {
+  public mutating func eatWhileNeitherSix(c1: UInt8, c2: UInt8, c3: UInt8,
+      c4: UInt8, c5: UInt8, c6: UInt8) -> Bool {
     return matchWhileNeitherSix(c1, c2: c2, c3: c3, c4: c4, c5: c5, c6: c6,
         consume: true) >= 0
   }
 
-  mutating func matchWhileNeitherSix(c1: UInt8, c2: UInt8, c3: UInt8, c4: UInt8,
-      c5: UInt8, c6: UInt8, consume: Bool = false) -> Int {
+  public mutating func matchWhileNeitherSix(c1: UInt8, c2: UInt8, c3: UInt8,
+      c4: UInt8, c5: UInt8, c6: UInt8, consume: Bool = false) -> Int {
     var r = -1
     var i = currentIndex
     let savei = i
@@ -718,13 +727,13 @@ public struct CodeUnitStream {
     return r
   }
 
-  mutating func eatWhileNeitherSeven(c1: UInt8, c2: UInt8, c3: UInt8, c4: UInt8,
-      c5: UInt8, c6: UInt8, c7: UInt8) -> Bool {
+  public mutating func eatWhileNeitherSeven(c1: UInt8, c2: UInt8, c3: UInt8,
+      c4: UInt8, c5: UInt8, c6: UInt8, c7: UInt8) -> Bool {
     return matchWhileNeitherSeven(c1, c2: c2, c3: c3, c4: c4, c5: c5, c6: c6,
         c7: c7, consume: true) >= 0
   }
 
-  mutating func matchWhileNeitherSeven(c1: UInt8, c2: UInt8, c3: UInt8,
+  public mutating func matchWhileNeitherSeven(c1: UInt8, c2: UInt8, c3: UInt8,
       c4: UInt8, c5: UInt8, c6: UInt8, c7: UInt8, consume: Bool = false)
       -> Int {
     var r = -1
@@ -748,26 +757,26 @@ public struct CodeUnitStream {
     return r
   }
 
-  var currentToken: [UInt8] {
+  public var currentToken: [UInt8] {
     return [UInt8](_codeUnits[startIndex..<currentIndex])
   }
 
-  var currentTokenString: String? {
+  public var currentTokenString: String? {
     return String.fromCharCodes(_codeUnits, start: startIndex,
         end: currentIndex - 1)
   }
 
   // More specialization
 
-  mutating func eatDigit() -> Bool {
+  public mutating func eatDigit() -> Bool {
     return matchDigit(true) != nil
   }
 
-  mutating func eatWhileDigit() -> Bool {
+  public mutating func eatWhileDigit() -> Bool {
     return matchWhileDigit(true) >= 0
   }
 
-  mutating func matchDigit(consume: Bool = false) -> UInt8? {
+  public mutating func matchDigit(consume: Bool = false) -> UInt8? {
     var r: UInt8?
     let i = currentIndex
     if i < lineEndIndex {
@@ -782,7 +791,7 @@ public struct CodeUnitStream {
     return r
   }
 
-  mutating func matchWhileDigit(consume: Bool = false) -> Int {
+  public mutating func matchWhileDigit(consume: Bool = false) -> Int {
     var r = -1
     var i = currentIndex
     let savei = i
@@ -803,16 +812,16 @@ public struct CodeUnitStream {
     return r
   }
 
-  mutating func eatLowerCase() -> Bool {
+  public mutating func eatLowerCase() -> Bool {
     return matchLowerCase(true) != nil
   }
 
-  mutating func eatLowerCases() -> Bool {
+  public mutating func eatLowerCases() -> Bool {
     return matchWhileLowerCase(true) >= 0
   }
 
   // a-z
-  mutating func matchLowerCase(consume: Bool = false) -> UInt8? {
+  public mutating func matchLowerCase(consume: Bool = false) -> UInt8? {
     var r: UInt8?
     let i = currentIndex
     if i < lineEndIndex {
@@ -827,7 +836,7 @@ public struct CodeUnitStream {
     return r
   }
 
-  mutating func matchWhileLowerCase(consume: Bool = false) -> Int {
+  public mutating func matchWhileLowerCase(consume: Bool = false) -> Int {
     var r = -1
     var i = currentIndex
     let savei = i
@@ -848,16 +857,16 @@ public struct CodeUnitStream {
     return r
   }
 
-  mutating func eatUpperCase() -> Bool {
+  public mutating func eatUpperCase() -> Bool {
     return matchUpperCase(true) != nil
   }
 
-  mutating func eatWhileUpperCase() -> Bool {
+  public mutating func eatWhileUpperCase() -> Bool {
     return matchWhileUpperCase(true) >= 0
   }
 
   // A-Z
-  mutating func matchUpperCase(consume: Bool = false) -> UInt8? {
+  public mutating func matchUpperCase(consume: Bool = false) -> UInt8? {
     var r: UInt8?
     let i = currentIndex
     if i < lineEndIndex {
@@ -872,7 +881,7 @@ public struct CodeUnitStream {
     return r
   }
 
-  mutating func matchWhileUpperCase(consume: Bool = false) -> Int {
+  public mutating func matchWhileUpperCase(consume: Bool = false) -> Int {
     var r = -1
     var i = currentIndex
     let savei = i
@@ -893,16 +902,16 @@ public struct CodeUnitStream {
     return r
   }
 
-  mutating func eatAlpha() -> Bool {
+  public mutating func eatAlpha() -> Bool {
     return matchAlpha(true) != nil
   }
 
-  mutating func eatWhileAlpha() -> Bool {
+  public mutating func eatWhileAlpha() -> Bool {
     return matchWhileAlpha(true) >= 0;
   }
 
   // A-Z a-z
-  mutating func matchAlpha(consume: Bool = false) -> UInt8? {
+  public mutating func matchAlpha(consume: Bool = false) -> UInt8? {
     var r: UInt8?
     let i = currentIndex
     if i < lineEndIndex {
@@ -917,7 +926,7 @@ public struct CodeUnitStream {
     return r
   }
 
-  mutating func matchWhileAlpha(consume: Bool = false) -> Int {
+  public mutating func matchWhileAlpha(consume: Bool = false) -> Int {
     var r = -1
     var i = currentIndex
     let savei = i
@@ -940,16 +949,16 @@ public struct CodeUnitStream {
     return r
   }
 
-  mutating func eatAlphaUnderline() -> Bool {
+  public mutating func eatAlphaUnderline() -> Bool {
     return matchAlphaUnderline(true) >= 0
   }
 
-  mutating func eatWhileAlphaUnderline() -> Bool {
+  public mutating func eatWhileAlphaUnderline() -> Bool {
     return matchWhileAlphaUnderline(true) >= 0
   }
 
   // A-Z a-z _
-  mutating func matchAlphaUnderline(consume: Bool = false) -> UInt8? {
+  public mutating func matchAlphaUnderline(consume: Bool = false) -> UInt8? {
     var r: UInt8?
     let i = currentIndex
     if i < lineEndIndex {
@@ -964,7 +973,7 @@ public struct CodeUnitStream {
     return r
   }
 
-  mutating func matchWhileAlphaUnderline(consume: Bool = false) -> Int {
+  public mutating func matchWhileAlphaUnderline(consume: Bool = false) -> Int {
     var r = -1
     var i = currentIndex
     let savei = i
@@ -987,16 +996,17 @@ public struct CodeUnitStream {
     return r
   }
 
-  mutating func eatAlphaUnderlineDigit() -> Bool {
+  public mutating func eatAlphaUnderlineDigit() -> Bool {
     return matchAlphaUnderlineDigit(true) != nil
   }
 
-  mutating func eatWhileAlphaUnderlineDigit() -> Bool {
+  public mutating func eatWhileAlphaUnderlineDigit() -> Bool {
     return matchWhileAlphaUnderlineDigit(true) >= 0
   }
 
   // A-Z a-z _ 0-9
-  mutating func matchAlphaUnderlineDigit(consume: Bool = false) -> UInt8? {
+  public mutating func matchAlphaUnderlineDigit(consume: Bool = false)
+      -> UInt8? {
     var r: UInt8?
     let i = currentIndex
     if i < lineEndIndex {
@@ -1012,7 +1022,8 @@ public struct CodeUnitStream {
     return r
   }
 
-  mutating func matchWhileAlphaUnderlineDigit(consume: Bool = false) -> Int {
+  public mutating func matchWhileAlphaUnderlineDigit(consume: Bool = false)
+      -> Int {
     var r = -1
     var i = currentIndex
     let savei = i
@@ -1036,16 +1047,17 @@ public struct CodeUnitStream {
     return r
   }
 
-  mutating func eatAlphaUnderlineDigitMinus() -> Bool {
+  public mutating func eatAlphaUnderlineDigitMinus() -> Bool {
     return matchAlphaUnderlineDigitMinus(true) != nil
   }
 
-  mutating func eatWhileAlphaUnderlineDigitMinus() -> Bool {
+  public mutating func eatWhileAlphaUnderlineDigitMinus() -> Bool {
     return matchWhileAlphaUnderlineDigitMinus(true) >= 0
   }
 
   // A-Z a-z _ 0-9
-  mutating func matchAlphaUnderlineDigitMinus(consume: Bool = false) -> UInt8? {
+  public mutating func matchAlphaUnderlineDigitMinus(consume: Bool = false)
+      -> UInt8? {
     var r: UInt8?
     let i = currentIndex
     if i < lineEndIndex {
@@ -1061,7 +1073,7 @@ public struct CodeUnitStream {
     return r
   }
 
-  mutating func matchWhileAlphaUnderlineDigitMinus(consume: Bool = false)
+  public mutating func matchWhileAlphaUnderlineDigitMinus(consume: Bool = false)
       -> Int {
     var r = -1
     var i = currentIndex
@@ -1086,16 +1098,16 @@ public struct CodeUnitStream {
     return r
   }
 
-  mutating func eatAlphaDigit() -> Bool {
+  public mutating func eatAlphaDigit() -> Bool {
     return matchAlphaDigit(true) != nil
   }
 
-  mutating func eatWhileAlphaDigit() -> Bool {
+  public mutating func eatWhileAlphaDigit() -> Bool {
     return matchWhileAlphaDigit(true) >= 0
   }
 
   // A-Z a-z 0-9
-  mutating func matchAlphaDigit(consume: Bool = false) -> UInt8? {
+  public mutating func matchAlphaDigit(consume: Bool = false) -> UInt8? {
     var r: UInt8?
     let i = currentIndex
     if i < lineEndIndex {
@@ -1111,7 +1123,7 @@ public struct CodeUnitStream {
     return r
   }
 
-  mutating func matchWhileAlphaDigit(consume: Bool = false) -> Int {
+  public mutating func matchWhileAlphaDigit(consume: Bool = false) -> Int {
     var r = -1
     var i = currentIndex
     let savei = i
@@ -1135,16 +1147,16 @@ public struct CodeUnitStream {
     return r
   }
 
-  mutating func eatHexa() -> Bool {
+  public mutating func eatHexa() -> Bool {
     return matchHexa(true) != nil
   }
 
-  mutating func eatWhileHexa() -> Bool {
+  public mutating func eatWhileHexa() -> Bool {
     return matchWhileHexa(true) >= 0
   }
 
   // A-F a-f 0-9
-  mutating func matchHexa(consume: Bool = false) -> UInt8? {
+  public mutating func matchHexa(consume: Bool = false) -> UInt8? {
     var r: UInt8?
     let i = currentIndex
     if i < lineEndIndex {
@@ -1160,7 +1172,7 @@ public struct CodeUnitStream {
     return r
   }
 
-  mutating func matchWhileHexa(consume: Bool = false) -> Int {
+  public mutating func matchWhileHexa(consume: Bool = false) -> Int {
     var r = -1
     var i = currentIndex
     let savei = i
@@ -1186,292 +1198,292 @@ public struct CodeUnitStream {
 
   // One-off symbols
 
-  mutating func eatOpenParen() -> Bool {
+  public mutating func eatOpenParen() -> Bool {
     return matchOpenParen(true)
   }
 
   // (
-  mutating func matchOpenParen(consume: Bool = false) -> Bool {
+  public mutating func matchOpenParen(consume: Bool = false) -> Bool {
     return matchOne(40, consume: consume) // (
   }
 
-  mutating func eatCloseParen() -> Bool {
+  public mutating func eatCloseParen() -> Bool {
     return matchCloseParen(true)
   }
 
   // )
-  mutating func matchCloseParen(consume: Bool = false) -> Bool {
+  public mutating func matchCloseParen(consume: Bool = false) -> Bool {
     return matchOne(41, consume: consume) // )
   }
 
-  mutating func eatLessThan() -> Bool {
+  public mutating func eatLessThan() -> Bool {
     return matchLessThan(true)
   }
 
   // <
-  mutating func matchLessThan(consume: Bool = false) -> Bool {
+  public mutating func matchLessThan(consume: Bool = false) -> Bool {
     return matchOne(60, consume: consume) // <
   }
 
-  mutating func eatGreaterThan() -> Bool {
+  public mutating func eatGreaterThan() -> Bool {
     return matchGreaterThan(true)
   }
 
   // >
-  mutating func matchGreaterThan(consume: Bool = false) -> Bool {
+  public mutating func matchGreaterThan(consume: Bool = false) -> Bool {
     return matchOne(62, consume: consume) // >
   }
 
-  mutating func eatOpenBracket() -> Bool {
+  public mutating func eatOpenBracket() -> Bool {
     return matchOpenBracket(true)
   }
 
   // [
-  mutating func matchOpenBracket(consume: Bool = false) -> Bool {
+  public mutating func matchOpenBracket(consume: Bool = false) -> Bool {
     return matchOne(91, consume: consume) // [
   }
 
-  mutating func eatCloseBracket() -> Bool {
+  public mutating func eatCloseBracket() -> Bool {
     return matchCloseBracket(true)
   }
 
   // ]
-  mutating func matchCloseBracket(consume: Bool = false) -> Bool {
+  public mutating func matchCloseBracket(consume: Bool = false) -> Bool {
     return matchOne(93, consume: consume) // ]
   }
 
-  mutating func eatOpenBrace() -> Bool {
+  public mutating func eatOpenBrace() -> Bool {
     return matchOpenBrace(true)
   }
 
   // {
-  mutating func matchOpenBrace(consume: Bool = false) -> Bool {
+  public mutating func matchOpenBrace(consume: Bool = false) -> Bool {
     return matchOne(123, consume: consume) // {
   }
 
-  mutating func eatCloseBrace() -> Bool {
+  public mutating func eatCloseBrace() -> Bool {
     return matchCloseBrace(true)
   }
 
   // }
-  mutating func matchCloseBrace(consume: Bool = false) -> Bool {
+  public mutating func matchCloseBrace(consume: Bool = false) -> Bool {
     return matchOne(125, consume: consume) // }
   }
 
-  mutating func eatEqual() -> Bool {
+  public mutating func eatEqual() -> Bool {
     return matchEqual(true)
   }
 
   // =
-  mutating func matchEqual(consume: Bool = false) -> Bool {
+  public mutating func matchEqual(consume: Bool = false) -> Bool {
     return matchOne(61, consume: consume) // =
   }
 
-  mutating func eatPlus() -> Bool {
+  public mutating func eatPlus() -> Bool {
     return matchPlus(true)
   }
 
   // +
-  mutating func matchPlus(consume: Bool = false) -> Bool {
+  public mutating func matchPlus(consume: Bool = false) -> Bool {
     return matchOne(43, consume: consume) // +
   }
 
-  mutating func eatMinus() -> Bool {
+  public mutating func eatMinus() -> Bool {
     return matchMinus(true)
   }
 
   // -
-  mutating func matchMinus(consume: Bool = false) -> Bool {
+  public mutating func matchMinus(consume: Bool = false) -> Bool {
     return matchOne(45, consume: consume) // -
   }
 
-  mutating func eatExclamation() -> Bool {
+  public mutating func eatExclamation() -> Bool {
     return matchExclamation(true)
   }
 
   // !
-  mutating func matchExclamation(consume: Bool = false) -> Bool {
+  public mutating func matchExclamation(consume: Bool = false) -> Bool {
     return matchOne(33, consume: consume) // !
   }
 
-  mutating func eatQuestionMark() -> Bool {
+  public mutating func eatQuestionMark() -> Bool {
     return matchQuestionMark(true)
   }
 
   // ?
-  mutating func matchQuestionMark(consume: Bool = false) -> Bool {
+  public mutating func matchQuestionMark(consume: Bool = false) -> Bool {
     return matchOne(63, consume: consume) // ?
   }
 
-  mutating func eatAmpersand() -> Bool {
+  public mutating func eatAmpersand() -> Bool {
     return matchAmpersand(true)
   }
 
   // &
-  mutating func matchAmpersand(consume: Bool = false) -> Bool {
+  public mutating func matchAmpersand(consume: Bool = false) -> Bool {
     return matchOne(38, consume: consume) // &
   }
 
-  mutating func eatSemicolon() -> Bool {
+  public mutating func eatSemicolon() -> Bool {
     return matchSemicolon(true)
   }
 
   // ;
-  mutating func matchSemicolon(consume: Bool = false) -> Bool {
+  public mutating func matchSemicolon(consume: Bool = false) -> Bool {
     return matchOne(59, consume: consume) // ;
   }
 
-  mutating func eatColon() -> Bool {
+  public mutating func eatColon() -> Bool {
     return matchColon(true)
   }
 
   // :
-  mutating func matchColon(consume: Bool = false) -> Bool {
+  public mutating func matchColon(consume: Bool = false) -> Bool {
     return matchOne(58, consume: consume) // :
   }
 
-  mutating func eatPoint() -> Bool {
+  public mutating func eatPoint() -> Bool {
     return matchPoint(true)
   }
 
   // .
-  mutating func matchPoint(consume: Bool = false) -> Bool {
+  public mutating func matchPoint(consume: Bool = false) -> Bool {
     return matchOne(46, consume: consume) // .
   }
 
-  mutating func eatComma() -> Bool {
+  public mutating func eatComma() -> Bool {
     return matchComma(true)
   }
 
   // ,
-  mutating func matchComma(consume: Bool = false) -> Bool {
+  public mutating func matchComma(consume: Bool = false) -> Bool {
     return matchOne(44, consume: consume) // ,
   }
 
-  mutating func eatAsterisk() -> Bool {
+  public mutating func eatAsterisk() -> Bool {
     return matchAsterisk(true)
   }
 
   // *
-  mutating func matchAsterisk(consume: Bool = false) -> Bool {
+  public mutating func matchAsterisk(consume: Bool = false) -> Bool {
     return matchOne(42, consume: consume) // *
   }
 
-  mutating func eatSlash() -> Bool {
+  public mutating func eatSlash() -> Bool {
     return matchSlash(true)
   }
 
   // /
-  mutating func matchSlash(consume: Bool = false) -> Bool {
+  public mutating func matchSlash(consume: Bool = false) -> Bool {
     return matchOne(47, consume: consume) // /
   }
 
-  mutating func eatBackslash() -> Bool {
+  public mutating func eatBackslash() -> Bool {
     return matchBackslash(true)
   }
 
   // \.
-  mutating func matchBackslash(consume: Bool = false) -> Bool {
+  public mutating func matchBackslash(consume: Bool = false) -> Bool {
     return matchOne(92, consume: consume) // \.
   }
 
-  mutating func eatAt() -> Bool {
+  public mutating func eatAt() -> Bool {
     return matchAt(true)
   }
 
   // @
-  mutating func matchAt(consume: Bool = false) -> Bool {
+  public mutating func matchAt(consume: Bool = false) -> Bool {
     return matchOne(64, consume: consume) // @
   }
 
-  mutating func eatTilde() -> Bool {
+  public mutating func eatTilde() -> Bool {
     return matchTilde(true)
   }
 
   // ~
-  mutating func matchTilde(consume: Bool = false) -> Bool {
+  public mutating func matchTilde(consume: Bool = false) -> Bool {
     return matchOne(126, consume: consume) // ~
   }
 
-  mutating func eatUnderline() -> Bool {
+  public mutating func eatUnderline() -> Bool {
     return matchUnderline(true)
   }
 
   // _
-  mutating func matchUnderline(consume: Bool = false) -> Bool {
+  public mutating func matchUnderline(consume: Bool = false) -> Bool {
     return matchOne(95, consume: consume) // _
   }
 
-  mutating func eatPercent() -> Bool {
+  public mutating func eatPercent() -> Bool {
     return matchPercent(true)
   }
 
   // %
-  mutating func matchPercent(consume: Bool = false) -> Bool {
+  public mutating func matchPercent(consume: Bool = false) -> Bool {
     return matchOne(37, consume: consume) // %
   }
 
-  mutating func eatDollar() -> Bool {
+  public mutating func eatDollar() -> Bool {
     return matchDollar(true)
   }
 
   // $
-  mutating func matchDollar(consume: Bool = false) -> Bool {
+  public mutating func matchDollar(consume: Bool = false) -> Bool {
     return matchOne(36, consume: consume) // $
   }
 
-  mutating func eatSingleQuote() -> Bool {
+  public mutating func eatSingleQuote() -> Bool {
     return matchSingleQuote(true)
   }
 
   // '
-  mutating func matchSingleQuote(consume: Bool = false) -> Bool {
+  public mutating func matchSingleQuote(consume: Bool = false) -> Bool {
     return matchOne(39, consume: consume) // '
   }
 
-  mutating func eatDoubleQuote() -> Bool {
+  public mutating func eatDoubleQuote() -> Bool {
     return matchDoubleQuote(true)
   }
 
   // "
-  mutating func matchDoubleQuote(consume: Bool = false) -> Bool {
+  public mutating func matchDoubleQuote(consume: Bool = false) -> Bool {
     return matchOne(34, consume: consume) // "
   }
 
-  mutating func eatHash() -> Bool {
+  public mutating func eatHash() -> Bool {
     return matchHash(true)
   }
 
   // #
-  mutating func matchHash(consume: Bool = false) -> Bool {
+  public mutating func matchHash(consume: Bool = false) -> Bool {
     return matchOne(35, consume: consume) // #
   }
 
-  mutating func eatPipe() -> Bool {
+  public mutating func eatPipe() -> Bool {
     return matchPipe(true)
   }
 
   // |
-  mutating func matchPipe(consume: Bool = false) -> Bool {
+  public mutating func matchPipe(consume: Bool = false) -> Bool {
     return matchOne(124, consume: consume) // |
   }
 
-  mutating func eatCircumflex() -> Bool {
+  public mutating func eatCircumflex() -> Bool {
     return matchCircumflex(true)
   }
 
   // ^
-  mutating func matchCircumflex(consume: Bool = false) -> Bool {
+  public mutating func matchCircumflex(consume: Bool = false) -> Bool {
     return matchOne(94, consume: consume) // ^
   }
 
   // Extended matching
 
-  mutating func eatInQuotes(qc: UInt8) -> Bool {
+  public mutating func eatInQuotes(qc: UInt8) -> Bool {
     return matchInQuotes(qc, consume: true) >= 0
   }
 
-  mutating func matchInQuotes(qc: UInt8, consume: Bool = false) -> Int {
+  public mutating func matchInQuotes(qc: UInt8, consume: Bool = false) -> Int {
     var r = -1
     var i = currentIndex
     if qc == _codeUnits[i] {
@@ -1493,11 +1505,12 @@ public struct CodeUnitStream {
     return r
   }
 
-  mutating func eatInEscapedQuotes(qc: UInt8) -> Bool {
+  public mutating func eatInEscapedQuotes(qc: UInt8) -> Bool {
     return matchInEscapedQuotes(qc, consume: true) >= 0
   }
 
-  mutating func matchInEscapedQuotes(qc: UInt8, consume: Bool = false) -> Int {
+  public mutating func matchInEscapedQuotes(qc: UInt8, consume: Bool = false)
+      -> Int {
     var r = -1
     var i = currentIndex
     if qc == _codeUnits[i] {
@@ -1524,12 +1537,12 @@ public struct CodeUnitStream {
     return r
   }
 
-  mutating func eatUntilEscapedString(string: String) -> Bool {
+  public mutating func eatUntilEscapedString(string: String) -> Bool {
     return matchUntilEscapedString(string, consume: true) >= 0
   }
 
-  mutating func matchUntilEscapedString(string: String, consume: Bool = false)
-      -> Int {
+  public mutating func matchUntilEscapedString(string: String,
+      consume: Bool = false) -> Int {
     var r = -1
     var i = currentIndex
     let lei = lineEndIndex
@@ -1575,11 +1588,11 @@ public struct CodeUnitStream {
     return r
   }
 
-  mutating func eatEscapingUntil(fn: (c: UInt8) -> Bool) -> Bool{
+  public mutating func eatEscapingUntil(fn: (c: UInt8) -> Bool) -> Bool{
     return matchEscapingUntil(true, fn: fn) >= 0
   }
 
-  mutating func matchEscapingUntil(consume: Bool = false,
+  public mutating func matchEscapingUntil(consume: Bool = false,
       fn: (c: UInt8) -> Bool) -> Int {
     var r = -1
     var i = currentIndex
@@ -1603,11 +1616,11 @@ public struct CodeUnitStream {
     return r
   }
 
-  mutating func eatKeyword(string: String) -> Bool {
+  public mutating func eatKeyword(string: String) -> Bool {
     return matchKeyword(string, consume: true) >= 0
   }
 
-  mutating func matchKeyword(string: String, consume: Bool = false) -> Int {
+  public mutating func matchKeyword(string: String, consume: Bool = false) -> Int {
     var r = -1
     let sa = [UInt8](string.utf8)
     let len = sa.count
@@ -1627,11 +1640,12 @@ public struct CodeUnitStream {
     return r
   }
 
-  mutating func eatKeywordFromList(firstCharTable: FirstCharTable) -> Bool {
+  public mutating func eatKeywordFromList(firstCharTable: FirstCharTable)
+      -> Bool {
     return matchKeywordFromList(firstCharTable, consume: true) >= 0
   }
 
-  mutating func matchKeywordFromList(firstCharTable: FirstCharTable,
+  public mutating func matchKeywordFromList(firstCharTable: FirstCharTable,
       consume: Bool = false) -> Int {
     var r = -1
     let i = currentIndex
@@ -1679,11 +1693,12 @@ public struct CodeUnitStream {
   }
 
   // Triple quotes sequence
-  mutating func eatEscapingUntilThree(c1: UInt8, c2: UInt8, c3: UInt8) -> Bool {
+  public mutating func eatEscapingUntilThree(c1: UInt8, c2: UInt8, c3: UInt8)
+      -> Bool {
     return matchEscapingUntilThree(c1, c2: c2, c3: c3, consume: true) >= 0
   }
 
-  mutating func matchEscapingUntilThree(c1: UInt8, c2: UInt8, c3: UInt8,
+  public mutating func matchEscapingUntilThree(c1: UInt8, c2: UInt8, c3: UInt8,
       consume: Bool = false) -> Int {
     var r = -1
     var i = currentIndex
@@ -1716,7 +1731,7 @@ public struct CodeUnitStream {
 
   // String list matching
 
-  mutating func makeFirstCharTable(strings: [String]) -> FirstCharTable {
+  public mutating func makeFirstCharTable(strings: [String]) -> FirstCharTable {
     let len = strings.count
     var a = FirstCharTable(count: 256, repeatedValue: nil)
     for i in 0..<len {
@@ -1733,11 +1748,12 @@ public struct CodeUnitStream {
     return a
   }
 
-  mutating func eatStringFromList(firstCharTable: FirstCharTable) -> Bool {
+  public mutating func eatStringFromList(firstCharTable: FirstCharTable)
+      -> Bool {
     return matchStringFromList(firstCharTable, consume: true) >= 0
   }
 
-  mutating func matchStringFromList(firstCharTable: FirstCharTable,
+  public mutating func matchStringFromList(firstCharTable: FirstCharTable,
       consume: Bool = false) -> Int {
     var r = -1
     let i = currentIndex
@@ -1776,12 +1792,12 @@ public struct CodeUnitStream {
     return r
   }
 
-  mutating func eatUntilIncludingStringFromList(firstCharTable: FirstCharTable)
+  public mutating func eatUntilIncludingStringFromList(firstCharTable: FirstCharTable)
       -> Bool {
     return matchUntilIncludingStringFromList(firstCharTable, consume: true) >= 0
   }
 
-  mutating func matchUntilIncludingStringFromList(
+  public mutating func matchUntilIncludingStringFromList(
       firstCharTable: FirstCharTable, consume: Bool = false) -> Int {
     var r = -1
     var i = currentIndex
@@ -1825,12 +1841,12 @@ public struct CodeUnitStream {
     return r
   }
 
-  mutating func eatUntilIncludingString(string: String) -> Bool {
+  public mutating func eatUntilIncludingString(string: String) -> Bool {
     return matchUntilIncludingString(string, consume: true) >= 0
   }
 
-  mutating func matchUntilIncludingString(string: String, consume: Bool = false)
-      -> Int {
+  public mutating func matchUntilIncludingString(string: String,
+      consume: Bool = false) -> Int {
     var r = -1
     var i = currentIndex
     var sa = [UInt8](string.utf8)
@@ -1880,13 +1896,13 @@ public struct CodeUnitStream {
     return r
   }*/
 
-  mutating func eatWhileNotStringFromList(firstCharTable: FirstCharTable)
+  public mutating func eatWhileNotStringFromList(firstCharTable: FirstCharTable)
       -> Bool {
     return matchWhileNotStringFromList(firstCharTable, consume: true) >= 0
   }
 
-  mutating func matchWhileNotStringFromList(firstCharTable: FirstCharTable,
-      consume: Bool = false) -> Int {
+  public mutating func matchWhileNotStringFromList(
+      firstCharTable: FirstCharTable, consume: Bool = false) -> Int {
     var r = -1
     var i = currentIndex
     let len = lineEndIndex
@@ -1930,11 +1946,12 @@ public struct CodeUnitStream {
     return r
   }
 
-  mutating func eatWhileStringFromList(firstCharTable: FirstCharTable) -> Bool {
+  public mutating func eatWhileStringFromList(firstCharTable: FirstCharTable)
+      -> Bool {
     return matchWhileStringFromList(firstCharTable, consume: true) >= 0
   }
 
-  mutating func matchWhileStringFromList(firstCharTable: FirstCharTable,
+  public mutating func matchWhileStringFromList(firstCharTable: FirstCharTable,
       consume: Bool = false) -> Int {
     var r = -1
     var i = currentIndex
