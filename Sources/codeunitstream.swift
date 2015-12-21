@@ -532,15 +532,15 @@ public class CodeUnitStream: CustomStringConvertible {
   }
 
   func eatTwo(c1: UInt8, c2: UInt8) -> Bool {
-    return matchTwo(c1, c2: c2, consume: true) >= 0
+    return matchTwo(c1, c2: c2, consume: true)
   }
 
-  func matchTwo(c1: UInt8, c2: UInt8, consume: Bool = false) -> Int {
-    var r = -1
+  func matchTwo(c1: UInt8, c2: UInt8, consume: Bool = false) -> Bool {
+    var r = false
     let i = currentIndex
     if i < lineEndIndex - 1 && _codeUnits[i] == c1 &&
         _codeUnits[i + 1] == c2 {
-      r = 2
+      r = true
       if consume {
         currentIndex = i + 2
       }
@@ -549,16 +549,16 @@ public class CodeUnitStream: CustomStringConvertible {
   }
 
   func eatThree(c1: UInt8, c2: UInt8, c3: UInt8) -> Bool {
-    return matchThree(c1, c2: c2, c3: c3, consume: true) >= 0
+    return matchThree(c1, c2: c2, c3: c3, consume: true)
   }
 
   func matchThree(c1: UInt8, c2: UInt8, c3: UInt8, consume: Bool = false)
-      -> Int {
-    var r = -1
+      -> Bool {
+    var r = false
     let i = currentIndex
     if i < lineEndIndex - 2 && _codeUnits[i] == c1 &&
         _codeUnits[i + 1] == c2 && _codeUnits[i + 2] == c3 {
-      r = 3
+      r = true
       if consume {
         currentIndex = i + 3
       }
