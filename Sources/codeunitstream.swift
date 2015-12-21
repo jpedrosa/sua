@@ -5,9 +5,9 @@ typealias FirstCharTable = [[[UInt8]]?]
 
 public class CodeUnitStream: CustomStringConvertible {
 
-  public var currentIndex = 0
-  public var startIndex = 0
   public var _codeUnits: [UInt8] = []
+  public var startIndex = 0
+  public var currentIndex = 0
   public var lineEndIndex = 0
   public var milestoneIndex = 0
 
