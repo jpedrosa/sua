@@ -20,7 +20,6 @@ public class PosixStdin {
     var buffer = [UInt8](count: len, repeatedValue: 0)
     var stream = CodeUnitStream()
     var n = try doRead(&buffer, maxBytes: len)
-    var ci = 0
     let hasFn = fn != nil
     while n > 0 {
       stream.merge(buffer, maxBytes: n)
