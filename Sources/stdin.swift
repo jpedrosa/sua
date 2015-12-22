@@ -46,6 +46,39 @@ public class PosixStdin {
     return a
   }
 
+  public func readByteLines(fn: ((line: [UInt8]) -> Void)? = nil) throws
+      -> [UInt8] {
+    var a: [UInt8] = []
+    let len = 1024
+    var buffer = [UInt8](count: len, repeatedValue: 0)
+    var stream = CodeUnitStream()
+    var n = try doRead(&buffer, maxBytes: len)
+    let hasFn = fn != nil
+    while n > 0 {
+      stream.merge(buffer, maxBytes: n)
+      while stream.skipTo(10) >= 0 { // \n
+        stream.currentIndex += 1
+        let b = stream.collectToken()
+        stream.startIndex = stream.currentIndex
+        if hasFn {
+          fn!(line: b)
+        } else {
+          a += b
+        }
+      }
+      n = try doRead(&buffer, maxBytes: len)
+    }
+    if !(stream.isEol && (stream.startIndex == stream.currentIndex)) {
+      let b = stream.collectToken()
+      if hasFn {
+        fn!(line: b)
+      } else {
+        a += b
+      }
+    }
+    return a
+  }
+
   public func readBytes(maxBytes: Int = 1024) throws -> [UInt8]? {
     var a = [UInt8](count: maxBytes, repeatedValue: 0)
     let n = try doRead(&a, maxBytes: maxBytes)

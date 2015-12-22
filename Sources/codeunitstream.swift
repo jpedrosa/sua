@@ -369,6 +369,12 @@ public struct CodeUnitStream {
     return s
   }
 
+  public mutating func collectToken() -> [UInt8] {
+    let s = currentToken
+    startIndex = currentIndex
+    return s
+  }
+
   static var _pool: [CodeUnitStream] = []
 
   static func _returnToPool(o: CodeUnitStream) {
