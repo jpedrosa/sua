@@ -78,6 +78,34 @@ func timeTop8(label: String = "top8") {
   print("timeTop8 (\(label)) count: \(count)")
 }
 
+func timeMap8(label: String = "map8") {
+  var count = 0
+  let c2 = [UInt8]("2".utf8)[0]
+  for _ in 0..<ITERATIONS {
+    let s = genSample(label)
+    var sa: [UInt8] = s.utf8.map { $0 }
+    let c = sa[sa.count - 1]
+    if c == c2 {
+      count += 1
+    }
+  }
+  print("timeMap8 (\(label)) count: \(count)")
+}
+
+func timeUtf16(label: String = "ut16") {
+  var count = 0
+  let s2 = "2"
+  let c2 = s2.utf16[s2.utf16.startIndex]
+  for _ in 0..<ITERATIONS {
+    let s = genSample(label)
+    let c = s.utf16[s.utf16.startIndex.advancedBy(s.utf16.count - 1)]
+    if c == c2 {
+      count += 1
+    }
+  }
+  print("timeUtf16 (\(label)) count: \(count)")
+}
+
 var sw = Stopwatch()
 sw.start()
 timeCharacter()
@@ -93,4 +121,12 @@ print("Elapsed: \(sw.millis)ms")
 
 sw.start()
 timeTop8()
+print("Elapsed: \(sw.millis)ms")
+
+sw.start()
+timeMap8()
+print("Elapsed: \(sw.millis)ms")
+
+sw.start()
+timeUtf16()
 print("Elapsed: \(sw.millis)ms")
