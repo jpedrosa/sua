@@ -188,21 +188,6 @@ public class File: CustomStringConvertible {
 }
 
 
-// This is like the "<<" in other languages. In Swift the "<<" has its
-// associative value set to none, and we apparently would need it to be set
-// to left for this to work. But I couldn't change it. Someone else suggested
-// this other version instead.
-infix operator <- { associativity left precedence 140 }
-func <-(lhs: File, rhs: String) -> File {
-  lhs.write(rhs)
-  return lhs
-}
-func <-(lhs: File, rhs: Any) -> File {
-  lhs.write("\(rhs)")
-  return lhs
-}
-
-
 public enum FileError: ErrorType {
   case FileException(message: String)
 }
