@@ -14,8 +14,9 @@ if !Stdin.isTerminal {
     if len > 0 && line[len - 1] == 10 {
       newLineCount += 1
     }
+    p(line)
+    p(String.fromCharCodes(line))
     //stream.codeUnits = line
-    //p(line)
   }
 
   print("  \(newLineCount)  ( - )   \(bytesCount)")
