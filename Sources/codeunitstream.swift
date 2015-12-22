@@ -232,7 +232,7 @@ public struct CodeUnitStream {
 
   public mutating func skipTo(c: UInt8) -> Int {
     let r = findIndex(c, startAt: currentIndex)
-    if r < lineEndIndex {
+    if r >= startIndex && r < lineEndIndex {
       currentIndex = r
     }
     return r
@@ -1997,6 +1997,20 @@ public struct CodeUnitStream {
       }
     }
     return r
+  }
+
+  mutating func merge(buffer: [UInt8], maxBytes: Int) {
+    let len = _codeUnits.count
+    let si = startIndex
+    if si >= len {
+      codeUnits = buffer
+    } else {
+      var a: [UInt8] = Array(_codeUnits[si..<len])
+      a += buffer[0..<maxBytes]
+      let offset = currentIndex - si
+      codeUnits = a
+      currentIndex = offset
+    }
   }
 
 }

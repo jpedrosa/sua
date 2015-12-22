@@ -13,14 +13,36 @@ public class PosixStdin {
     return n
   }
 
-  public func readLines(fn: ((line: String?) -> Void)?) throws -> [String?] {
+  public func readLines(fn: ((line: String?) -> Void)? = nil) throws
+      -> [String?] {
     var a: [String?] = []
     let len = 1024
     var buffer = [UInt8](count: len, repeatedValue: 0)
     var stream = CodeUnitStream()
-    if fn != nil {
-    } else {
-
+    var n = try doRead(&buffer, maxBytes: len)
+    var ci = 0
+    let hasFn = fn != nil
+    while n > 0 {
+      stream.merge(buffer, maxBytes: n)
+      while stream.skipTo(10) >= 0 { // \n
+        stream.currentIndex += 1
+        let s = stream.collectTokenString()
+        stream.startIndex = stream.currentIndex
+        if hasFn {
+          fn!(line: s)
+        } else {
+          a.append(s)
+        }
+      }
+      n = try doRead(&buffer, maxBytes: len)
+    }
+    if !(stream.isEol && (stream.startIndex == stream.currentIndex)) {
+      let s = stream.collectTokenString()
+      if hasFn {
+        fn!(line: s)
+      } else {
+        a.append(s)
+      }
     }
     return a
   }
