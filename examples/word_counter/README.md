@@ -12,7 +12,7 @@ a helper class (or struct) for parsing bytes which I used in Dart quite a bit,
 called [CodeUnitStream](../../Sources/codeunitstream.swift).
 
 Based on those advancements, I was able to create this Word Example in very few
-lines, since most of the code is now found in pretty reusable libraries.
+lines of code, since most of the code is now found in pretty reusable libraries.
 
 Let's see an example run here:
 
