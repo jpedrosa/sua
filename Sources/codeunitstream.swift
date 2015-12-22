@@ -2009,7 +2009,7 @@ public struct CodeUnitStream {
     let len = _codeUnits.count
     let si = startIndex
     if si >= len {
-      codeUnits = buffer
+      codeUnits = [UInt8](buffer[0..<maxBytes])
     } else {
       var a = [UInt8](_codeUnits[si..<len])
       a += buffer[0..<maxBytes]

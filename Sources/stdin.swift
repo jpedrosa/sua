@@ -35,8 +35,8 @@ public class PosixStdin {
       }
       n = try doRead(&buffer, maxBytes: len)
     }
-    if !(stream.isEol && (stream.startIndex == stream.currentIndex)) {
-      let s = stream.collectTokenString()
+    stream.skipToEnd()
+    if let s = stream.collectTokenString() {
       if hasFn {
         fn!(line: s)
       } else {
@@ -68,7 +68,7 @@ public class PosixStdin {
       }
       n = try doRead(&buffer, maxBytes: len)
     }
-    if !(stream.isEol && (stream.startIndex == stream.currentIndex)) {
+    if stream.startIndex < stream.lineEndIndex {
       let b = stream.collectToken()
       if hasFn {
         fn!(line: b)
