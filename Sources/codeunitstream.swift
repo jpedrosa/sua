@@ -2011,7 +2011,7 @@ public struct CodeUnitStream {
     if si >= len {
       codeUnits = buffer
     } else {
-      var a: [UInt8] = Array(_codeUnits[si..<len])
+      var a = [UInt8](_codeUnits[si..<len])
       a += buffer[0..<maxBytes]
       let offset = currentIndex - si
       codeUnits = a
