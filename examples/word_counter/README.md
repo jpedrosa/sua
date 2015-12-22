@@ -11,7 +11,7 @@ For Sua I recently added support for reading from Standard Input and also
 a helper class (or struct) for parsing bytes which I used in Dart quite a bit,
 called [CodeUnitStream](../../Sources/codeunitstream.swift).
 
-Based on those advancements, I was able to create this Word Example in very few
+Based on those advancements, I was able to create this Word Counter example in very few
 lines of code, since most of the code is now found in pretty reusable libraries.
 
 Let's see an example run here:
