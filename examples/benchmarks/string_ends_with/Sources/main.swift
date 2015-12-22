@@ -106,6 +106,27 @@ func timeUtf16(label: String = "ut16") {
   print("timeUtf16 (\(label)) count: \(count)")
 }
 
+
+var utf8Cache = [Int: [UInt8]]()
+func prepareUtf8Cache(label: String = "ut8c") {
+  for i in 0..<ITERATIONS {
+    utf8Cache[i] = [UInt8](genSample(label).utf8)
+  }
+}
+
+func timeUtf8Cache(label: String = "ut8c") {
+  var count = 0
+  let c2 = [UInt8]("2".utf8)[0]
+  for i in 0..<ITERATIONS {
+    let a = utf8Cache[i]!
+    let c = a[a.count - 1]
+    if c == c2 {
+      count += 1
+    }
+  }
+  print("timeUtf8Cache (\(label)) count: \(count)")
+}
+
 var sw = Stopwatch()
 sw.start()
 timeCharacter()
@@ -129,4 +150,9 @@ print("Elapsed: \(sw.millis)ms")
 
 sw.start()
 timeUtf16()
+print("Elapsed: \(sw.millis)ms")
+
+prepareUtf8Cache()
+sw.start()
+timeUtf8Cache()
 print("Elapsed: \(sw.millis)ms")
