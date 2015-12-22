@@ -9,7 +9,7 @@ been creating.
 
 For Sua I recently added support for reading from Standard Input and also
 a helper class (or struct) for parsing bytes which I used in Dart quite a bit,
-called CodeUniStream.
+called [CodeUnitStream](../../Sources/codeunitstream.swift).
 
 Based on those advancements, I was able to create this Word Example in very few
 lines, since most of the code is now found in pretty reusable libraries.
