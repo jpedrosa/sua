@@ -44,11 +44,6 @@ public class File: CustomStringConvertible {
       });
   }*/
 
-  /*func <<(string: String) -> File {
-    write(string)
-    return self
-  }*/
-
   public func print(v: String) {
     write(v)
   }
@@ -190,6 +185,21 @@ public class File: CustomStringConvertible {
 
   public var description: String { return "File(path: \(inspect(path)))" }
 
+}
+
+
+// This is like the "<<" in other languages. In Swift the "<<" has its
+// associative value set to none, and we apparently would need it to be set
+// to left for this to work. But I couldn't change it. Someone else suggested
+// this other version instead.
+infix operator <- { associativity left precedence 140 }
+func <-(lhs: File, rhs: String) -> File {
+  lhs.write(rhs)
+  return lhs
+}
+func <-(lhs: File, rhs: Any) -> File {
+  lhs.write("\(rhs)")
+  return lhs
 }
 
 
