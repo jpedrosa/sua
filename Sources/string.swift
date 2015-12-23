@@ -26,27 +26,43 @@ public extension String {
       end: Int = -1) -> String? {
     let lasti = charCodes.count - 1
     let ei = end < 0 ? lasti : end
-    var a = charCodes // Copy array by assigning it and then change it below.
-    if ei < lasti {
-      a[ei + 1] = 0
+    if ei < start {
+      return nil
     } else {
-      a.append(0)
+      var a: [CChar]
+      if ei < lasti {
+        a = [CChar](charCodes[start...ei + 1])
+        a[a.count - 1] = 0
+      } else {
+        a = [CChar](charCodes[start...lasti])
+        if a[a.count - 1] != 0 {
+          a.append(0)
+        }
+      }
+      return String.fromCString(&a)
     }
-    return String.fromCString(&a)
   }
 
   public static func fromCharCodes(charCodes: [UInt8], start: Int = 0,
       end: Int = -1) -> String? {
     let lasti = charCodes.count - 1
     let ei = end < 0 ? lasti : end
-    var a = charCodes // Copy array by assigning it and then change it below.
-    if ei < lasti {
-      a[ei + 1] = 0
+    if ei < start {
+      return nil
     } else {
-      a.append(0)
+      var a: [UInt8]
+      if ei < lasti {
+        a = [UInt8](charCodes[start...ei + 1])
+        a[a.count - 1] = 0
+      } else {
+        a = [UInt8](charCodes[start...lasti])
+        if a[a.count - 1] != 0 {
+          a.append(0)
+        }
+      }
+      let ap = UnsafePointer<CChar>(a)
+      return String.fromCString(ap)
     }
-    let ap = UnsafePointer<CChar>(a)
-    return String.fromCString(ap)
   }
 
 
