@@ -86,7 +86,7 @@ public class PosixStdin {
     if n <= 0 {
       return nil
     } else if n < maxBytes {
-      a = a[0..<n].map { UInt8($0) }
+      a = [UInt8](a[0..<n])
     }
     return a
   }
