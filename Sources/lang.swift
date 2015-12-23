@@ -16,3 +16,39 @@ public func p(a: Any...) {
     debugPrint(e)
   }
 }
+
+// printList is like the "puts" command in Ruby.
+// printList will check whether the line ends with a new line, and if it does
+// not, it will append a new line to it.
+// It will also print the individual items of arrays and variadic parameters on
+// separate lines.
+// Since importing Glibc already imports the "puts" command found in C which
+// would conflict with this command, we've given it a unique name instead.
+func printList(string: String) {
+  // 10 - new line
+  if string.isEmpty ||  string.utf8[
+      string.utf8.startIndex.advancedBy(string.utf8.count - 1)] != 10 {
+    print(string)
+  } else {
+    Stdout.write(string)
+  }
+}
+
+func printList(strings: [String]) {
+  for s in strings {
+    printList(s)
+  }
+}
+
+func printList(bunch: [Any]) {
+  p("check")
+  for o in bunch {
+    printList("\(o)")
+  }
+}
+
+func printList(list: Any...) {
+  for v in list {
+    printList("\(v)")
+  }
+}
