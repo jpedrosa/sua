@@ -212,8 +212,8 @@ public class PosixSys {
       }
       let np = UnsafePointer<CChar>(nm)
       if let s = String.fromCString(np) {
-        let (left, right) = s.splitOnce("=")
-        env[left!] = right ?? ""
+        let (key, value) = s.splitOnce("=")
+        env[key!] = value ?? ""
       }
       i += 1
     }
