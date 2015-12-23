@@ -6,9 +6,9 @@ public class Stdout {
     IO.flush()
   }
 
-  public static func writeBytes(a: [UInt8], length: Int) -> Int {
+  public static func writeBytes(a: [UInt8], maxBytes: Int) -> Int {
     var r = a
-    let n = Sys.write(PosixSys.STDOUT_FD, address: &r, length: length)
+    let n = Sys.write(PosixSys.STDOUT_FD, address: &r, length: maxBytes)
     IO.flush()
     return n
   }
