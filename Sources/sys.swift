@@ -212,18 +212,10 @@ public class PosixSys {
       }
       let np = UnsafePointer<CChar>(nm)
       if let s = String.fromCString(np) {
-        var b: [CChar] = s.utf8.map { CChar($0) }
-        let lasti = b.count - 1
-        for m in 0...lasti {
-          if b[m] == 61 {
-            if let k = String.fromCharCodes(b, start: 0, end: m - 1) {
-              env[k] = String.fromCharCodes(b, start: m + 1, end: lasti) ?? ""
-            }
-            break
-          }
-        }
+        let (left, right) = s.splitOnce("=")
+        env[left!] = right ?? ""
       }
-      i++
+      i += 1
     }
     return env
   }

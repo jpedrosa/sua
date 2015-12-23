@@ -65,4 +65,67 @@ public extension String {
     }
   }
 
+
+  /**
+    Splits a string once or into 2 halves by returning a tuple with the left
+    and right values.
+
+    If the string pattern is not found at all, the left value will always be
+    nil.
+
+    E.g.:
+        print("abcdef".splitOnce("cd")) // Prints (Optional("ab"), Optional("ef"))
+        print("abcdef".splitOnce("xy")) // Prints (nil, nil)
+        print("abcdef".splitOnce("ab")) // Prints (Optional(""), Optional("cdef"))
+        print("abcdef".splitOnce("ef")) // (Optional("abcd"), nil)
+  */
+  public func splitOnce(string: String) -> (left: String?, right: String?) {
+    var left: String?
+    var right: String?
+    if !string.isEmpty {
+      let sfc = string.utf16.codeUnitAt(0)
+      let jlen = string.utf16.count
+      let len = utf16.count
+      let validLen = len - jlen + 1
+      for i in 0..<validLen {
+        if utf16.codeUnitAt(i) == sfc {
+          var ok = true
+          var j = 1
+          while j < jlen {
+            if utf16.codeUnitAt(i + j) != string.utf16.codeUnitAt(j) {
+              ok = false
+              break
+            }
+            j += 1
+          }
+          if ok {
+            left = utf16.substring(0, endIndex: i)
+            if i + j < len {
+              right = utf16.substring(i + j, endIndex: len)
+            }
+            break
+          }
+        }
+      }
+    }
+    return (left, right)
+  }
+
+}
+
+
+public extension String.UTF16View {
+
+  // Handy method for obtaining a string out of UTF16 indices.
+  public func substring(startIndex: Int, endIndex: Int)
+      -> String? {
+    return String(self[self.startIndex.advancedBy(
+        startIndex)..<self.startIndex.advancedBy(endIndex)])
+  }
+
+  // Handy method for obtaining a UTF16 code unit to compare with.
+  public func codeUnitAt(index: Int) -> UInt16 {
+    return self[startIndex.advancedBy(index)]
+  }
+
 }
