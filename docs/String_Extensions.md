@@ -6,7 +6,7 @@ candidates for extensions and it was the first one that I actually extended with
 the fromCharCodes methods.
 
 Today I added to those by giving the String a
-[splitOnce](../Sources/string.swift) method. The inspiration
+[splitOnce](../Sources/string.swift#L82) method. The inspiration
 for this method came from having to split the key/value pairs of the environment
 variables. The older code looked quite ugly and I tried to revamp it based on
 my new knowledge of how performant the different String iteration methods can
