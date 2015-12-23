@@ -26,8 +26,7 @@ public func p(a: Any...) {
 // would conflict with this command, we've given it a unique name instead.
 func printList(string: String) {
   // 10 - new line
-  if string.isEmpty ||  string.utf8[
-      string.utf8.startIndex.advancedBy(string.utf8.count - 1)] != 10 {
+  if string.isEmpty || string.utf16.codeUnitAt(string.utf16.count - 1) != 10 {
     print(string)
   } else {
     Stdout.write(string)
