@@ -24,9 +24,9 @@ public extension String {
   */
   public static func fromCharCodes(charCodes: [CChar], start: Int = 0,
       end: Int = -1) -> String? {
-    var a = charCodes // Copy array by assigning it and then change it below.
-    let lasti = a.count - 1
+    let lasti = charCodes.count - 1
     let ei = end < 0 ? lasti : end
+    var a = charCodes // Copy array by assigning it and then change it below.
     if ei < lasti {
       a[ei + 1] = 0
     } else {
@@ -37,9 +37,9 @@ public extension String {
 
   public static func fromCharCodes(charCodes: [UInt8], start: Int = 0,
       end: Int = -1) -> String? {
-    var a = charCodes // Copy array by assigning it and then change it below.
-    let lasti = a.count - 1
+    let lasti = charCodes.count - 1
     let ei = end < 0 ? lasti : end
+    var a = charCodes // Copy array by assigning it and then change it below.
     if ei < lasti {
       a[ei + 1] = 0
     } else {
