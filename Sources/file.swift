@@ -58,7 +58,7 @@ public class File: CustomStringConvertible {
     var a = [UInt8](count: len, repeatedValue: 0)
     let n = try doRead(&a, maxBytes: len)
     if n < maxBytes {
-      a = a[0..<n].map { UInt8($0) }
+      a = [UInt8](a[0..<n])
     }
     return a
   }
@@ -68,7 +68,7 @@ public class File: CustomStringConvertible {
     var a = [CChar](count: len, repeatedValue: 0)
     let n = try doRead(&a, maxBytes: len)
     if n < maxBytes {
-      a = a[0..<n].map { CChar($0) }
+      a = [CChar](a[0..<n])
     }
     return a
   }
