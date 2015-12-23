@@ -41,7 +41,6 @@ func printList(strings: [String]) {
 }
 
 func printList(bunch: [Any]) {
-  p("check")
   for o in bunch {
     printList("\(o)")
   }
