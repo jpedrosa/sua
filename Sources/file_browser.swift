@@ -65,12 +65,6 @@ final public class FileBrowser {
     }
   }
 
-  public var isDot: Bool {
-    let a = nameBytes
-    let len = a.count
-    return len <= 2 && a[0] == 46 && (len == 1 || a[1] == 46) // . ..
-  }
-
   public var type: FileType {
     let t = entry!.memory.d_type
     return t == 8 ? .F : (t == 4 ? .D : .U)
