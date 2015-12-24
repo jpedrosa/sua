@@ -14,7 +14,7 @@ public enum FileType {
 }
 
 
-public class FileBrowser {
+final public class FileBrowser {
 
   var dirp: COpaquePointer?
   var entry: DirentEntry?
@@ -48,14 +48,14 @@ public class FileBrowser {
     }
   }
 
-  var entryName: String? {
+  public var name: String? {
     var dirName = entry!.memory.d_name
     return withUnsafePointer(&dirName) { (ptr) -> String? in
       return String.fromCString(UnsafePointer<CChar>(ptr))
     }
   }
 
-  var entryNameBytes: [UInt8] {
+  public var nameBytes: [UInt8] {
     var dirName = entry!.memory.d_name
     return withUnsafePointer(&dirName) { (ptr) -> [UInt8] in
       let len = Int(Sys.strlen(UnsafePointer<CChar>(ptr)))
@@ -65,21 +65,27 @@ public class FileBrowser {
     }
   }
 
-  var entryType: FileType {
+  public var isDot: Bool {
+    let a = nameBytes
+    let len = a.count
+    return len <= 2 && a[0] == 46 && (len == 1 || a[1] == 46) // . ..
+  }
+
+  public var type: FileType {
     let t = entry!.memory.d_type
     return t == 8 ? .F : (t == 4 ? .D : .U)
   }
 
   public static func scanDir(dirPath: String,
-      fn: (name: String, type: FileType) -> Void) throws {
+      fn: (fb: FileBrowser) -> Void) throws {
     let fb = try FileBrowser(path: dirPath)
     while fb.next() {
-      fn(name: fb.entryName ?? "", type: fb.entryType)
+      fn(fb: fb)
     }
   }
 
   public static func recurseDir(dirPath: String,
-      fn: (name: String, type: FileType, dirPath: String) -> Void) {
+      fn: (fb: FileBrowser, dirPath: String) -> Void) {
     let a = [UInt8](dirPath.utf8)
     let lasti = a.count - 1
     if lasti >= 0 {
@@ -92,13 +98,15 @@ public class FileBrowser {
   }
 
   public static func doRecurseDir(dirPath: String,
-      fn: (name: String, type: FileType, dirPath: String) -> Void) {
+      fn: (fb: FileBrowser, dirPath: String) -> Void) {
     do {
-      try scanDir(dirPath) { (name, type) in
-        if name != ".." && name != "." {
-          fn(name: name, type: type, dirPath: dirPath)
-          if type == .D {
-            doRecurseDir("\(dirPath)\(name)/", fn: fn)
+      try scanDir(dirPath) { fb in
+        if !fb.isDot {
+          fn(fb: fb, dirPath: dirPath)
+          if fb.type == .D {
+            if let name = fb.name {
+              doRecurseDir("\(dirPath)\(name)/", fn: fn)
+            }
           }
         }
       }
