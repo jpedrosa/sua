@@ -33,6 +33,9 @@ public class FileBrowser {
 
   public func next() -> Bool {
     guard let dp = dirp else { return false }
+    // Funny stuff. If the code was entry = Sys.readdir(dp), at the end of the
+    // listing the entry would still not be set to nil. By storing it into The
+    // temp variable "e" first, we get it to behave correctly.
     let e = Sys.readdir(dp)
     entry = e
     return e != nil
@@ -57,29 +60,11 @@ public class FileBrowser {
     return t == 8 ? .F : (t == 4 ? .D : .U)
   }
 
-  var entryRawType: UInt8 {
-    return entry!.memory.d_type
-  }
-
   public static func scanDir(dirPath: String,
       fn: (name: String, type: FileType) -> Void) throws {
-    var dirp = Sys.opendir(dirPath)
-    if (dirp == nil) {
-      throw FileBrowserError.InvalidDirectory(message:
-          "Failed to open directory.")
-    }
-    defer {
-      Sys.closedir(dirp)
-    }
-    var entry = Sys.readdir(dirp)
-    while entry != nil {
-      var dirName = entry.memory.d_name
-      let name = withUnsafePointer(&dirName) { (ptr) -> String in
-        return String.fromCString(UnsafePointer<CChar>(ptr)) ?? ""
-      }
-      let t = entry.memory.d_type
-      fn(name: name, type: t == 8 ? .F : (t == 4 ? .D : .U))
-      entry = Sys.readdir(dirp)
+    let fb = try FileBrowser(path: dirPath)
+    while fb.next() {
+      fn(name: fb.entryName ?? "", type: fb.entryType)
     }
   }
 
