@@ -114,7 +114,7 @@ public class StatMode: CustomStringConvertible {
     var j = a.count - 1
     while j >= 0 {
       s += String(a[j])
-      j--
+      j -= 1
     }
     return s
   }
