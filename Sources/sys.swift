@@ -51,6 +51,10 @@ public enum PopenOperation: String {
   case WriteWithCloexec
 }
 
+// This alias allows other files like the FileBrowser to declare this type
+// without having to import Glibc as well.
+public typealias DirentEntry = UnsafeMutablePointer<dirent>
+
 public class PosixSys {
 
   public static let DEFAULT_DIR_MODE = S_IRWXU | S_IRWXG | S_IRWXO
@@ -153,7 +157,7 @@ public class PosixSys {
     return stat()
   }
 
-  public func readdir(dirp: COpaquePointer) -> UnsafeMutablePointer<dirent> {
+  public func readdir(dirp: COpaquePointer) -> DirentEntry {
     return dirp != nil ? _readdir(dirp) : nil
   }
 

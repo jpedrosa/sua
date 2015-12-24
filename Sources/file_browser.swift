@@ -10,11 +10,56 @@ public enum FileType {
   public static func translate(type: FileType) -> String {
     return type == .F ? "f" : (type == .D ? "d" : "?")
   }
-  
+
 }
 
 
 public class FileBrowser {
+
+  var dirp: COpaquePointer?
+  var entry: DirentEntry?
+
+  public init(path: String) throws {
+    dirp = Sys.opendir(path)
+    if dirp == nil {
+      throw FileBrowserError.InvalidDirectory(message:
+          "Failed to open directory.")
+    }
+  }
+
+  deinit {
+    close()
+  }
+
+  public func next() -> Bool {
+    guard let dp = dirp else { return false }
+    let e = Sys.readdir(dp)
+    entry = e
+    return e != nil
+  }
+
+  public func close() {
+    if let dp = dirp {
+      Sys.closedir(dp)
+      dirp = nil
+    }
+  }
+
+  var entryName: String? {
+    var dirName = entry!.memory.d_name
+    return withUnsafePointer(&dirName) { (ptr) -> String? in
+      return String.fromCString(UnsafePointer<CChar>(ptr))
+    }
+  }
+
+  var entryType: FileType {
+    let t = entry!.memory.d_type
+    return t == 8 ? .F : (t == 4 ? .D : .U)
+  }
+
+  var entryRawType: UInt8 {
+    return entry!.memory.d_type
+  }
 
   public static func scanDir(dirPath: String,
       fn: (name: String, type: FileType) -> Void) throws {
