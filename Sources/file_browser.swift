@@ -86,10 +86,9 @@ final public class FileBrowser {
 
   public static func recurseDir(dirPath: String,
       fn: (fb: FileBrowser, dirPath: String) -> Void) {
-    let a = [UInt8](dirPath.utf8)
-    let lasti = a.count - 1
+    let lasti = dirPath.utf16.count - 1
     if lasti >= 0 {
-      if a[lasti] != 47 { // /
+      if dirPath.utf16.codeUnitAt(lasti) != 47 { // /
         doRecurseDir("\(dirPath)/", fn: fn)
       } else {
         doRecurseDir(dirPath, fn: fn)
