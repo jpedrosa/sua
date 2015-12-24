@@ -29,6 +29,7 @@ let _pclose = pclose
 let _fread = fread
 let _getenv = getenv
 let _isatty = isatty
+let _strlen = strlen
 
 
 public enum FileOperation: Int {
@@ -202,6 +203,10 @@ public class PosixSys {
 
   public func isatty(fd: Int32) -> Bool {
     return _isatty(fd) == 1
+  }
+
+  public func strlen(sp: UnsafePointer<CChar>) -> UInt {
+    return _strlen(sp)
   }
 
   // The environ variable is made available by the CSua sister project

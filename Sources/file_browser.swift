@@ -55,6 +55,16 @@ public class FileBrowser {
     }
   }
 
+  var entryNameBytes: [UInt8] {
+    var dirName = entry!.memory.d_name
+    return withUnsafePointer(&dirName) { (ptr) -> [UInt8] in
+      let len = Int(Sys.strlen(UnsafePointer<CChar>(ptr)))
+      let b = UnsafeBufferPointer<UInt8>(start: UnsafePointer<UInt8>(ptr),
+          count: len)
+      return [UInt8](b)
+    }
+  }
+
   var entryType: FileType {
     let t = entry!.memory.d_type
     return t == 8 ? .F : (t == 4 ? .D : .U)
