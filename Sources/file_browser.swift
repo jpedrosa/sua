@@ -77,15 +77,15 @@ final public class FileBrowser {
   }
 
   public static func scanDir(dirPath: String,
-      fn: (fb: FileBrowser) -> Void) throws {
+      fn: (name: String, type: FileType) -> Void) throws {
     let fb = try FileBrowser(path: dirPath)
     while fb.next() {
-      fn(fb: fb)
+      fn(name: fb.name ?? "", type: fb.type)
     }
   }
 
   public static func recurseDir(dirPath: String,
-      fn: (fb: FileBrowser, dirPath: String) -> Void) {
+      fn: (name: String, type: FileType, dirPath: String) -> Void) {
     let lasti = dirPath.utf16.count - 1
     if lasti >= 0 {
       if dirPath.utf16.codeUnitAt(lasti) != 47 { // /
@@ -97,15 +97,13 @@ final public class FileBrowser {
   }
 
   public static func doRecurseDir(dirPath: String,
-      fn: (fb: FileBrowser, dirPath: String) -> Void) {
+      fn: (name: String, type: FileType, dirPath: String) -> Void) {
     do {
-      try scanDir(dirPath) { fb in
-        if !fb.isDot {
-          fn(fb: fb, dirPath: dirPath)
-          if fb.type == .D {
-            if let name = fb.name {
-              doRecurseDir("\(dirPath)\(name)/", fn: fn)
-            }
+      try scanDir(dirPath) { (name, type) in
+        if name != ".." && name != "." {
+          fn(name: name, type: type, dirPath: dirPath)
+          if type == .D {
+            doRecurseDir("\(dirPath)\(name)/", fn: fn)
           }
         }
       }
