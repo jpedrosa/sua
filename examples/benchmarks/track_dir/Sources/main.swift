@@ -81,7 +81,7 @@ func browseDir(pathBytes: [UInt8]) throws {
         cp += nameBytes
         cp.append(47)
         cp.append(0) // Now append the trailing null-byte 0
-        trackDir(cp)
+        try browseDir(cp)
       }
     }
   }
