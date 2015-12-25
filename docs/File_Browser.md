@@ -62,7 +62,7 @@ This call produces about the same result of the one in the first example,
 printing file and directory names and their types whether they are file,
 directory or potentially unknown.
 
-How if you want to search with recursion, you could try something like the
+Now if you want to search with recursion, you could try something like the
 following:
 
 ```swift
