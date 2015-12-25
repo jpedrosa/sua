@@ -27,12 +27,11 @@ func trackDir(pathBytes: [UInt8]) {
         if len <= 2 && b[0] == 46 && (len == 1 || b[1] == 46) {
           // Ignore Dot file: . ..
         } else {
-          let nb = [UInt8](b)
           var cp = [UInt8]()
-          cp.reserveCapacity(pathBytes.count + nb.count + 1)
+          cp.reserveCapacity(pathBytes.count + len + 1)
           cp += pathBytes
           cp.removeLast() // Remove null-byte 0
-          cp += nb
+          cp += b
           cp.append(47)
           cp.append(0) // Now append the trailing null-byte 0
           trackDir(cp)
