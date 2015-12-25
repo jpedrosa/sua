@@ -82,9 +82,9 @@ function did already.
 Detour
 ------
 
-While testing a new runtime for Dart called Fletch I first came up with code
-that has turned into this FileBrowser class. When doing it in Fletch I also
-created a version calling the Linux getdents system call and with getdents it
-was slightly faster than using the standard readdir one.
+I first came up with code that has turned into this FileBrowser class while 
+testing a new runtime for Dart called Fletch. In Fletch I also created a version
+using the Linux getdents system call. With getdents it was slightly faster than
+using the standard readdir one.
 
 Overall I'm pretty OK with how fast the FileBrowser in Swift has become.
