@@ -5,7 +5,7 @@ Sua Swift is a project to experiment with Swift on Ubuntu/Linux.
 
 ----------
 
-**December 25 News**
+**December 25, 2015 News**
 
 While this project is still in an experimental phase, it has started to become
 more useful with classes like [FileBrowser](Sources/file_browser.swift),
