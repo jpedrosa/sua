@@ -6,11 +6,6 @@ public enum FileType {
   case Directory
   case File
   case Unknown
-
-  public static func translate(type: FileType) -> String {
-    return type == .F ? "f" : (type == .D ? "d" : "?")
-  }
-
 }
 
 
