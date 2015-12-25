@@ -81,34 +81,34 @@ final public class FileBrowser {
     return entry!.memory.d_ino
   }
 
-  public static func scanDir(dirPath: String,
+  public static func scanDir(path: String,
       fn: (name: String, type: FileType) -> Void) throws {
-    let fb = try FileBrowser(path: dirPath)
+    let fb = try FileBrowser(path: path)
     while fb.next() {
       fn(name: fb.name ?? "", type: fb.type)
     }
   }
 
-  public static func recurseDir(dirPath: String,
-      fn: (name: String, type: FileType, dirPath: String) -> Void) {
-    let lasti = dirPath.utf16.count - 1
+  public static func recurseDir(path: String,
+      fn: (name: String, type: FileType, path: String) -> Void) {
+    let lasti = path.utf16.count - 1
     if lasti >= 0 {
-      if dirPath.utf16.codeUnitAt(lasti) != 47 { // /
-        doRecurseDir("\(dirPath)/", fn: fn)
+      if path.utf16.codeUnitAt(lasti) != 47 { // /
+        doRecurseDir("\(path)/", fn: fn)
       } else {
-        doRecurseDir(dirPath, fn: fn)
+        doRecurseDir(path, fn: fn)
       }
     }
   }
 
-  public static func doRecurseDir(dirPath: String,
-      fn: (name: String, type: FileType, dirPath: String) -> Void) {
+  public static func doRecurseDir(path: String,
+      fn: (name: String, type: FileType, path: String) -> Void) {
     do {
-      try scanDir(dirPath) { (name, type) in
+      try scanDir(path) { (name, type) in
         if name != ".." && name != "." {
-          fn(name: name, type: type, dirPath: dirPath)
+          fn(name: name, type: type, path: path)
           if type == .D {
-            doRecurseDir("\(dirPath)\(name)/", fn: fn)
+            doRecurseDir("\(path)\(name)/", fn: fn)
           }
         }
       }
