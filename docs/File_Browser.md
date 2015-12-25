@@ -22,15 +22,17 @@ While developing it I tested the performance in for example this [benchmark](../
 
 ```
 $ .build/release/TrackDir
-"trackDir   count: 726484 Elapsed: 528"
-"spelunkDir count: 726484 Elapsed: 613"
-"browseDir  count: 726484 Elapsed: 500"
+"trackDir   count: 744069 Elapsed: 524"
+"spelunkDir count: 744069 Elapsed: 616"
+"browseDir  count: 744069 Elapsed: 540"
 ```
 (Elapsed time is in milliseconds, while searching over 720k files in the entire
 file system starting at "/".)
 
-It is not that the browseDir function is necessarily faster than the trackDir
-one, since the trackDir one is just a single recursive function doing all the
+(Edit: The benchmark had a bug where browseDir was calling the trackDir function. It was showing the browseDir version being slightly faster despite doing more work by apparently calling into the FileBrowser class instance, which it was not. Now corrected, the browseDir version is slightly slower which seems to be OK. It is a testimony to how optimized Swift is that the corrected version is still about as fast.)
+
+The browseDir function trails the trackDir function by a bit, since the trackDir
+one is just a single recursive function doing all the
 work, while the browseDir function calls into the FileBrowser methods. The
 reason later functions can be faster than the earlier ones is that the earlier
 ones help to warm up the IO calls to the operating system, which is enjoyed by
