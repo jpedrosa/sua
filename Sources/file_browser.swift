@@ -22,6 +22,7 @@ final public class FileBrowser {
     }
   }
 
+  // The array needs to include a null value (0) at the end.
   public init(pathBytes: [UInt8]) throws {
     dirp = Sys.opendir(pathBytes)
     if dirp == nil {
