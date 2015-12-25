@@ -3,6 +3,21 @@ Sua Swift
 
 Sua Swift is a project to experiment with Swift on Ubuntu/Linux.
 
+----------
+
+While this project is still in an experimental phase, it has started to become
+more useful with classes like [FileBrowser](Sources/file_browser.swift),
+[RNG](Sources/rng.swift), [File](Sources/file.swift),
+[CodeUnitStream](Sources/codeunitstream.swift), [Stopwatch](Sources/tick.swift),
+etc.
+
+We still miss a class for dealing with DateTime. And that's a big miss. But I
+consider this project to be worth of a version number like 0.1 at least. In my
+own repository I have a tag for it of 0.3.3 which coming from 0.0.1 seems like
+a lot of ground covered.
+
+----------
+
 Swift has recently been released as open source and is supported on Ubuntu. But
 it seems as though that the main APIs are still too heavily dependent on OSX,
 even if there are signs that they may be reimplementing many of the APIs on
@@ -34,6 +49,7 @@ Progress Notes
 --------------
 *LATEST*
 
+* [File Browser](docs/File_Browser.md)
 * [String Extensions](docs/String_Extensions.md)
 * [Data Types](docs/Data_Types.md)
 * [December 11, 2015](docs/Progress_Notes_December_11_2015.md)
