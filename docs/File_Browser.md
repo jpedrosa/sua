@@ -22,14 +22,16 @@ While developing it I tested the performance in for example this [benchmark](../
 
 ```
 $ .build/release/TrackDir
-"trackDir   count: 744069 Elapsed: 524"
-"spelunkDir count: 744069 Elapsed: 616"
-"browseDir  count: 744069 Elapsed: 540"
+"trackDir   count: 743559 Elapsed: 518"
+"spelunkDir count: 743559 Elapsed: 611"
+"browseDir  count: 743559 Elapsed: 528"
 ```
 (Elapsed time is in milliseconds, while searching over 720k files in the entire
 file system starting at "/".)
 
 (Edit: The benchmark had a bug where browseDir was calling the trackDir function. It was showing the browseDir version being slightly faster despite doing more work by apparently calling into the FileBrowser class instance, which it was not. Now corrected, the browseDir version is slightly slower which seems to be OK. It is a testimony to how optimized Swift is that the corrected version is still about as fast.)
+
+(Edit #2: By using reserveCapacity for the path bytes concatenation, the numbers seem to have improved by a bit for the trackDir and browseDir benchmark functions. I updated the numbers above.)
 
 The browseDir function trails the trackDir function by a bit, since the trackDir
 one is just a single recursive function doing all the
