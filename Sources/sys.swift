@@ -7,31 +7,6 @@ public enum SysError: ErrorType {
   case InvalidOpenFileOperation(operation: String)
 }
 
-
-let _fflush = fflush
-let _getpid = getpid
-let _close = close
-let _mkdir = mkdir
-let _read = read
-let _write = write
-let _lseek = lseek
-let _rename = rename
-let _unlink = unlink
-let _getcwd = getcwd
-let _stat = stat
-let _lstat = lstat
-let _readdir = readdir
-let _opendir = opendir
-let _closedir = closedir
-let _fgets = fgets
-let _popen = popen
-let _pclose = pclose
-let _fread = fread
-let _getenv = getenv
-let _isatty = isatty
-let _strlen = strlen
-
-
 public enum FileOperation: Int {
   case R
   case W
@@ -92,17 +67,17 @@ public class PosixSys {
   }
 
   public func mkdir(dirPath: String, mode: UInt32 = DEFAULT_DIR_MODE) -> Int32 {
-    return retry { _mkdir(dirPath, mode) }
+    return retry { Glibc.mkdir(dirPath, mode) }
   }
 
   public func read(fd: Int32, address: UnsafeMutablePointer<Void>,
       length: Int) -> Int {
-    return retry { _read(fd, address, length) }
+    return retry { Glibc.read(fd, address, length) }
   }
 
   public func write(fd: Int32, address: UnsafePointer<Void>,
       length: Int) -> Int {
-    return retry { _write(fd, address, length) }
+    return retry { Glibc.write(fd, address, length) }
   }
 
   public func writeString(fd: Int32, string: String) -> Int {
@@ -111,32 +86,32 @@ public class PosixSys {
   }
 
   public func close(fd: Int32) -> Int32 {
-    return retry { _close(fd) }
+    return retry { Glibc.close(fd) }
   }
 
   public func fflush(stream: UnsafeMutablePointer<FILE> = nil) -> Int32 {
-    return _fflush(stream)
+    return Glibc.fflush(stream)
   }
 
   public func lseek(fd: Int32, offset: Int, whence: Int32) -> Int {
-    return retry { _lseek(fd, offset, whence) }
+    return retry { Glibc.lseek(fd, offset, whence) }
   }
 
   public var pid: Int32 {
-    return _getpid()
+    return Glibc.getpid()
   }
 
   public func rename(oldPath: String, newPath: String) -> Int32 {
-    return _rename(oldPath, newPath)
+    return Glibc.rename(oldPath, newPath)
   }
 
   public func unlink(path: String) -> Int32 {
-    return _unlink(path)
+    return Glibc.unlink(path)
   }
 
   public var cwd: String? {
     var a = [CChar](count:256, repeatedValue: 0)
-    let i = _getcwd(&a, 255)
+    let i = Glibc.getcwd(&a, 255)
     if i != nil {
       return String.fromCharCodes(a)
     }
@@ -147,11 +122,11 @@ public class PosixSys {
   // name stat.
   public func doStat(path: String, buffer: UnsafeMutablePointer<stat>)
       -> Int32 {
-    return _stat(path, buffer)
+    return Glibc.stat(path, buffer)
   }
 
   public func lstat(path: String, buffer: UnsafeMutablePointer<stat>) -> Int32 {
-    return _lstat(path, buffer)
+    return Glibc.lstat(path, buffer)
   }
 
   public func statBuffer() -> stat {
@@ -159,29 +134,29 @@ public class PosixSys {
   }
 
   public func readdir(dirp: COpaquePointer) -> DirentEntry {
-    return dirp != nil ? _readdir(dirp) : nil
+    return dirp != nil ? Glibc.readdir(dirp) : nil
   }
 
   public func opendir(path: String) -> COpaquePointer {
-    return _opendir(path)
+    return Glibc.opendir(path)
   }
 
   public func opendir(pathBytes: [UInt8]) -> COpaquePointer {
-    return _opendir(UnsafePointer<CChar>(pathBytes))
+    return Glibc.opendir(UnsafePointer<CChar>(pathBytes))
   }
 
   public func closedir(dirp: COpaquePointer) -> Int32 {
-    return retry { _closedir(dirp) }
+    return retry { Glibc.closedir(dirp) }
   }
 
   public func fgets(buffer: UnsafeMutablePointer<CChar>, length: Int32,
       fp: UnsafeMutablePointer<FILE>) -> UnsafeMutablePointer<CChar> {
-    return _fgets(buffer, length, fp)
+    return Glibc.fgets(buffer, length, fp)
   }
 
   public func fread(buffer: UnsafeMutablePointer<Void>, size: Int,
       nmemb: Int, fp: UnsafeMutablePointer<FILE>) -> Int {
-    return _fread(buffer, size, nmemb, fp)
+    return Glibc.fread(buffer, size, nmemb, fp)
   }
 
   public func popen(command: String, operation: PopenOperation = .R)
@@ -193,24 +168,24 @@ public class PosixSys {
       case .RE, .ReadWithCloexec: op = "re"
       case .WE, .WriteWithCloexec: op = "we"
     }
-    return _popen(command, op)
+    return Glibc.popen(command, op)
   }
 
   public func pclose(fp: UnsafeMutablePointer<FILE>) -> Int32 {
-    return _pclose(fp)
+    return Glibc.pclose(fp)
   }
 
   public func getenv(key: String) -> String? {
-    let vp = _getenv(key)
+    let vp = Glibc.getenv(key)
     return vp != nil ? String.fromCString(vp) : nil
   }
 
   public func isatty(fd: Int32) -> Bool {
-    return _isatty(fd) == 1
+    return Glibc.isatty(fd) == 1
   }
 
   public func strlen(sp: UnsafePointer<CChar>) -> UInt {
-    return _strlen(sp)
+    return Glibc.strlen(sp)
   }
 
   public func sleep(n: UInt32) {
