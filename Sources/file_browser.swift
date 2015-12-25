@@ -22,6 +22,14 @@ final public class FileBrowser {
     }
   }
 
+  public init(pathBytes: [UInt8]) throws {
+    dirp = Sys.opendir(pathBytes)
+    if dirp == nil {
+      throw FileBrowserError.InvalidDirectory(message:
+          "Failed to open directory.")
+    }
+  }
+
   deinit {
     close()
   }

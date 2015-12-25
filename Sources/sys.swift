@@ -162,8 +162,12 @@ public class PosixSys {
     return dirp != nil ? _readdir(dirp) : nil
   }
 
-  public func opendir(dirPath: String) -> COpaquePointer {
-    return _opendir(dirPath)
+  public func opendir(path: String) -> COpaquePointer {
+    return _opendir(path)
+  }
+
+  public func opendir(pathBytes: [UInt8]) -> COpaquePointer {
+    return _opendir(UnsafePointer<CChar>(pathBytes))
   }
 
   public func closedir(dirp: COpaquePointer) -> Int32 {
