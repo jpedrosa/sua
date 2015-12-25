@@ -73,6 +73,14 @@ final public class FileBrowser {
     return t == 8 ? .F : (t == 4 ? .D : .U)
   }
 
+  public var rawType: UInt8 {
+    return entry!.memory.d_type
+  }
+
+  public var ino: UInt {
+    return entry!.memory.d_ino
+  }
+
   public static func scanDir(dirPath: String,
       fn: (name: String, type: FileType) -> Void) throws {
     let fb = try FileBrowser(path: dirPath)
