@@ -2,7 +2,7 @@
 
 public class Dir {
 
-  public static var pwd: String? {
+  public static var cwd: String? {
     return Sys.cwd
   }
 
