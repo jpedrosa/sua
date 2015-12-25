@@ -62,7 +62,7 @@ This call produces about the same result of the one in the first example,
 printing file and directory names and their types whether they are file,
 directory or potentially unknown.
 
-If you would rather search with recursion, you could try something such as this:
+If you would rather search with recursion, you could try something such as this one:
 
 ```swift
 FileBrowser.recurseDir("./") { (name, type, path) in
