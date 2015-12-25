@@ -47,7 +47,7 @@ public class PosixSys {
   public static let STDERR_FD: Int32 = 2
 
   public func open(path: String, flags: Int32, mode: UInt32) -> Int32 {
-    return retry { csua_open(path, flags, mode) }
+    return retry { Glibc.open(path, flags, mode) }
   }
 
   public func openFile(filePath: String, operation: FileOperation = .R,
