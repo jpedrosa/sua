@@ -213,6 +213,10 @@ public class PosixSys {
     return _strlen(sp)
   }
 
+  public func sleep(n: UInt32) {
+    Glibc.sleep(n)
+  }
+
   // The environ variable is made available by the CSua sister project
   // dependency.
   public var environment: [String: String] {

@@ -2,12 +2,6 @@
 import Glibc
 
 
-func nativeSleep(n: Int) {
-  if (n >= 0) {
-    sleep(UInt32(n))
-  }
-}
-
 public class IO {
 
   public static func sleep(f: Double) {
@@ -19,7 +13,9 @@ public class IO {
   }
 
   public static func sleep(n: Int) {
-    nativeSleep(n)
+    if n >= 0 {
+      Sys.sleep(UInt32(n))
+    }
   }
 
   public static func flush() {
