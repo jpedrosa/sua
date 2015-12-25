@@ -66,14 +66,45 @@ func spelunkDir(path: String) {
   }
 }
 
+func browseDir(pathBytes: [UInt8]) throws {
+  let fb = try FileBrowser(pathBytes: pathBytes)
+  while fb.next() {
+    count += 1
+    if fb.type == .D {
+      let nameBytes = fb.nameBytes
+      let len = nameBytes.count
+      if len <= 2 && nameBytes[0] == 46 && (len == 1 || nameBytes[1] == 46) {
+        // Ignore Dot file: . ..
+      } else {
+        var cp = pathBytes
+        cp.removeLast() // Remove null-byte 0
+        cp += nameBytes
+        cp.append(47)
+        cp.append(0) // Now append the trailing null-byte 0
+        trackDir(cp)
+      }
+    }
+  }
+}
+
+
 var sw = Stopwatch()
 var a = [UInt8]("/".utf8)
 a.append(0)
 sw.start()
 trackDir(a)
-p("count: \(count) Elapsed: \(sw.millis)")
+p("trackDir   count: \(count) Elapsed: \(sw.millis)")
 
 count = 0
 sw.start()
 spelunkDir("/")
-p("count: \(count) Elapsed: \(sw.millis)")
+p("spelunkDir count: \(count) Elapsed: \(sw.millis)")
+
+count = 0
+sw.start()
+do {
+  try browseDir(a)
+} catch {
+  // ignore errors.
+}
+p("browseDir  count: \(count) Elapsed: \(sw.millis)")
