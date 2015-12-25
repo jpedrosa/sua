@@ -60,15 +60,12 @@ final public class FileBrowser {
   }
 
   public var nameBytes: [UInt8] {
-    return [UInt8](nameBytesBuffer)
-  }
-
-  public var nameBytesBuffer: UnsafeBufferPointer<UInt8> {
     var dirName = entry!.memory.d_name
-    return withUnsafePointer(&dirName) { (ptr) -> UnsafeBufferPointer<UInt8> in
+    return withUnsafePointer(&dirName) { (ptr) -> [UInt8] in
       let len = Int(Sys.strlen(UnsafePointer<CChar>(ptr)))
-      return UnsafeBufferPointer<UInt8>(start: UnsafePointer<UInt8>(ptr),
+      let b = UnsafeBufferPointer<UInt8>(start: UnsafePointer<UInt8>(ptr),
           count: len)
+      return [UInt8](b)
     }
   }
 
