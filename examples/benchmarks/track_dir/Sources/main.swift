@@ -149,3 +149,8 @@ do {
   // ignore errors.
 }
 p("browseDir2 count: \(count) Elapsed: \(sw.millis)")
+
+count = 0
+sw.start()
+trackDir(a)
+p("**trackDir count: \(count) Elapsed: \(sw.millis)")
