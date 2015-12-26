@@ -29,7 +29,7 @@ $ .build/release/TrackDir
 (Elapsed time is in milliseconds, while searching over 720k files in the entire
 file system starting at "/".)
 
-(Edit: The benchmark had a bug where browseDir was calling the trackDir function. It was showing the browseDir version being slightly faster despite doing more work by apparently calling into the FileBrowser class instance, which it was not. Now corrected, the browseDir version is slightly slower which seems to be OK. It is a testimony to how optimized Swift is that the corrected version is still about as fast.)
+(Edit: The benchmark had a bug where browseDir was calling the trackDir function. It was showing the browseDir version being slightly faster despite doing more work by apparently calling into the FileBrowser class instance, which it was not. Now corrected, the browseDir version is slightly slower which seems to be OK. It is a testament to how optimized Swift is that the corrected version is still about as fast.)
 
 (Edit #2: By using reserveCapacity for the path bytes concatenation, the numbers seem to have improved by a bit for the trackDir and browseDir benchmark functions. I updated the numbers above.)
 
