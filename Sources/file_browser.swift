@@ -69,6 +69,10 @@ final public class FileBrowser {
     }
   }
 
+  public var rawEntry: DirentEntry {
+    return entry!
+  }
+
   public var type: FileType {
     let t = entry!.memory.d_type
     return t == 8 ? .F : (t == 4 ? .D : .U)

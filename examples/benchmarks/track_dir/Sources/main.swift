@@ -1,6 +1,6 @@
 
 import Glibc
-import Sua
+import CSua
 
 
 var count = 0
@@ -91,6 +91,33 @@ func browseDir(pathBytes: [UInt8]) throws {
   }
 }
 
+func browseDir2(pathBytes: [UInt8]) throws {
+  let fb = try FileBrowser(pathBytes: pathBytes)
+  while fb.next() {
+    count += 1
+    if fb.type == .D {
+      var rn = fb.rawEntry.memory.d_name
+      try withUnsafePointer(&rn) { ptr in
+        let len = Int(Sys.strlen(UnsafePointer<CChar>(ptr)))
+        let b = UnsafeBufferPointer<UInt8>(start: UnsafePointer<UInt8>(ptr),
+            count: len)
+        if len <= 2 && b[0] == 46 && (len == 1 || b[1] == 46) {
+          // Ignore Dot file: . ..
+        } else {
+          var cp = [UInt8]()
+          cp.reserveCapacity(pathBytes.count + len + 1)
+          cp += pathBytes
+          cp.removeLast() // Remove null-byte 0
+          cp += b
+          cp.append(47)
+          cp.append(0) // Now append the trailing null-byte 0
+          try browseDir2(cp)
+        }
+      }
+    }
+  }
+}
+
 
 var sw = Stopwatch()
 var a = [UInt8]("/".utf8)
@@ -112,3 +139,12 @@ do {
   // ignore errors.
 }
 p("browseDir  count: \(count) Elapsed: \(sw.millis)")
+
+count = 0
+sw.start()
+do {
+  try browseDir2(a)
+} catch {
+  // ignore errors.
+}
+p("browseDir2 count: \(count) Elapsed: \(sw.millis)")
