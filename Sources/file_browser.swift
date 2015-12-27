@@ -1,11 +1,8 @@
 
 public enum FileType {
-  case D
-  case F
-  case U
-  case Directory
-  case File
-  case Unknown
+  case D // Directory
+  case F // File
+  case U // Unknown
 }
 
 
