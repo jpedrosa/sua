@@ -2,41 +2,41 @@
 import Glibc
 
 
-public struct TimeStore: CustomStringConvertible {
+public struct TimeBuffer: CustomStringConvertible {
 
-  public var store: UnsafeMutablePointer<tm>
+  public var buffer: UnsafeMutablePointer<tm>
 
   public init(secondsSinceEpoch: Int) {
     var n = secondsSinceEpoch
-    self.store = gmtime(&n)
+    self.buffer = gmtime(&n)
   }
 
   public init() {
     var n = time(nil)
-    self.store = gmtime(&n)
+    self.buffer = gmtime(&n)
   }
 
-  public init(store: UnsafeMutablePointer<tm>) {
-    self.store = store
+  public init(buffer: UnsafeMutablePointer<tm>) {
+    self.buffer = buffer
   }
 
-  public var isDst: Bool { return store.memory.tm_isdst == 1 }
+  public var isDst: Bool { return buffer.memory.tm_isdst == 1 }
 
-  public var yearday: Int32 { return store.memory.tm_yday }
+  public var yearday: Int32 { return buffer.memory.tm_yday }
 
-  public var weekday: Int32 { return store.memory.tm_wday }
+  public var weekday: Int32 { return buffer.memory.tm_wday }
 
-  public var year: Int32 { return store.memory.tm_year }
+  public var year: Int32 { return buffer.memory.tm_year }
 
-  public var month: Int32 { return store.memory.tm_mon }
+  public var month: Int32 { return buffer.memory.tm_mon }
 
-  public var day: Int32 { return store.memory.tm_mday }
+  public var day: Int32 { return buffer.memory.tm_mday }
 
-  public var hour: Int32 { return store.memory.tm_hour }
+  public var hour: Int32 { return buffer.memory.tm_hour }
 
-  public var minute: Int32 { return store.memory.tm_min }
+  public var minute: Int32 { return buffer.memory.tm_min }
 
-  public var second: Int32 { return store.memory.tm_sec }
+  public var second: Int32 { return buffer.memory.tm_sec }
 
   public var secondsSinceEpoch: Int {
     var r = Int(second)
@@ -52,7 +52,7 @@ public struct TimeStore: CustomStringConvertible {
   }
 
   public var description: String {
-    return "TimeStore(year: \(year), month: \(month), day: \(day), " +
+    return "TimeBuffer(year: \(year), month: \(month), day: \(day), " +
         "hour: \(hour), minute: \(minute), second: \(second), " +
         "weekday: \(weekday), yearday: \(yearday), isDst: \(isDst))"
   }
@@ -63,7 +63,7 @@ public struct TimeStore: CustomStringConvertible {
 public struct TimeMath {
 
   var _secondsSinceEpoch = 0
-  var _store: TimeStore
+  var _buffer: TimeBuffer
 
   public init() {
     self.init(secondsSinceEpoch: time(nil))
@@ -72,39 +72,39 @@ public struct TimeMath {
   public init(secondsSinceEpoch: Int) {
     var n = secondsSinceEpoch
     _secondsSinceEpoch = n
-    _store = TimeStore(store: gmtime(&n))
+    _buffer = TimeBuffer(buffer: gmtime(&n))
   }
 
-  public init(store: UnsafeMutablePointer<tm>) {
-    _store = TimeStore(store: store)
-    _secondsSinceEpoch = _store.secondsSinceEpoch
+  public init(buffer: UnsafeMutablePointer<tm>) {
+    _buffer = TimeBuffer(buffer: buffer)
+    _secondsSinceEpoch = _buffer.secondsSinceEpoch
   }
 
   public var day: Int {
-    get { return Int(_store.day) }
+    get { return Int(_buffer.day) }
     set {
-      secondsSinceEpoch += (newValue - Int(_store.day)) * 86400
+      secondsSinceEpoch += (newValue - Int(_buffer.day)) * 86400
     }
   }
 
   public var hour: Int {
-    get { return Int(_store.hour) }
+    get { return Int(_buffer.hour) }
     set {
-      secondsSinceEpoch += (newValue - Int(_store.hour)) * 3600
+      secondsSinceEpoch += (newValue - Int(_buffer.hour)) * 3600
     }
   }
 
   public var minute: Int {
-    get { return Int(_store.minute) }
+    get { return Int(_buffer.minute) }
     set {
-      secondsSinceEpoch += (newValue - Int(_store.minute)) * 60
+      secondsSinceEpoch += (newValue - Int(_buffer.minute)) * 60
     }
   }
 
   public var second: Int {
-    get { return Int(_store.second) }
+    get { return Int(_buffer.second) }
     set {
-      secondsSinceEpoch += newValue - Int(_store.second)
+      secondsSinceEpoch += newValue - Int(_buffer.second)
     }
   }
 
@@ -113,12 +113,21 @@ public struct TimeMath {
     set {
       var n = newValue
       _secondsSinceEpoch = n
-      _store = TimeStore(store: gmtime(&n))
+      _buffer = TimeBuffer(buffer: gmtime(&n))
     }
   }
 
-  public var store: TimeStore {
-    return _store
+  public var buffer: TimeBuffer {
+    return _buffer
+  }
+
+}
+
+
+public struct Time {
+
+  public init() {
+
   }
 
 }
