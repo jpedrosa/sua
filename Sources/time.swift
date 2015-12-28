@@ -75,10 +75,10 @@ public struct TimeBuffer: CustomStringConvertible {
 }
 
 
-public struct TimeMath {
+public struct Time: CustomStringConvertible {
 
-  var _secondsSinceEpoch = 0
   var _buffer: TimeBuffer
+  var _secondsSinceEpoch = 0
 
   public init() {
     self.init(secondsSinceEpoch: time(nil))
@@ -93,6 +93,18 @@ public struct TimeMath {
     _buffer = TimeBuffer(buffer: buffer)
     _secondsSinceEpoch = _buffer.secondsSinceEpoch
   }
+
+  public var isUtc: Bool { return _buffer.isUtc }
+
+  public var isDst: Bool { return _buffer.isDst }
+
+  public var yearday: Int32 { return _buffer.yearday }
+
+  public var weekday: Int32 { return _buffer.weekday }
+
+  public var year: Int32 { return 1900 + _buffer.year }
+
+  public var month: Int32 { return _buffer.month }
 
   public var day: Int {
     get { return Int(_buffer.day) }
@@ -129,43 +141,6 @@ public struct TimeMath {
       _buffer = TimeBuffer(secondsSinceEpoch: newValue)
     }
   }
-
-  public var buffer: TimeBuffer {
-    return _buffer
-  }
-
-}
-
-
-public struct Time: CustomStringConvertible {
-
-  var buffer: TimeBuffer
-
-  public init() {
-    buffer = TimeBuffer()
-  }
-
-  public var isUtc: Bool { return buffer.isUtc }
-
-  public var isDst: Bool { return buffer.isDst }
-
-  public var yearday: Int32 { return buffer.yearday }
-
-  public var weekday: Int32 { return buffer.weekday }
-
-  public var year: Int32 { return 1900 + buffer.year }
-
-  public var month: Int32 { return buffer.month }
-
-  public var day: Int32 { return buffer.day }
-
-  public var hour: Int32 { return buffer.hour }
-
-  public var minute: Int32 { return buffer.minute }
-
-  public var second: Int32 { return buffer.second }
-
-  public var secondsSinceEpoch: Int { return buffer.secondsSinceEpoch }
 
   public var description: String {
     return "Time(year: \(year), month: \(month), day: \(day), " +
