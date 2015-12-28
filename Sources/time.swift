@@ -87,7 +87,7 @@ public struct Time: CustomStringConvertible {
   }
 
   public init(secondsSinceEpoch: Int) {
-    let n = Time.findLocalTimeDifference() + secondsSinceEpoch
+    let n = secondsSinceEpoch - Time.findLocalTimeDifference()
     _secondsSinceEpoch = n
     _buffer = TimeBuffer(secondsSinceEpoch: n)
   }
@@ -229,7 +229,7 @@ public struct Time: CustomStringConvertible {
   }
 
   static public func findLocalTimeDifference() -> Int {
-    return TimeBuffer.utc().secondsSinceEpoch - TimeBuffer().secondsSinceEpoch
+    return TimeBuffer().secondsSinceEpoch - TimeBuffer.utc().secondsSinceEpoch
   }
 
 }
