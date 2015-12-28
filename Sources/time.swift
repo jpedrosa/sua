@@ -16,10 +16,7 @@ public struct TimeBuffer: CustomStringConvertible {
   }
 
   public init() {
-    var n = time(nil)
-    var b = tm()
-    gmtime_r(&n, &b)
-    buffer = b
+    self.init(secondsSinceEpoch: time(nil))
   }
 
   public init(buffer: CTime) {
