@@ -229,7 +229,15 @@ public struct Time: CustomStringConvertible {
   }
 
   static public func findLocalTimeDifference() -> Int {
-    return TimeBuffer().secondsSinceEpoch - TimeBuffer.utc().secondsSinceEpoch
+    let n = TimeBuffer().secondsSinceEpoch
+    let tbUtc = TimeBuffer.utc()
+    var nu = tbUtc.secondsSinceEpoch
+    // TODO Joao: confirm that this is necessary. The idea is from this SO thread:
+    // http://stackoverflow.com/questions/9076494/how-to-convert-from-utc-to-local-time-in-c
+    if tbUtc.isDst {
+      nu -= 3600
+    }
+    return n - nu
   }
 
 }
