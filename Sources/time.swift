@@ -98,8 +98,8 @@ public struct Time: CustomStringConvertible {
   }
 
   // Month from 0 to 11.
-  public init(year: Int, month: Int, day: Int, hour: Int, minute: Int,
-      second: Int) {
+  public init(year: Int, month: Int, day: Int, hour: Int = 0, minute: Int = 0,
+      second: Int = 0) {
     self.init(secondsSinceEpoch: Time.convertToSecondsSinceEpoch(year,
         month: month, day: day, hour: hour, minute: minute, second: second))
   }
