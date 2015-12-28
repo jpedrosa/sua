@@ -35,13 +35,13 @@ public class TimeStore: CustomStringConvertible {
 
   public var hour: Int32 { return store.memory.tm_hour }
 
-  public var minutes: Int32 { return store.memory.tm_min }
+  public var minute: Int32 { return store.memory.tm_min }
 
-  public var seconds: Int32 { return store.memory.tm_sec }
+  public var second: Int32 { return store.memory.tm_sec }
 
   public var secondsSinceEpoch: Int {
-    var r = Int(seconds)
-    r += Int(minutes) * 60
+    var r = Int(second)
+    r += Int(minute) * 60
     r += Int(hour) * 3600
     r += Int(yearday) * 86400
     let y = Int(year)
@@ -54,7 +54,7 @@ public class TimeStore: CustomStringConvertible {
 
   public var description: String {
     return "TimeStore(year: \(year), month: \(month), day: \(day), " +
-        "hour: \(hour), minutes: \(minutes), seconds: \(seconds), " +
+        "hour: \(hour), minute: \(minute), second: \(second), " +
         "weekday: \(weekday), yearday: \(yearday), isDst: \(isDst))"
   }
 
@@ -96,16 +96,16 @@ public struct TimeMath {
   }
 
   public var minute: Int {
-    get { return Int(_store.minutes) }
+    get { return Int(_store.minute) }
     set {
-      secondsSinceEpoch += (newValue - Int(_store.minutes)) * 60
+      secondsSinceEpoch += (newValue - Int(_store.minute)) * 60
     }
   }
 
   public var second: Int {
-    get { return Int(_store.seconds) }
+    get { return Int(_store.second) }
     set {
-      secondsSinceEpoch += newValue - Int(_store.seconds)
+      secondsSinceEpoch += newValue - Int(_store.second)
     }
   }
 
