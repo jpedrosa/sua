@@ -11,14 +11,13 @@ public class TimeStore: CustomStringConvertible {
     self.store = gmtime(&n)
   }
 
-  public init(store: UnsafeMutablePointer<tm>? = nil) {
-    if let v = store {
-      self.store = v
-    } else {
-      var n = time(nil)
-      //var brok = gmtime(&n)
-      self.store = gmtime(&n)
-    }
+  public init() {
+    var n = time(nil)
+    self.store = gmtime(&n)
+  }
+
+  public init(store: UnsafeMutablePointer<tm>) {
+    self.store = store
   }
 
   public var isDst: Bool { return store.memory.tm_isdst == 1 }
