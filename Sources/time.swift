@@ -2,41 +2,47 @@
 import Glibc
 
 
+public typealias CTime = tm
+
 public struct TimeBuffer: CustomStringConvertible {
 
-  public var buffer: UnsafeMutablePointer<tm>
+  public var buffer: CTime
 
   public init(secondsSinceEpoch: Int) {
     var n = secondsSinceEpoch
-    self.buffer = gmtime(&n)
+    var b = tm()
+    gmtime_r(&n, &b)
+    buffer = b
   }
 
   public init() {
     var n = time(nil)
-    self.buffer = gmtime(&n)
+    var b = tm()
+    gmtime_r(&n, &b)
+    buffer = b
   }
 
-  public init(buffer: UnsafeMutablePointer<tm>) {
+  public init(buffer: CTime) {
     self.buffer = buffer
   }
 
-  public var isDst: Bool { return buffer.memory.tm_isdst == 1 }
+  public var isDst: Bool { return buffer.tm_isdst == 1 }
 
-  public var yearday: Int32 { return buffer.memory.tm_yday }
+  public var yearday: Int32 { return buffer.tm_yday }
 
-  public var weekday: Int32 { return buffer.memory.tm_wday }
+  public var weekday: Int32 { return buffer.tm_wday }
 
-  public var year: Int32 { return buffer.memory.tm_year }
+  public var year: Int32 { return buffer.tm_year }
 
-  public var month: Int32 { return buffer.memory.tm_mon }
+  public var month: Int32 { return buffer.tm_mon }
 
-  public var day: Int32 { return buffer.memory.tm_mday }
+  public var day: Int32 { return buffer.tm_mday }
 
-  public var hour: Int32 { return buffer.memory.tm_hour }
+  public var hour: Int32 { return buffer.tm_hour }
 
-  public var minute: Int32 { return buffer.memory.tm_min }
+  public var minute: Int32 { return buffer.tm_min }
 
-  public var second: Int32 { return buffer.memory.tm_sec }
+  public var second: Int32 { return buffer.tm_sec }
 
   public var secondsSinceEpoch: Int {
     var r = Int(second)
@@ -70,12 +76,11 @@ public struct TimeMath {
   }
 
   public init(secondsSinceEpoch: Int) {
-    var n = secondsSinceEpoch
-    _secondsSinceEpoch = n
-    _buffer = TimeBuffer(buffer: gmtime(&n))
+    _secondsSinceEpoch = secondsSinceEpoch
+    _buffer = TimeBuffer(secondsSinceEpoch: secondsSinceEpoch)
   }
 
-  public init(buffer: UnsafeMutablePointer<tm>) {
+  public init(buffer: CTime) {
     _buffer = TimeBuffer(buffer: buffer)
     _secondsSinceEpoch = _buffer.secondsSinceEpoch
   }
@@ -111,9 +116,8 @@ public struct TimeMath {
   public var secondsSinceEpoch: Int {
     get { return _secondsSinceEpoch }
     set {
-      var n = newValue
-      _secondsSinceEpoch = n
-      _buffer = TimeBuffer(buffer: gmtime(&n))
+      _secondsSinceEpoch = newValue
+      _buffer = TimeBuffer(secondsSinceEpoch: newValue)
     }
   }
 
