@@ -2,7 +2,7 @@
 import Glibc
 
 
-public class TimeStore: CustomStringConvertible {
+public struct TimeStore: CustomStringConvertible {
 
   public var store: UnsafeMutablePointer<tm>
 
