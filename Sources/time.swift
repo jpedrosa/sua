@@ -97,6 +97,11 @@ public struct Time: CustomStringConvertible {
     _secondsSinceEpoch = _buffer.secondsSinceEpoch
   }
 
+  public init(buffer: TimeBuffer) {
+    _buffer = buffer
+    _secondsSinceEpoch = buffer.secondsSinceEpoch
+  }
+
   // Month from 0 to 11.
   public init(year: Int, month: Int, day: Int, hour: Int = 0, minute: Int = 0,
       second: Int = 0) {
@@ -238,6 +243,10 @@ public struct Time: CustomStringConvertible {
       nu -= 3600
     }
     return n - nu
+  }
+
+  static public func utc() -> Time {
+    return Time(buffer: TimeBuffer.utc())
   }
 
 }
