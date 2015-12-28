@@ -7,11 +7,12 @@ public typealias CTime = tm
 public struct TimeBuffer: CustomStringConvertible {
 
   public var buffer: CTime
+  public var _utc = false
 
   public init(secondsSinceEpoch: Int) {
     var n = secondsSinceEpoch
     var b = tm()
-    gmtime_r(&n, &b)
+    localtime_r(&n, &b)
     buffer = b
   }
 
@@ -19,9 +20,12 @@ public struct TimeBuffer: CustomStringConvertible {
     self.init(secondsSinceEpoch: time(nil))
   }
 
-  public init(buffer: CTime) {
+  public init(buffer: CTime, utc: Bool = false) {
     self.buffer = buffer
+    _utc = utc
   }
+
+  public var isUtc: Bool { return _utc }
 
   public var isDst: Bool { return buffer.tm_isdst == 1 }
 
@@ -57,7 +61,15 @@ public struct TimeBuffer: CustomStringConvertible {
   public var description: String {
     return "TimeBuffer(year: \(year), month: \(month), day: \(day), " +
         "hour: \(hour), minute: \(minute), second: \(second), " +
-        "weekday: \(weekday), yearday: \(yearday), isDst: \(isDst))"
+        "weekday: \(weekday), yearday: \(yearday), isDst: \(isDst), " +
+        "isUtc: \(_utc))"
+  }
+
+  static func utc() -> TimeBuffer {
+    var n = time(nil)
+    var b = tm()
+    gmtime_r(&n, &b)
+    return TimeBuffer(buffer: b, utc: true)
   }
 
 }
