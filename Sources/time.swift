@@ -81,12 +81,15 @@ public struct Time: CustomStringConvertible {
   var _secondsSinceEpoch = 0
 
   public init() {
-    self.init(secondsSinceEpoch: time(nil))
+    let n = time(nil)
+    _secondsSinceEpoch = n
+    _buffer = TimeBuffer(secondsSinceEpoch: n)
   }
 
   public init(secondsSinceEpoch: Int) {
-    _secondsSinceEpoch = secondsSinceEpoch
-    _buffer = TimeBuffer(secondsSinceEpoch: secondsSinceEpoch)
+    let n = Time.findLocalTimeDifference() + secondsSinceEpoch
+    _secondsSinceEpoch = n
+    _buffer = TimeBuffer(secondsSinceEpoch: n)
   }
 
   public init(buffer: CTime) {
@@ -94,17 +97,24 @@ public struct Time: CustomStringConvertible {
     _secondsSinceEpoch = _buffer.secondsSinceEpoch
   }
 
+  // Month from 0 to 11.
+  public init(year: Int, month: Int, day: Int, hour: Int, minute: Int,
+      second: Int) {
+    self.init(secondsSinceEpoch: Time.convertToSecondsSinceEpoch(year,
+        month: month, day: day, hour: hour, minute: minute, second: second))
+  }
+
   public var isUtc: Bool { return _buffer.isUtc }
 
   public var isDst: Bool { return _buffer.isDst }
 
-  public var yearday: Int32 { return _buffer.yearday }
+  public var yearday: Int { return Int(_buffer.yearday) }
 
-  public var weekday: Int32 { return _buffer.weekday }
+  public var weekday: Int { return Int(_buffer.weekday) }
 
-  public var year: Int32 { return 1900 + _buffer.year }
+  public var year: Int { return 1900 + Int(_buffer.year) }
 
-  public var month: Int32 { return _buffer.month }
+  public var month: Int { return Int(_buffer.month) }
 
   public var day: Int {
     get { return Int(_buffer.day) }
@@ -147,6 +157,79 @@ public struct Time: CustomStringConvertible {
         "hour: \(hour), minute: \(minute), second: \(second), " +
         "weekday: \(weekday), yearday: \(yearday), isDst: \(isDst), " +
         "isUtc: \(isUtc))"
+  }
+
+  static public func isLeapYear(year: Int) -> Bool {
+    if year % 4 != 0 {
+      return false
+    } else if year % 100 != 0 {
+      return true
+    } else if year % 400 != 0 {
+      return false
+    } else {
+      return true
+    }
+  }
+
+  // Months from 0 to 11.
+  static public func countYeardays(year: Int, month: Int, day: Int) -> Int {
+    var r = day - 1
+    switch month {
+      case 11: // Dec
+        fallthrough
+      case 10: // Nov
+        r += 30
+        fallthrough
+      case 9: // Oct
+        r += 31
+        fallthrough
+      case 8: // Sep
+        r += 30
+        fallthrough
+      case 7: // Aug
+        r += 31
+        fallthrough
+      case 6: // Jul
+        r += 31
+        fallthrough
+      case 5: // Jun
+        r += 30
+        fallthrough
+      case 4: // May
+        r += 31
+        fallthrough
+      case 3: // Apr
+        r += 30
+        fallthrough
+      case 2: // Mar
+        r += 31
+        fallthrough
+      case 1: // Feb
+        r += isLeapYear(year) ? 29 : 28
+        fallthrough
+      case 0: // Jan
+        r += 31
+        fallthrough
+      default: // Jan
+        () // Ignore.
+    }
+    return r;
+  }
+
+  static public func convertToSecondsSinceEpoch(year: Int, month: Int,
+      day: Int, hour: Int, minute: Int, second: Int) -> Int {
+    var r = second
+    r += minute * 60
+    r += hour * 3600
+    r += (Time.countYeardays(year, month: month, day: day)) * 86400
+    let y = year - 1900
+    r += (y - 70) * 31536000
+    r += ((y - 69) / 4) * 86400
+    return r
+  }
+
+  static public func findLocalTimeDifference() -> Int {
+    return TimeBuffer.utc().secondsSinceEpoch - TimeBuffer().secondsSinceEpoch
   }
 
 }
