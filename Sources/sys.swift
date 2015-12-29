@@ -31,6 +31,8 @@ public enum PopenOperation: String {
 // without having to import Glibc as well.
 public typealias DirentEntry = UnsafeMutablePointer<dirent>
 
+public typealias CStat = stat
+
 public class PosixSys {
 
   public static let DEFAULT_DIR_MODE = S_IRWXU | S_IRWXG | S_IRWXO

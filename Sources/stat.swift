@@ -4,11 +4,15 @@ import Glibc
 
 public class StatBuffer: CustomStringConvertible {
 
-  var buffer = Sys.statBuffer()
+  var buffer: CStat
   var _statMode = StatMode()
 
   public init() {
     buffer = Sys.statBuffer()
+  }
+
+  public init(buffer: CStat) {
+    self.buffer = buffer
   }
 
   public func stat(path: String) -> Bool {
@@ -44,6 +48,11 @@ public class StatBuffer: CustomStringConvertible {
   public var mtime: timespec { return buffer.st_mtim }
 
   public var ctime: timespec { return buffer.st_ctim }
+
+  public var ctimeAsTime: Time {
+    return Time(secondsSinceEpoch: buffer.st_ctim.tv_sec,
+        nanoseconds: buffer.st_ctim.tv_nsec)
+  }
 
   public var isRegularFile: Bool { return (mode & S_IFMT) == S_IFREG }
 

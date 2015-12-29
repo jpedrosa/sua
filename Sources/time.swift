@@ -96,16 +96,13 @@ public struct Time: CustomStringConvertible {
   public var nanoseconds = 0
 
   public init() {
-    let n = time(nil)
-    _secondsSinceEpoch = n
-    _buffer = TimeBuffer(secondsSinceEpoch: n)
+    self.init(secondsSinceEpoch: time(nil))
   }
 
+  // Assume secondsSinceEpoch is coming from UTC.
   public init(secondsSinceEpoch: Int, nanoseconds: Int = 0) {
-    let n = secondsSinceEpoch - Time.findLocalTimeDifference()
-    _secondsSinceEpoch = n
     self.nanoseconds = nanoseconds
-    _buffer = TimeBuffer(secondsSinceEpoch: n)
+    _buffer = TimeBuffer(secondsSinceEpoch: secondsSinceEpoch)
   }
 
   public init(buffer: CTime) {
@@ -121,7 +118,8 @@ public struct Time: CustomStringConvertible {
   public init(year: Int, month: Int, day: Int, hour: Int = 0, minute: Int = 0,
       second: Int = 0) {
     self.init(secondsSinceEpoch: Time.convertToSecondsSinceEpoch(year,
-        month: month, day: day, hour: hour, minute: minute, second: second))
+        month: month, day: day, hour: hour, minute: minute, second: second) -
+        Time.findLocalTimeDifference())
   }
 
   public var isUtc: Bool { return _buffer.isUtc }
@@ -294,15 +292,13 @@ public struct Time: CustomStringConvertible {
 
   static public func utc(year year: Int, month: Int, day: Int, hour: Int = 0,
       minute: Int = 0, second: Int = 0) -> Time {
-    return utc(secondsSinceEpoch: Time.convertToSecondsSinceEpoch(year,
+    return Time(secondsSinceEpoch: Time.convertToSecondsSinceEpoch(year,
         month: month, day: day, hour: hour, minute: minute, second: second))
   }
 
   static public func utc(secondsSinceEpoch secs: Int, nanoseconds: Int = 0)
       -> Time {
-    var t = Time(buffer: TimeBuffer.utc(secs))
-    t.nanoseconds = nanoseconds
-    return t
+    return Time(secondsSinceEpoch: secs, nanoseconds: nanoseconds)
   }
 
   static public var locale = Locale.one

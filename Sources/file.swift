@@ -166,6 +166,11 @@ public class File: CustomStringConvertible {
     return Sys.doStat(path, buffer: &buf) == 0
   }
 
+  public static func stat(path: String) -> StatBuffer? {
+    var buf = Sys.statBuffer()
+    return Sys.doStat(path, buffer: &buf) == 0 ? StatBuffer(buffer: buf) : nil
+  }
+
   public static func delete(path: String) throws {
     if Sys.unlink(path) == -1 {
       throw FileError.FileException(message: "Failed to delete file.")
