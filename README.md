@@ -5,6 +5,16 @@ Sua Swift is a project to experiment with Swift on Ubuntu/Linux.
 
 ----------
 
+**News - December 29, 2015**
+
+I am so happy that we now have a [Time](Sources/time.swift) class as well. It
+took quite a bit of work to get it off the ground. But the results have been
+pretty good so far. The Time class is like our own version of the DateTime class
+in other languages. But has a shorter name to boot! And lots of
+[shortcut features](docs/Time.md)!
+
+----------
+
 **News - December 25, 2015**
 
 While this project is still in an experimental phase, it has started to become
@@ -51,6 +61,7 @@ Progress Notes
 --------------
 *LATEST*
 
+* [Time](docs/Time.md)
 * [File Browser](docs/File_Browser.md)
 * [String Extensions](docs/String_Extensions.md)
 * [Data Types](docs/Data_Types.md)
@@ -60,4 +71,3 @@ Contributors
 ------------
 
 * Joao Pedrosa - joaopedrosa at gmail.com
-
