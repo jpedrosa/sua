@@ -151,7 +151,11 @@ public struct Time: CustomStringConvertible {
 
   public var yearday: Int { return Int(_buffer.yearday) }
 
-  public var weekday: Int { return Int(_buffer.weekday) }
+  // Make it range from Monday to Sunday and from 1 to 7.
+  public var weekday: Int {
+    let n = Int(_buffer.weekday)
+    return n == 0 ? 7 : n
+  }
 
   public var year: Int { return 1900 + Int(_buffer.year) }
 
