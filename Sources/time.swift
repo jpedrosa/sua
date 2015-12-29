@@ -283,7 +283,7 @@ public struct Time: CustomStringConvertible {
       case 1: // Jan
         r += 31
         fallthrough
-      default: // Jan
+      default:
         () // Ignore.
     }
     return r;
