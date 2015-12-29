@@ -290,7 +290,7 @@ public struct Time: CustomStringConvertible {
     var r = second
     r += minute * 60
     r += hour * 3600
-    r += (countYeardays(year, month: month, day: day)) * 86400
+    r += countYeardays(year, month: month, day: day) * 86400
     let y = year - 1900
     r += (y - 70) * 31536000
     r += ((y - 69) / 4) * 86400
