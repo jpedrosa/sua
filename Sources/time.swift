@@ -74,7 +74,7 @@ public struct TimeBuffer: CustomStringConvertible {
     return TimeBuffer(buffer: b, utc: true)
   }
 
-  static func utc(secondsSinceEpoch: Int) -> TimeBuffer {
+  static func utc(secondsSinceEpoch secondsSinceEpoch: Int) -> TimeBuffer {
     var n = secondsSinceEpoch
     var b = tm()
     gmtime_r(&n, &b)
@@ -322,7 +322,9 @@ public struct Time: CustomStringConvertible {
 
   static public func utc(secondsSinceEpoch secs: Int, nanoseconds: Int = 0)
       -> Time {
-    return Time(secondsSinceEpoch: secs, nanoseconds: nanoseconds)
+    var t = Time(buffer: TimeBuffer.utc(secondsSinceEpoch: secs))
+    t.nanoseconds = nanoseconds
+    return t
   }
 
   static public var locale = Locale.one
