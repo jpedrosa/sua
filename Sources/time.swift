@@ -72,6 +72,13 @@ public struct TimeBuffer: CustomStringConvertible {
     return TimeBuffer(buffer: b, utc: true)
   }
 
+  static func utc(secondsSinceEpoch: Int) -> TimeBuffer {
+    var n = secondsSinceEpoch
+    var b = tm()
+    gmtime_r(&n, &b)
+    return TimeBuffer(buffer: b, utc: true)
+  }
+
 }
 
 
@@ -154,6 +161,28 @@ public struct Time: CustomStringConvertible {
     set {
       _secondsSinceEpoch = newValue
       _buffer = TimeBuffer(secondsSinceEpoch: newValue)
+    }
+  }
+
+  // Returns a new instance of Time.
+  // If self is set on UTC already, just copy it over. Otherwise, convert it
+  // from local time to UTC.
+  public func toUtc() -> Time {
+    if isUtc {
+      return self
+    } else {
+      return Time.utc(secondsSinceEpoch: secondsSinceEpoch)
+    }
+  }
+
+  // Returns a new instance of Time.
+  // If self is set on local time already, just copy it over. Otherwise,
+  // convert it from UTC to local time.
+  public func toLocalTime() -> Time {
+    if !isUtc {
+      return self
+    } else {
+      return Time(buffer: TimeBuffer(secondsSinceEpoch: secondsSinceEpoch))
     }
   }
 
@@ -247,6 +276,16 @@ public struct Time: CustomStringConvertible {
 
   static public func utc() -> Time {
     return Time(buffer: TimeBuffer.utc())
+  }
+
+  static public func utc(year year: Int, month: Int, day: Int, hour: Int = 0,
+      minute: Int = 0, second: Int = 0) -> Time {
+    return utc(secondsSinceEpoch: Time.convertToSecondsSinceEpoch(year,
+        month: month, day: day, hour: hour, minute: minute, second: second))
+  }
+
+  static public func utc(secondsSinceEpoch secs: Int) -> Time {
+    return Time(buffer: TimeBuffer.utc(secs))
   }
 
 }
