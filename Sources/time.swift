@@ -84,6 +84,28 @@ public struct TimeBuffer: CustomStringConvertible {
 }
 
 
+// Time is by default set on local time. It also supports time in UTC format
+// and can convert between the two of them with methods such as toUtc() and
+// toLocalTime().
+//
+// Time math is supported on the second, minute, hour and day properties and
+// a new time buffer value will be computed to present the changes with.
+//
+// Time can also be compared with the comparison operators: <  ==  >  !=
+//
+// An output format can be obtained by using the strftime function similar to C.
+// E.g.
+//    var t = Time()           // Creates a new Time object set on local time.
+//    var u = Time.utc()       // Creates a new Time object set on UTC time.
+//    print(Time().strftime("%Y-%m-%d %H:%M:%S")) //> 2015-12-29 05:28:20
+//    print(Time() == Time())  // Prints true
+//    print(Time().secondsSinceEpoch) // Prints 1451377821
+//    var k = Time(year: 2016, month: 12, day: 30) // Creates a new Time object.
+//    // As does this:
+//    Time.utc(year: 2016, month: 12, day: 30, hour: 5, minute: 3, second: 1)
+//    var r = Time()
+//    r.minute -= 30           // Goes back in time half an hour.
+//    r.day += 7               // Goes forward a week.
 public struct Time: CustomStringConvertible {
 
   var _buffer: TimeBuffer
@@ -327,4 +349,12 @@ public func >(lhs: Time, rhs: Time) -> Bool {
   return lhs.secondsSinceEpoch > rhs.secondsSinceEpoch ||
       (lhs.secondsSinceEpoch == rhs.secondsSinceEpoch &&
       lhs.nanoseconds > rhs.nanoseconds)
+}
+
+public func <=(lhs: Time, rhs: Time) -> Bool {
+  return lhs < rhs || lhs == rhs
+}
+
+public func >=(lhs: Time, rhs: Time) -> Bool {
+  return lhs > rhs || lhs == rhs
 }
