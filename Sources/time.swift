@@ -33,8 +33,12 @@ public struct TimeBuffer: CustomStringConvertible {
 
   public var weekday: Int32 { return buffer.tm_wday }
 
+  // Low level. C-based. Years start from 1900.
+  // Current year would have a value of current_year - 1900.
+  // E.g. 2016 - 1900   // Which would be 116.
   public var year: Int32 { return buffer.tm_year }
 
+  // Low level. C-based. Months go from 0 to 11 here.
   public var month: Int32 { return buffer.tm_mon }
 
   public var day: Int32 { return buffer.tm_mday }
