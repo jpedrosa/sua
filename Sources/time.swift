@@ -212,9 +212,8 @@ public struct Time: CustomStringConvertible {
     if !isUtc {
       return self
     } else {
-      var t = Time(buffer: TimeBuffer(secondsSinceEpoch: secondsSinceEpoch))
-      t.nanoseconds = nanoseconds
-      return t
+      return Time(secondsSinceEpoch: secondsSinceEpoch,
+          nanoseconds: nanoseconds)
     }
   }
 
