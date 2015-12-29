@@ -53,8 +53,6 @@ public struct TimeBuffer: CustomStringConvertible {
     let y = Int(year)
     r += (y - 70) * 31536000
     r += ((y - 69) / 4) * 86400
-    //r += ((y - 1) / 100) * 86400
-    //r += ((y + 299) / 400) * 86400
     return r
   }
 
