@@ -193,6 +193,10 @@ public struct Time: CustomStringConvertible {
     }
   }
 
+  public func strftime(mask: String) -> String {
+    return Time.locale.strftime(self, mask: mask)
+  }
+
   public var description: String {
     return "Time(year: \(year), month: \(month), day: \(day), " +
         "hour: \(hour), minute: \(minute), second: \(second), " +
@@ -293,6 +297,8 @@ public struct Time: CustomStringConvertible {
   static public func utc(secondsSinceEpoch secs: Int) -> Time {
     return Time(buffer: TimeBuffer.utc(secs))
   }
+
+  static public var locale = Locale()
 
 }
 

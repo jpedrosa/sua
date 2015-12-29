@@ -1,22 +1,22 @@
 
 
-class Locale {
+public class Locale {
 
-  let months = [
+  public let months = [
     "January", "February", "March", "April", "May", "June", "July",
     "August", "Septemper", "October", "November", "December"]
 
-  let abbreviatedMonths = [
+  public let abbreviatedMonths = [
     "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct",
     "Nov", "Dec"]
 
-  let weekdays = [
+  public let weekdays = [
     "Monday", "Thuesday", "Wednesday", "Thursday", "Friday", "Saturday",
     "Sunday"]
 
-  let abbreviatedWeekdays = ["Mon", "Thu", "Wed", "Thu", "Fri", "Sat", "Sun"]
+  public let abbreviatedWeekdays = ["Mon", "Thu", "Wed", "Thu", "Fri", "Sat", "Sun"]
 
-  func strftime(time: Time, mask: String) -> String {
+  public func strftime(time: Time, mask: String) -> String {
     var sb = ""
     func process(z: String, padding: Int = 0) {
       for _ in z.utf16.count - padding..<0 {
