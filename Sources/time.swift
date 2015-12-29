@@ -290,7 +290,7 @@ public struct Time: CustomStringConvertible {
     var r = second
     r += minute * 60
     r += hour * 3600
-    r += (Time.countYeardays(year, month: month, day: day)) * 86400
+    r += (countYeardays(year, month: month, day: day)) * 86400
     let y = year - 1900
     r += (y - 70) * 31536000
     r += ((y - 69) / 4) * 86400
@@ -315,7 +315,7 @@ public struct Time: CustomStringConvertible {
 
   static public func utc(year year: Int, month: Int, day: Int, hour: Int = 0,
       minute: Int = 0, second: Int = 0) -> Time {
-    return Time(secondsSinceEpoch: Time.convertToSecondsSinceEpoch(year,
+    return Time(secondsSinceEpoch: convertToSecondsSinceEpoch(year,
         month: month, day: day, hour: hour, minute: minute, second: second) -
         findLocalTimeDifference())
   }
