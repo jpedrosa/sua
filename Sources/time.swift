@@ -109,7 +109,6 @@ public struct Time: CustomStringConvertible {
     _secondsSinceEpoch = buffer.secondsSinceEpoch
   }
 
-  // Month from 0 to 11.
   public init(year: Int, month: Int, day: Int, hour: Int = 0, minute: Int = 0,
       second: Int = 0) {
     self.init(secondsSinceEpoch: Time.convertToSecondsSinceEpoch(year,
@@ -126,7 +125,7 @@ public struct Time: CustomStringConvertible {
 
   public var year: Int { return 1900 + Int(_buffer.year) }
 
-  public var month: Int { return Int(_buffer.month) }
+  public var month: Int { return 1 + Int(_buffer.month) }
 
   public var day: Int {
     get { return Int(_buffer.day) }
@@ -205,43 +204,42 @@ public struct Time: CustomStringConvertible {
     }
   }
 
-  // Months from 0 to 11.
   static public func countYeardays(year: Int, month: Int, day: Int) -> Int {
     var r = day - 1
     switch month {
-      case 11: // Dec
+      case 12: // Dec
         fallthrough
-      case 10: // Nov
+      case 11: // Nov
         r += 30
         fallthrough
-      case 9: // Oct
+      case 10: // Oct
         r += 31
         fallthrough
-      case 8: // Sep
+      case 9: // Sep
         r += 30
         fallthrough
-      case 7: // Aug
+      case 8: // Aug
         r += 31
         fallthrough
-      case 6: // Jul
+      case 7: // Jul
         r += 31
         fallthrough
-      case 5: // Jun
+      case 6: // Jun
         r += 30
         fallthrough
-      case 4: // May
+      case 5: // May
         r += 31
         fallthrough
-      case 3: // Apr
+      case 4: // Apr
         r += 30
         fallthrough
-      case 2: // Mar
+      case 3: // Mar
         r += 31
         fallthrough
-      case 1: // Feb
+      case 2: // Feb
         r += isLeapYear(year) ? 29 : 28
         fallthrough
-      case 0: // Jan
+      case 1: // Jan
         r += 31
         fallthrough
       default: // Jan
