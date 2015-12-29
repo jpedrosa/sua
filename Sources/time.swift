@@ -89,6 +89,12 @@ public struct Time: CustomStringConvertible {
   var _buffer: TimeBuffer
   var _secondsSinceEpoch = 0
 
+  // This property is still under consideration. It may be useful when using
+  // the strftime command to include milliseconds, which nanoseconds are then
+  // converted to. It may also help to store all the time data that is
+  // available under Linux.
+  public var nanoseconds = 0
+
   public init() {
     let n = time(nil)
     _secondsSinceEpoch = n
