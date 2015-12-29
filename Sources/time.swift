@@ -304,17 +304,23 @@ public struct Time: CustomStringConvertible {
 
 
 public func <(lhs: Time, rhs: Time) -> Bool {
-  return lhs.secondsSinceEpoch < rhs.secondsSinceEpoch
+  return lhs.secondsSinceEpoch < rhs.secondsSinceEpoch ||
+      (lhs.secondsSinceEpoch == rhs.secondsSinceEpoch &&
+      lhs.nanoseconds < rhs.nanoseconds)
 }
 
 public func ==(lhs: Time, rhs: Time) -> Bool {
-  return lhs.secondsSinceEpoch == rhs.secondsSinceEpoch
+  return lhs.secondsSinceEpoch == rhs.secondsSinceEpoch &&
+      lhs.nanoseconds == rhs.nanoseconds
 }
 
 public func !=(lhs: Time, rhs: Time) -> Bool {
-  return lhs.secondsSinceEpoch != rhs.secondsSinceEpoch
+  return lhs.secondsSinceEpoch != rhs.secondsSinceEpoch ||
+      lhs.nanoseconds != rhs.nanoseconds
 }
 
 public func >(lhs: Time, rhs: Time) -> Bool {
-  return lhs.secondsSinceEpoch > rhs.secondsSinceEpoch
+  return lhs.secondsSinceEpoch > rhs.secondsSinceEpoch ||
+      (lhs.secondsSinceEpoch == rhs.secondsSinceEpoch &&
+      lhs.nanoseconds > rhs.nanoseconds)
 }
