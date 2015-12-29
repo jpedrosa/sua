@@ -31,6 +31,7 @@ public struct TimeBuffer: CustomStringConvertible {
 
   public var yearday: Int32 { return buffer.tm_yday }
 
+  // Low level. C-based. Weekdays start from 0 with Sunday.
   public var weekday: Int32 { return buffer.tm_wday }
 
   // Low level. C-based. Years start from 1900.
