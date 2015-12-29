@@ -18,6 +18,10 @@ public class Locale {
   public let abbreviatedWeekdays = ["Mon", "Thu", "Wed", "Thu", "Fri", "Sat",
       "Sun"]
 
+  // Formats time like the strftime function in C.
+  // We're still missing some of the features though.
+  // E.g.
+  //    p(Time().strftime("%Y-%m-%d %H:%M:%S")) //> "2015-12-29 04:06:12"
   public func strftime(time: Time, mask: String) -> String {
     var sb = ""
     var tokenIndex = -1
