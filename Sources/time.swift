@@ -200,8 +200,8 @@ public struct Time: CustomStringConvertible {
   public var description: String {
     return "Time(year: \(year), month: \(month), day: \(day), " +
         "hour: \(hour), minute: \(minute), second: \(second), " +
-        "weekday: \(weekday), yearday: \(yearday), isDst: \(isDst), " +
-        "isUtc: \(isUtc))"
+        "nanoseconds: \(nanoseconds), weekday: \(weekday), " +
+        "yearday: \(yearday), isDst: \(isDst), isUtc: \(isUtc))"
   }
 
   static public func isLeapYear(year: Int) -> Bool {
