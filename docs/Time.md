@@ -13,7 +13,7 @@ print(Time().strftime("%Y-%m-%d %H:%M:%S"))    // Prints: 2015-12-29 05:47:13
 ```
 
 With Swift we don't have easy access to variadic C functions like strftime. So
-this is a custom one that is not very thorough at the moment. I first came up
+this is a custom function that is not very thorough at the moment. I first came up
 with versions of it in JavaScript and Dart. It was originally based on a version
 of it created by a famous Ruby developer called _why.
 
