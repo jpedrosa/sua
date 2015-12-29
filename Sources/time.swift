@@ -2,8 +2,6 @@
 import Glibc
 
 
-public typealias CTime = tm
-
 public struct TimeBuffer: CustomStringConvertible {
 
   public var buffer: CTime
@@ -11,7 +9,7 @@ public struct TimeBuffer: CustomStringConvertible {
 
   public init(secondsSinceEpoch: Int) {
     var n = secondsSinceEpoch
-    var b = tm()
+    var b = Sys.timeBuffer()
     localtime_r(&n, &b)
     buffer = b
   }
@@ -69,15 +67,15 @@ public struct TimeBuffer: CustomStringConvertible {
   }
 
   static func utc() -> TimeBuffer {
-    var n = time(nil)
-    var b = tm()
+    var n = Sys.time()
+    var b = Sys.timeBuffer()
     gmtime_r(&n, &b)
     return TimeBuffer(buffer: b, utc: true)
   }
 
   static func utc(secondsSinceEpoch secondsSinceEpoch: Int) -> TimeBuffer {
     var n = secondsSinceEpoch
-    var b = tm()
+    var b = Sys.timeBuffer()
     gmtime_r(&n, &b)
     return TimeBuffer(buffer: b, utc: true)
   }

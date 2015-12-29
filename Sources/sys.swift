@@ -35,6 +35,8 @@ public typealias CStat = stat
 
 public typealias CTimespec = timespec
 
+public typealias CTime = tm
+
 public class PosixSys {
 
   public static let DEFAULT_DIR_MODE = S_IRWXU | S_IRWXG | S_IRWXO
@@ -194,6 +196,14 @@ public class PosixSys {
 
   public func sleep(n: UInt32) {
     Glibc.sleep(n)
+  }
+
+  public func time() -> Int {
+    return Glibc.time(nil)
+  }
+
+  public func timeBuffer() -> CTime {
+    return tm()
   }
 
   // The environ variable is made available by the CSua sister project
