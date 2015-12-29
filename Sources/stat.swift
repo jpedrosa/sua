@@ -47,15 +47,15 @@ public class StatBuffer: CustomStringConvertible {
     return Time(secondsSinceEpoch: ts.tv_sec, nanoseconds: ts.tv_nsec)
   }
 
-  public var atime: timespec { return buffer.st_atim }
+  public var atime: CTimespec { return buffer.st_atim }
 
   public var atimeAsTime: Time { return tsToTime(buffer.st_atim) }
 
-  public var mtime: timespec { return buffer.st_mtim }
+  public var mtime: CTimespec { return buffer.st_mtim }
 
   public var mtimeAsTime: Time { return tsToTime(buffer.st_mtim) }
 
-  public var ctime: timespec { return buffer.st_ctim }
+  public var ctime: CTimespec { return buffer.st_ctim }
 
   public var ctimeAsTime: Time { return tsToTime(buffer.st_ctim) }
 
