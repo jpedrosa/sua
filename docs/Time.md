@@ -78,7 +78,7 @@ Another choice I had to make was whether the default time would be taken in UTC
 or local time. I preferred local time and I checked it on Dart and they have it
 as local time by default as well.
 
-A small feature that I like is the arithmetic on day, hour, minutes and seconds
+A small feature that I like is the arithmetic on day, hour, minute and second
 as added to the Time class itself. It helps that the Time class is actually a
 struct. Structs in Swift have the property of Copy-on-Write which makes them a
 little safer to share around even as they are modified. When a struct is
