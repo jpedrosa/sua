@@ -266,7 +266,7 @@ public struct Time: CustomStringConvertible {
     let n = TimeBuffer().secondsSinceEpoch
     let tbUtc = TimeBuffer.utc()
     var nu = tbUtc.secondsSinceEpoch
-    // TODO Joao: confirm that this is necessary. The idea is from this SO thread:
+    // TODO Joao: confirm that this is needed. The idea is from this SO thread:
     // http://stackoverflow.com/questions/9076494/how-to-convert-from-utc-to-local-time-in-c
     if tbUtc.isDst {
       nu -= 3600
