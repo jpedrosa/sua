@@ -18,7 +18,13 @@ public class Locale {
 
   public func strftime(time: Time, mask: String) -> String {
     var sb = ""
+    var tokenIndex = -1
+    var i = 0
     func process(z: String, padding: Int = 0) {
+      if tokenIndex >= 0 {
+        sb += mask.utf16.substring(tokenIndex, endIndex: i - 1) ?? ""
+        tokenIndex = -1
+      }
       for _ in z.utf16.count - padding..<0 {
         sb += "0"
       }
@@ -26,7 +32,6 @@ public class Locale {
     }
     let len = mask.utf16.count
     let lasti = len - 1
-    var i = 0
     while i < len {
       if mask.utf16.codeUnitAt(i) == 37 && i < lasti { // %
         i += 1
@@ -74,9 +79,14 @@ public class Locale {
           i -= 1
         }
       } else {
-        sb += mask.utf16.substring(i, endIndex: i + 1) ?? ""
+        if tokenIndex < 0 {
+          tokenIndex = i
+        }
       }
       i += 1
+    }
+    if tokenIndex >= 0 {
+      sb += mask.utf16.substring(tokenIndex, endIndex: i) ?? ""
     }
     return sb
   }
