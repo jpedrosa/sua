@@ -1,21 +1,21 @@
 
-import Glibc
 
-
+// This class holds a buffer to C's tm (CTime) struct. The tm struct is
+// needed for retrieving data from C functions such as localtime_r and gmtime_r.
+// This is a low level class that still exposes many of the C level interfaces.
 public struct TimeBuffer: CustomStringConvertible {
 
   public var buffer: CTime
   public var _utc = false
 
   public init(secondsSinceEpoch: Int) {
-    var n = secondsSinceEpoch
     var b = Sys.timeBuffer()
-    localtime_r(&n, &b)
+    Sys.localtime_r(secondsSinceEpoch, buffer: &b)
     buffer = b
   }
 
   public init() {
-    self.init(secondsSinceEpoch: time(nil))
+    self.init(secondsSinceEpoch: Sys.time())
   }
 
   public init(buffer: CTime, utc: Bool = false) {
@@ -67,16 +67,14 @@ public struct TimeBuffer: CustomStringConvertible {
   }
 
   static func utc() -> TimeBuffer {
-    var n = Sys.time()
     var b = Sys.timeBuffer()
-    gmtime_r(&n, &b)
+    Sys.gmtime_r(Sys.time(), buffer: &b)
     return TimeBuffer(buffer: b, utc: true)
   }
 
   static func utc(secondsSinceEpoch secondsSinceEpoch: Int) -> TimeBuffer {
-    var n = secondsSinceEpoch
     var b = Sys.timeBuffer()
-    gmtime_r(&n, &b)
+    Sys.gmtime_r(secondsSinceEpoch, buffer: &b)
     return TimeBuffer(buffer: b, utc: true)
   }
 
@@ -117,7 +115,7 @@ public struct Time: CustomStringConvertible {
   public var nanoseconds = 0
 
   public init() {
-    self.init(secondsSinceEpoch: time(nil))
+    self.init(secondsSinceEpoch: Sys.time())
   }
 
   // Assume secondsSinceEpoch is coming from UTC.

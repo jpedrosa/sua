@@ -206,6 +206,19 @@ public class PosixSys {
     return tm()
   }
 
+  public func localtime_r(secondsSinceEpoch: Int,
+      buffer: UnsafeMutablePointer<CTime>) {
+    var n = secondsSinceEpoch
+    Glibc.localtime_r(&n, buffer)
+  }
+
+  public func gmtime_r(secondsSinceEpoch: Int,
+      buffer: UnsafeMutablePointer<CTime>) {
+    var n = secondsSinceEpoch
+    Glibc.gmtime_r(&n, buffer)
+  }
+
+
   // The environ variable is made available by the CSua sister project
   // dependency.
   public var environment: [String: String] {
