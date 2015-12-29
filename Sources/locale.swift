@@ -31,8 +31,10 @@ public class Locale {
         sb += mask.utf16.substring(tokenIndex, endIndex: i - 1) ?? ""
         tokenIndex = -1
       }
-      for _ in z.utf16.count - padding..<0 {
+      var j = z.utf16.count - padding
+      while j < 0 {
         sb += "0"
+        j += 1
       }
       sb += z
     }
