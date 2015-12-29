@@ -289,3 +289,20 @@ public struct Time: CustomStringConvertible {
   }
 
 }
+
+
+public func <(lhs: Time, rhs: Time) -> Bool {
+  return lhs.secondsSinceEpoch < rhs.secondsSinceEpoch
+}
+
+public func ==(lhs: Time, rhs: Time) -> Bool {
+  return lhs.secondsSinceEpoch == rhs.secondsSinceEpoch
+}
+
+public func !=(lhs: Time, rhs: Time) -> Bool {
+  return lhs.secondsSinceEpoch != rhs.secondsSinceEpoch
+}
+
+public func >(lhs: Time, rhs: Time) -> Bool {
+  return lhs.secondsSinceEpoch > rhs.secondsSinceEpoch
+}
