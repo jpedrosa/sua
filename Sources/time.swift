@@ -298,7 +298,7 @@ public struct Time: CustomStringConvertible {
     return Time(buffer: TimeBuffer.utc(secs))
   }
 
-  static public var locale = Locale()
+  static public var locale = Locale.one
 
 }
 

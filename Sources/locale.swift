@@ -1,20 +1,22 @@
+import Glibc
 
 
 public class Locale {
 
   public let months = [
-    "January", "February", "March", "April", "May", "June", "July",
-    "August", "Septemper", "October", "November", "December"]
+      "January", "February", "March", "April", "May", "June", "July",
+      "August", "Septemper", "October", "November", "December"]
 
   public let abbreviatedMonths = [
-    "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct",
-    "Nov", "Dec"]
+      "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct",
+      "Nov", "Dec"]
 
   public let weekdays = [
-    "Monday", "Thuesday", "Wednesday", "Thursday", "Friday", "Saturday",
-    "Sunday"]
+      "Monday", "Thuesday", "Wednesday", "Thursday", "Friday", "Saturday",
+      "Sunday"]
 
-  public let abbreviatedWeekdays = ["Mon", "Thu", "Wed", "Thu", "Fri", "Sat", "Sun"]
+  public let abbreviatedWeekdays = ["Mon", "Thu", "Wed", "Thu", "Fri", "Sat",
+      "Sun"]
 
   public func strftime(time: Time, mask: String) -> String {
     var sb = ""
@@ -90,5 +92,9 @@ public class Locale {
     }
     return sb
   }
+
+  // Default, constant locale that can be used when the format requires
+  // American, English or standard system compatibility.
+  public static let one = Locale()
 
 }
