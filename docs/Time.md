@@ -116,5 +116,5 @@ print(d.strftime("%Y-%m-%d %H:%M:%S"))    // Prints: 2016-01-01 00:00:00
 P.S. I am finishing writing this code as I'm writing this post. In fact I just
 fixed an issue caused by one of my recent changes to make the Time class be
 local time by default. I will commit the fix together with this article if you
-want to see it. And above all, you're welcome to help me to fix any other issues
+want to see it. And above all, you're welcome to help me fix any other issues
 or to make the Time class even better! Cheers!
