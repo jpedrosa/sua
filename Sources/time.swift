@@ -101,9 +101,10 @@ public struct Time: CustomStringConvertible {
     _buffer = TimeBuffer(secondsSinceEpoch: n)
   }
 
-  public init(secondsSinceEpoch: Int) {
+  public init(secondsSinceEpoch: Int, nanoseconds: Int = 0) {
     let n = secondsSinceEpoch - Time.findLocalTimeDifference()
     _secondsSinceEpoch = n
+    self.nanoseconds = nanoseconds
     _buffer = TimeBuffer(secondsSinceEpoch: n)
   }
 
@@ -178,7 +179,8 @@ public struct Time: CustomStringConvertible {
     if isUtc {
       return self
     } else {
-      return Time.utc(secondsSinceEpoch: secondsSinceEpoch)
+      return Time.utc(secondsSinceEpoch: secondsSinceEpoch,
+          nanoseconds: nanoseconds)
     }
   }
 
@@ -189,7 +191,9 @@ public struct Time: CustomStringConvertible {
     if !isUtc {
       return self
     } else {
-      return Time(buffer: TimeBuffer(secondsSinceEpoch: secondsSinceEpoch))
+      var t = Time(buffer: TimeBuffer(secondsSinceEpoch: secondsSinceEpoch))
+      t.nanoseconds = nanoseconds
+      return t
     }
   }
 
@@ -294,8 +298,11 @@ public struct Time: CustomStringConvertible {
         month: month, day: day, hour: hour, minute: minute, second: second))
   }
 
-  static public func utc(secondsSinceEpoch secs: Int) -> Time {
-    return Time(buffer: TimeBuffer.utc(secs))
+  static public func utc(secondsSinceEpoch secs: Int, nanoseconds: Int = 0)
+      -> Time {
+    var t = Time(buffer: TimeBuffer.utc(secs))
+    t.nanoseconds = nanoseconds
+    return t
   }
 
   static public var locale = Locale.one
