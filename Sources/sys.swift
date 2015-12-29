@@ -29,7 +29,7 @@ public enum PopenOperation: String {
 
 // This alias allows other files like the FileBrowser to declare this type
 // without having to import Glibc as well.
-public typealias DirentEntry = UnsafeMutablePointer<dirent>
+public typealias CDirent = UnsafeMutablePointer<dirent>
 
 public typealias CStat = stat
 
@@ -137,7 +137,7 @@ public class PosixSys {
     return stat()
   }
 
-  public func readdir(dirp: COpaquePointer) -> DirentEntry {
+  public func readdir(dirp: COpaquePointer) -> CDirent {
     return dirp != nil ? Glibc.readdir(dirp) : nil
   }
 

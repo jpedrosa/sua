@@ -9,7 +9,7 @@ public enum FileType {
 final public class FileBrowser {
 
   var dirp: COpaquePointer?
-  var entry: DirentEntry?
+  var entry: CDirent?
 
   public init(path: String) throws {
     dirp = Sys.opendir(path)
@@ -66,7 +66,7 @@ final public class FileBrowser {
     }
   }
 
-  public var rawEntry: DirentEntry {
+  public var rawEntry: CDirent {
     return entry!
   }
 
