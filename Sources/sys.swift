@@ -194,8 +194,13 @@ public class PosixSys {
     return Glibc.strlen(sp)
   }
 
-  public func sleep(n: UInt32) {
-    Glibc.sleep(n)
+  public func sleep(n: UInt32) -> UInt32 {
+    return Glibc.sleep(n)
+  }
+
+  public func nanosleep(seconds: Int, nanoseconds: Int = 0) -> Int32 {
+    var ts: CTimespec = Glibc.timespec(tv_sec: seconds, tv_nsec: nanoseconds)
+    return retry { Glibc.nanosleep(&ts, nil) }
   }
 
   public func time() -> Int {
@@ -203,7 +208,7 @@ public class PosixSys {
   }
 
   public func timeBuffer() -> CTime {
-    return tm()
+    return Glibc.tm()
   }
 
   public func localtime_r(secondsSinceEpoch: Int,
@@ -217,7 +222,6 @@ public class PosixSys {
     var n = secondsSinceEpoch
     Glibc.gmtime_r(&n, buffer)
   }
-
 
   // The environ variable is made available by the CSua sister project
   // dependency.
