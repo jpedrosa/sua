@@ -33,6 +33,8 @@ public typealias DirentEntry = UnsafeMutablePointer<dirent>
 
 public typealias CStat = stat
 
+public typealias CTimespec = timespec
+
 public class PosixSys {
 
   public static let DEFAULT_DIR_MODE = S_IRWXU | S_IRWXG | S_IRWXO

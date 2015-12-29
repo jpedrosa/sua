@@ -101,6 +101,7 @@ public struct Time: CustomStringConvertible {
 
   // Assume secondsSinceEpoch is coming from UTC.
   public init(secondsSinceEpoch: Int, nanoseconds: Int = 0) {
+    _secondsSinceEpoch = secondsSinceEpoch
     self.nanoseconds = nanoseconds
     _buffer = TimeBuffer(secondsSinceEpoch: secondsSinceEpoch)
   }

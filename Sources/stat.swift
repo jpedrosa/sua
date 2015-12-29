@@ -43,16 +43,21 @@ public class StatBuffer: CustomStringConvertible {
 
   public var blocks: Int { return buffer.st_blocks }
 
+  func tsToTime(ts: CTimespec) -> Time {
+    return Time(secondsSinceEpoch: ts.tv_sec, nanoseconds: ts.tv_nsec)
+  }
+
   public var atime: timespec { return buffer.st_atim }
+
+  public var atimeAsTime: Time { return tsToTime(buffer.st_atim) }
 
   public var mtime: timespec { return buffer.st_mtim }
 
+  public var mtimeAsTime: Time { return tsToTime(buffer.st_mtim) }
+
   public var ctime: timespec { return buffer.st_ctim }
 
-  public var ctimeAsTime: Time {
-    return Time(secondsSinceEpoch: buffer.st_ctim.tv_sec,
-        nanoseconds: buffer.st_ctim.tv_nsec)
-  }
+  public var ctimeAsTime: Time { return tsToTime(buffer.st_ctim) }
 
   public var isRegularFile: Bool { return (mode & S_IFMT) == S_IFREG }
 
