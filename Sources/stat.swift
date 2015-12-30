@@ -2,7 +2,7 @@
 import Glibc
 
 
-public struct StatBuffer: CustomStringConvertible {
+public struct Stat: CustomStringConvertible {
 
   var buffer: CStat
 
@@ -26,7 +26,7 @@ public struct StatBuffer: CustomStringConvertible {
 
   public var ino: UInt { return buffer.st_ino }
 
-  public var mode: UInt32 { return buffer.st_mode }
+  public var rawMode: UInt32 { return buffer.st_mode }
 
   public var nlink: UInt { return buffer.st_nlink }
 
@@ -58,22 +58,22 @@ public struct StatBuffer: CustomStringConvertible {
 
   public var ctimeAsTime: Time { return tsToTime(buffer.st_ctim) }
 
-  public var isRegularFile: Bool { return (mode & S_IFMT) == S_IFREG }
+  public var isRegularFile: Bool { return (rawMode & S_IFMT) == S_IFREG }
 
-  public var isDirectory: Bool { return (mode & S_IFMT) == S_IFDIR }
+  public var isDirectory: Bool { return (rawMode & S_IFMT) == S_IFDIR }
 
-  public var isSymlink: Bool { return (mode & S_IFMT) == S_IFLNK }
+  public var isSymlink: Bool { return (rawMode & S_IFMT) == S_IFLNK }
 
-  public var statMode: StatMode {
-    return StatMode(mode: mode)
+  public var mode: StatMode {
+    return StatMode(mode: rawMode)
   }
 
   public var description: String {
-    return "StatBuffer(dev: \(dev), ino: \(ino), mode: \(mode), " +
+    return "StatBuffer(dev: \(dev), ino: \(ino), rawMode: \(rawMode), " +
         "nlink: \(nlink), uid: \(uid), gid: \(gid), rdev: \(rdev), " +
         "size: \(size), blksize: \(blksize), blocks: \(blocks), " +
         "atime: \(atime), mtime: \(mtime), ctime: \(ctime), " +
-        "statMode: \(statMode))"
+        "mode: \(mode))"
   }
 
 }
