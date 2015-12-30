@@ -1,7 +1,17 @@
-Sua Swift
+Sua
 ---------
 
-Sua Swift is a project to experiment with Swift on Ubuntu/Linux.
+Sua provides Swift users with a new set of core libraries that mostly depend on
+Glibc. The work on this project started on Ubuntu/Linux, but it could also be
+made to work on OSX by depending on Darwin there.
+
+The idea for this project started as an experiment to see how viable using Swift
+under Linux would be. And the results have shown that it is plenty viable. This
+project has quickly garnered many important classes that help with dealing with
+files, directories, time, some parsing, some more IO and on we go!
+
+By starting anew, we get to pick some new API names that are shorter and
+sweeter.
 
 ----------
 
