@@ -21,17 +21,17 @@ try IO.popen("cd /home/dewd/t_ && grep -ir a.*b") { s in
 }
 
 try PopenStream.readBytes("ls -l /home/dewd/t_") { a, len in
-  Stdout.writeBytes(a, length: len)
+  Stdout.writeBytes(a, maxBytes: len)
 }
 
 try PopenStream.readBytes("lssdsdsd -l /home/dewd/t_") { a, len in
-  Stdout.writeBytes(a, length: len)
+  Stdout.writeBytes(a, maxBytes: len)
 }
 
 try PopenStream.readBytes("find /home/dewd/t_ -type f") { a, len in
-  Stdout.writeBytes(a, length: len)
+  Stdout.writeBytes(a, maxBytes: len)
 }
 
 try IO.popenBytes("cd /home/dewd/t_ && grep -ir a.*b") { a, len in
-  Stdout.writeBytes(a, length: len)
+  Stdout.writeBytes(a, maxBytes: len)
 }

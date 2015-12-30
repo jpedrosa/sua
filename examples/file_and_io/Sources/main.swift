@@ -93,7 +93,7 @@ p(try! IO.readLines("/home/dewd/t_/sample.txt"))
 
 p(try IO.writeBytes("/home/dewd/t_/many_tries.txt", bytes: a))
 
-p(Dir.pwd)
+p(Dir.cwd)
 
 p(try! IO.readBytes("/home/dewd/t_/swift_playground/a.out"))
 

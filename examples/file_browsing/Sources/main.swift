@@ -11,7 +11,7 @@ p(buf.self)
 var i = stat("/home/dewd/t_/sample.txt", &buf)
 p("iiii \(i) \(buf)")
 
-var o = Sys.doStat("/home/dewd/t_/sample.txt", buffer: &buf)
+var o = Sys.stat("/home/dewd/t_/sample.txt", buffer: &buf)
 p("oooo \(o)")
 
 var h = Sys.lstat("/home/dewd/t_/sample.txt", buffer: &buf)
@@ -23,7 +23,7 @@ p("exists: \(File.exists("/home/dewd/t_/nosample.txt"))")
 
 p(buf.st_dev)
 
-var sb = StatBuffer()
+var sb = Stat()
 sb.stat("/home/dewd/t_/sample.txt")
 p("\(sb.dev) \(sb.ino) \(sb.mode) \(sb.atime)")
 p(sb)
