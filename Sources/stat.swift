@@ -2,10 +2,9 @@
 import Glibc
 
 
-public class StatBuffer: CustomStringConvertible {
+public struct StatBuffer: CustomStringConvertible {
 
   var buffer: CStat
-  lazy var _statMode = StatMode()
 
   public init() {
     buffer = Sys.statBuffer()
@@ -15,11 +14,11 @@ public class StatBuffer: CustomStringConvertible {
     self.buffer = buffer
   }
 
-  public func stat(path: String) -> Bool {
+  mutating public func stat(path: String) -> Bool {
     return Sys.doStat(path, buffer: &buffer) == 0
   }
 
-  public func lstat(path: String) -> Bool {
+  mutating public func lstat(path: String) -> Bool {
     return Sys.lstat(path, buffer: &buffer) == 0
   }
 
@@ -66,8 +65,7 @@ public class StatBuffer: CustomStringConvertible {
   public var isSymlink: Bool { return (mode & S_IFMT) == S_IFLNK }
 
   public var statMode: StatMode {
-    _statMode.mode = mode
-    return _statMode
+    return StatMode(mode: mode)
   }
 
   public var description: String {
@@ -81,7 +79,7 @@ public class StatBuffer: CustomStringConvertible {
 }
 
 
-public class StatMode: CustomStringConvertible {
+public struct StatMode: CustomStringConvertible {
 
   var mode: UInt32
 
