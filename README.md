@@ -1,5 +1,5 @@
 Sua
----------
+---
 
 Sua provides Swift users with a new set of core libraries that mostly depend on
 Glibc. The work on this project started on Ubuntu/Linux, but it could also be
@@ -8,10 +8,19 @@ made to work on OSX by depending on Darwin there.
 The idea for this project started as an experiment to see how viable using Swift
 under Linux would be. And the results have shown that it is plenty viable. This
 project has quickly garnered many important classes that help with dealing with
-files, directories, time, some parsing, some more IO and on we go!
+files, directories, time, some parsing, some more IO, and on we go!
 
 By starting anew, we get to pick some new API names that are shorter and
 sweeter.
+
+----------
+
+**News - December 30, 2015**
+
+We have added the [LICENSE.txt](LICENSE.txt) file and took the opportunity to
+rename the project to just Sua from Sua Swift. The reason for the change is
+to avoid using the trademarkable name Swift in the name of the project itself.
+It may help us to comply with the Swift license itself too.
 
 ----------
 
