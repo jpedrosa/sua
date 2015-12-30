@@ -55,7 +55,7 @@ to help to avoid name conflicts with more standard APIs.
 License
 -------
 
-Same as Swift's.
+See the [LICENSE.txt](LICENSE.txt) file.
 
 Progress Notes
 --------------
