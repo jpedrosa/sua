@@ -5,7 +5,7 @@ import Glibc
 public class StatBuffer: CustomStringConvertible {
 
   var buffer: CStat
-  var _statMode = StatMode()
+  lazy var _statMode = StatMode()
 
   public init() {
     buffer = Sys.statBuffer()
