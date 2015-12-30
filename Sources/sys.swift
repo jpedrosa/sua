@@ -37,7 +37,8 @@ public typealias CTimespec = timespec
 
 public typealias CTime = tm
 
-public class PosixSys {
+
+public struct PosixSys {
 
   public static let DEFAULT_DIR_MODE = S_IRWXU | S_IRWXG | S_IRWXO
 
