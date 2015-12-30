@@ -2,6 +2,8 @@
 import Glibc
 
 
+// The Stat class presents some higher level features, but it still exposes
+// some of the lower level APIs for performance reasons.
 public struct Stat: CustomStringConvertible {
 
   var buffer: CStat
@@ -15,7 +17,7 @@ public struct Stat: CustomStringConvertible {
   }
 
   mutating public func stat(path: String) -> Bool {
-    return Sys.doStat(path, buffer: &buffer) == 0
+    return Sys.stat(path, buffer: &buffer) == 0
   }
 
   mutating public func lstat(path: String) -> Bool {

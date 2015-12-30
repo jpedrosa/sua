@@ -163,12 +163,12 @@ public class File: CustomStringConvertible {
 
   public static func exists(path: String) -> Bool {
     var buf = Sys.statBuffer()
-    return Sys.doStat(path, buffer: &buf) == 0
+    return Sys.stat(path, buffer: &buf) == 0
   }
 
   public static func stat(path: String) -> Stat? {
     var buf = Sys.statBuffer()
-    return Sys.doStat(path, buffer: &buf) == 0 ? Stat(buffer: buf) : nil
+    return Sys.stat(path, buffer: &buf) == 0 ? Stat(buffer: buf) : nil
   }
 
   public static func delete(path: String) throws {

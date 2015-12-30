@@ -38,6 +38,11 @@ public typealias CTimespec = timespec
 public typealias CTime = tm
 
 
+func statStruct() -> CStat {
+  return stat()
+}
+
+
 public struct PosixSys {
 
   public static let DEFAULT_DIR_MODE = S_IRWXU | S_IRWXG | S_IRWXO
@@ -125,19 +130,18 @@ public struct PosixSys {
     return nil
   }
 
-  // Named with a do prefix to avoid conflict with functions and types of
-  // name stat.
-  public func doStat(path: String, buffer: UnsafeMutablePointer<stat>)
+  public func stat(path: String, buffer: UnsafeMutablePointer<CStat>)
       -> Int32 {
     return Glibc.stat(path, buffer)
   }
 
-  public func lstat(path: String, buffer: UnsafeMutablePointer<stat>) -> Int32 {
+  public func lstat(path: String, buffer: UnsafeMutablePointer<CStat>)
+      -> Int32 {
     return Glibc.lstat(path, buffer)
   }
 
-  public func statBuffer() -> stat {
-    return stat()
+  public func statBuffer() -> CStat {
+    return statStruct()
   }
 
   public func readdir(dirp: COpaquePointer) -> CDirent {
