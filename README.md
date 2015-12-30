@@ -1,6 +1,8 @@
 Sua
 ---
 
+![Sua Logo](docs/images/sua_logo.png)
+
 Sua provides Swift users with a new set of core libraries that mostly depend on
 Glibc. The work on this project started on Ubuntu/Linux, but it could also be
 made to work on OSX by depending on Darwin there.
