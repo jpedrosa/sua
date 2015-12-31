@@ -30,6 +30,9 @@ public enum PopenOperation: String {
 
 public class Signal {
 
+  // The callback closure must be created directly from a function on the
+  // outer scope so that it does not capture context. As required by Swift for
+  // callbacks to C functions.
   public static var trap = Glibc.signal
 
   public static let INT = SIGINT
@@ -37,6 +40,8 @@ public class Signal {
   public static let ABRT = SIGABRT
   public static let KILL = SIGKILL
   public static let HUP = SIGHUP
+  public static let ALRM = SIGALRM
+  public static let CHLD = SIGCHLD
 
 }
 
