@@ -27,6 +27,20 @@ public enum PopenOperation: String {
   case WriteWithCloexec
 }
 
+
+public class Signal {
+
+  public static var trap = Glibc.signal
+
+  public static let INT = SIGINT
+  public static let TERM = SIGTERM
+  public static let ABRT = SIGABRT
+  public static let KILL = SIGKILL
+  public static let HUP = SIGHUP
+
+}
+
+
 // This alias allows other files like the FileBrowser to declare this type
 // without having to import Glibc as well.
 public typealias CDirentPointer = UnsafeMutablePointer<dirent>
