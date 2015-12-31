@@ -1,4 +1,7 @@
 
+// This is a version based on a simpler version created for the C language:
+// https://github.com/eatonphil/referenceserver/blob/master/c/server.c
+
 import Glibc
 
 
@@ -50,8 +53,9 @@ var buffer = [UInt8](count: 1024, repeatedValue: 0)
 var clientAddr = sockaddr_in()
 var clientAddrLen = UInt32(sizeofValue(clientAddr))
 
+listen(fd, SOMAXCONN)
+
 while true {
-  listen(fd, SOMAXCONN)
   var cfd = withUnsafePointer(&clientAddr) { (ptr) -> Int32 in
     return accept(fd, UnsafeMutablePointer<sockaddr>(ptr), &clientAddrLen)
   }
