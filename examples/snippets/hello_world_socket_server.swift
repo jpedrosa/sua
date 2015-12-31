@@ -15,7 +15,7 @@ var address = sockaddr_in()
 address.sin_family = UInt16(AF_INET)
 address.sin_addr.s_addr = inet_addr(addressName)
 var portNumber: UInt16 = 9123
-print("Trying to start server on http://\(addressName):\(portNumber)/")
+print("Trying to start server on \(addressName):\(portNumber)")
 
 // Create our own version of the C function htons().
 var reversePortNumber = withUnsafePointer(&portNumber) { (ptr) -> UInt16 in
@@ -35,8 +35,14 @@ address.sin_port = reversePortNumber
 
 var addrlen = UInt32(sizeofValue(address))
 
-withUnsafePointer(&address) { ptr in
-  bind(fd, UnsafePointer<sockaddr>(ptr), addrlen)
+let bindResult = withUnsafePointer(&address) { (ptr) -> Int32 in
+  return bind(fd, UnsafePointer<sockaddr>(ptr), addrlen)
+}
+
+if bindResult == -1 {
+  print("Error: Could not start the server. Port may already be in use by " +
+      "another process.")
+  exit(1)
 }
 
 var buffer = [UInt8](count: 1024, repeatedValue: 0)
