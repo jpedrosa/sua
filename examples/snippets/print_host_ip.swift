@@ -2,6 +2,11 @@
 import Glibc
 
 
+func printIP(hostName: String, buffer: [CChar]) {
+  let z = String.fromCString(buffer) ?? ""
+  print("Host: \(hostName), IP: \(z)")
+}
+
 func printHostIP(hostName: String) {
   var hints = addrinfo()
   hints.ai_family = AF_INET
@@ -21,11 +26,18 @@ func printHostIP(hostName: String) {
       var descBuffer = [CChar](count: Int(len), repeatedValue: 0)
       var sockaddr = h.ai_addr.memory
       withUnsafePointer(&sockaddr) { ptr in
-        let sin = UnsafePointer<sockaddr_in>(ptr)
-        var sin_addr = sin.memory.sin_addr
-        if inet_ntop(fam, &sin_addr, &descBuffer, UInt32(len)) != nil {
-          let z = String.fromCString(descBuffer) ?? ""
-          print("Host: \(hostName), IP: \(z)")
+        if fam == AF_INET {
+          let sin = UnsafePointer<sockaddr_in>(ptr)
+          var sin_addr = sin.memory.sin_addr
+          if inet_ntop(fam, &sin_addr, &descBuffer, UInt32(len)) != nil {
+            printIP(hostName, buffer: descBuffer)
+          }
+        } else {
+          let sin = UnsafePointer<sockaddr_in6>(ptr)
+          var sin_addr = sin.memory.sin6_addr
+          if inet_ntop(fam, &sin_addr, &descBuffer, UInt32(len)) != nil {
+            printIP(hostName, buffer: descBuffer)
+          }
         }
       }
       let next = h.ai_next
@@ -37,6 +49,8 @@ func printHostIP(hostName: String) {
     }
   } else {
     print("Error: couldn't find address for \"\(hostName)\").")
+    let msg = String.fromCString(gai_strerror(status)) ?? ""
+    print("Error message: \(msg)")
   }
 }
 
