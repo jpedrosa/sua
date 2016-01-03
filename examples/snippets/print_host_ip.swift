@@ -10,7 +10,7 @@ func printIP(hostName: String, ip: String?) {
 
 func printHostIP(hostName: String) {
   var hints = addrinfo()
-  hints.ai_family = AF_INET6
+  hints.ai_family = AF_INET
   hints.ai_socktype = Int32(SOCK_STREAM.rawValue)
   let flags = AI_ADDRCONFIG
   hints.ai_flags = flags
