@@ -10,6 +10,9 @@ func printHostIP(hostName: String) {
   hints.ai_protocol = Int32(IPPROTO_TCP)
   var info = UnsafeMutablePointer<addrinfo>()
   let status = getaddrinfo(hostName, nil, &hints, &info)
+  defer {
+    freeaddrinfo(info)
+  }
   if status == 0 {
     var h = info.memory
     while true {
