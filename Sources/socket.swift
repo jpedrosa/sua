@@ -185,3 +185,84 @@ public struct SocketAddress {
   }
 
 }
+
+
+public struct Socket {
+
+  var fd: Int32
+
+  public init(fd: Int32) {
+    self.fd = fd
+  }
+
+  public func write(string: String) -> Int {
+    return Sys.writeString(fd, string: "Hello World\n")
+  }
+
+  public func readBytes(inout buffer: [UInt8]) -> Int {
+    return recv(fd, &buffer, buffer.count, 0)
+  }
+
+  public func close() {
+    Sys.close(fd)
+  }
+
+}
+
+
+public class ServerSocket {
+
+  var socketAddress: SocketAddress
+  var clientAddr = sockaddr_in()
+  var clientAddrLen: UInt32 = 0
+  var cSocketAddress: CSocketAddress
+  var fd: Int32
+
+  public init(hostName: String, port: UInt16) throws {
+    clientAddrLen = UInt32(sizeofValue(clientAddr))
+    socketAddress = SocketAddress(hostName: hostName)
+    fd = socket(AF_INET, Int32(SOCK_STREAM.rawValue), 0)
+    if fd == -1 {
+      throw ServerSocketError.SocketStartError
+    }
+    if let sa = socketAddress.ip4ToCSocketAddress(port) {
+      cSocketAddress = sa
+      var address = sa
+      let addrlen = UInt32(sizeofValue(address))
+      if bind(fd, &address, addrlen) == -1 {
+        throw ServerSocketError.BindError
+      } else {
+        listen(fd, SOMAXCONN)
+      }
+    } else {
+      throw ServerSocketError.AddressError(message:
+          socketAddress.errorMessage ?? "")
+    }
+  }
+
+  public func accept() -> Socket? {
+    let fd = rawAccept()
+    if fd != -1 {
+      return Socket(fd: fd)
+    }
+    return nil
+  }
+
+  // Returns the client file descriptor directly.
+  public func rawAccept() -> Int32 {
+    return Glibc.accept(fd, &cSocketAddress, &clientAddrLen)
+  }
+
+  public func close() {
+    Sys.close(fd)
+    fd = -1
+  }
+
+}
+
+
+enum ServerSocketError: ErrorType {
+  case AddressError(message: String)
+  case BindError
+  case SocketStartError
+}
