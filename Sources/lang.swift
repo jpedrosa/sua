@@ -24,7 +24,7 @@ public func p(a: Any...) {
 // separate lines.
 // Since importing Glibc already imports the "puts" command found in C which
 // would conflict with this command, we've given it a unique name instead.
-func printList(string: String) {
+public func printList(string: String) {
   // 10 - new line
   if string.isEmpty || string.utf16.codeUnitAt(string.utf16.count - 1) != 10 {
     print(string)
@@ -33,19 +33,19 @@ func printList(string: String) {
   }
 }
 
-func printList(strings: [String]) {
+public func printList(strings: [String]) {
   for s in strings {
     printList(s)
   }
 }
 
-func printList(bunch: [Any]) {
+public func printList(bunch: [Any]) {
   for o in bunch {
     printList("\(o)")
   }
 }
 
-func printList(list: Any...) {
+public func printList(list: Any...) {
   for v in list {
     printList("\(v)")
   }
