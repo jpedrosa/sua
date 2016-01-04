@@ -196,7 +196,7 @@ public struct Socket {
   }
 
   public func write(string: String) -> Int {
-    return Sys.writeString(fd, string: "Hello World\n")
+    return Sys.writeString(fd, string: string)
   }
 
   public func read(inout buffer: [UInt8], maxBytes: Int) -> Int {
