@@ -50,6 +50,8 @@ public struct HeaderParser {
   var tokenBufferEnd = 0
   var done = false
 
+  public init() { }
+
   public var isDone: Bool { return done }
 
   mutating func addToTokenBuffer(a: [UInt8], startIndex: Int, endIndex: Int) {
