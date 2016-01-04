@@ -22,20 +22,28 @@ public class Mutex {
 
 
 var registerThreadMutex = Mutex()
-var registerThreadCallback: (() -> Void)?
+var threadCallbacks: [pthread_t: () -> Void] = [:]
 
 func runPthread(ctx: UnsafeMutablePointer<Void>) -> UnsafeMutablePointer<Void> {
-  registerThreadCallback!()
+  let id = pthread_self()
+  var fn = threadCallbacks[id]
+  while fn == nil {
+    // Yield to master thread so it can set up the callback for us.
+    IO.sleep(0.000000001)
+    fn = threadCallbacks[id]
+  }
+  fn!()
+  threadCallbacks[id] = nil
   return ctx
 }
 
 func createPthread(inout id: UInt, fn: () -> Void) {
   registerThreadMutex.lock()
-  registerThreadCallback = fn
   defer {
     registerThreadMutex.unlock()
   }
   pthread_create(&id, nil, runPthread, nil)
+  threadCallbacks[id] = fn
 }
 
 
