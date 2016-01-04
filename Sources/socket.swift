@@ -199,7 +199,7 @@ public struct Socket {
     return Sys.writeString(fd, string: "Hello World\n")
   }
 
-  public func readBytes(inout buffer: [UInt8]) -> Int {
+  public func read(inout buffer: [UInt8]) -> Int {
     return recv(fd, &buffer, buffer.count, 0)
   }
 
