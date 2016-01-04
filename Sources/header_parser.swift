@@ -108,7 +108,7 @@ public struct HeaderParser {
     }
   }
 
-  mutating func parse(charCodes: [UInt8]) throws {
+  mutating public func parse(charCodes: [UInt8]) throws {
     stream = charCodes
     index = 0
     length = stream.count
