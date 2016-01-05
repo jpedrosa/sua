@@ -31,7 +31,7 @@ func runPthread(ctx: UnsafeMutablePointer<Void>) -> UnsafeMutablePointer<Void> {
   }
   var fn = threadCallbacks[id]
   while fn == nil {
-    // Yield to master thread so it can set up the callback for us.
+    // Yield to parent thread so it can set up the callback for us.
     IO.sleep(0.000000001)
     fn = threadCallbacks[id]
   }
