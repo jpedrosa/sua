@@ -49,6 +49,25 @@ func createPthread(inout id: UInt, fn: () -> Void) {
 }
 
 
+// This class enables pthreads with a handy syntax.
+// E.g.
+//     let serverSocket = try ServerSocket(hostName: "127.0.0.1", port: 9123)
+//     defer {
+//       serverSocket.close()
+//     }
+//     var buffer = [UInt8](count: 1024, repeatedValue: 0)
+//     while true {
+//       if let socket = serverSocket.accept() {
+//         var tb = Thread() {
+//           defer {
+//             socket.close()
+//           }
+//           var n = socket.read(&buffer, maxBytes: buffer.count)
+//           socket.write("Hello World\n")
+//         }
+//         try tb.join()
+//       }
+//     }
 public class Thread {
 
   public var threadId = pthread_t()
