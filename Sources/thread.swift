@@ -66,8 +66,16 @@ public class Thread {
 
   // On the importance of calling join to help to avoid memory leaks, see this
   // SO thread: http://stackoverflow.com/questions/17642433/why-pthread-causes-a-memory-leak
-  public func join() {
-    pthread_join(threadId, nil)
+  public func join() throws -> Thread {
+    if pthread_join(threadId, nil) != 0 {
+      throw ThreadError.JoinFailed
+    }
+    return self
   }
 
+}
+
+
+enum ThreadError: ErrorType {
+  case JoinFailed
 }
