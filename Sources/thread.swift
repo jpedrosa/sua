@@ -26,6 +26,9 @@ var threadCallbacks: [pthread_t: () -> Void] = [:]
 
 func runPthread(ctx: UnsafeMutablePointer<Void>) -> UnsafeMutablePointer<Void> {
   let id = pthread_self()
+  defer {
+    threadCallbacks[id] = nil
+  }
   var fn = threadCallbacks[id]
   while fn == nil {
     // Yield to master thread so it can set up the callback for us.
@@ -33,7 +36,6 @@ func runPthread(ctx: UnsafeMutablePointer<Void>) -> UnsafeMutablePointer<Void> {
     fn = threadCallbacks[id]
   }
   fn!()
-  threadCallbacks[id] = nil
   return ctx
 }
 
@@ -62,6 +64,8 @@ public class Thread {
     createPthread(&threadId, fn: fn)
   }
 
+  // On the importance of calling join to help to avoid memory leaks, see this
+  // SO thread: http://stackoverflow.com/questions/17642433/why-pthread-causes-a-memory-leak
   public func join() {
     pthread_join(threadId, nil)
   }
