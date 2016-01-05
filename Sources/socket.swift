@@ -248,6 +248,35 @@ public class ServerSocket {
     return nil
   }
 
+  func ensureProcessCleanup() {
+    signal(SIGCHLD, SIG_IGN)
+  }
+
+  public func spawnAccept(fn: (Socket) -> Void) throws {
+    ensureProcessCleanup();
+    // Create the child process.
+    let cfd = rawAccept()
+    if cfd == -1 {
+      throw ServerSocketError.AcceptError
+    }
+    let pid = fork()
+    if pid < 0 {
+      throw ServerSocketError.ForkError
+    }
+    if pid == 0 {
+      // This is the child process.
+      defer {
+        // Auto-exit the process to make sure we don't spam the system with
+        // loose processes.
+        exit(0)
+      }
+      Sys.close(fd)
+      fn(Socket(fd: cfd))
+    } else {
+      Sys.close(cfd)
+    }
+  }
+
   // Returns the client file descriptor directly.
   public func rawAccept() -> Int32 {
     return Glibc.accept(fd, &cSocketAddress, &clientAddrLen)
@@ -265,4 +294,6 @@ enum ServerSocketError: ErrorType {
   case AddressError(message: String)
   case BindError
   case SocketStartError
+  case ForkError
+  case AcceptError
 }
