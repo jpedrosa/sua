@@ -266,8 +266,7 @@ public class ServerSocket {
     if pid == 0 {
       // This is the child process.
       defer {
-        // Auto-exit the process to make sure we don't spam the system with
-        // loose processes.
+        // Ensure the process exits cleanly.
         exit(0)
       }
       Sys.close(fd)
