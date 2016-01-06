@@ -107,7 +107,7 @@ func processArguments() -> SocketAllOptions? {
       let s = stream.collectTokenString()
       stream.eatSpace()
       if stream.isEol {
-        let n = Int(s!) ?? -1
+        let n = Int(s!)!
         if n >= 0 && n <= 65535 {
           port = UInt16(n)
           return true
