@@ -141,7 +141,7 @@ public struct SocketAddress {
     address.sin_family = UInt16(AF_INET)
     if let na = ip4ToUInt32() {
       address.sin_addr.s_addr = na
-      address.sin_port = ByteOrder.htons(port)
+      address.sin_port = port.bigEndian
       return withUnsafePointer(&address) { ptr -> sockaddr in
         return UnsafePointer<sockaddr>(ptr).memory
       }
