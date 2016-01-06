@@ -77,12 +77,115 @@ struct SocketAllOptions {
 }
 
 
+func printUsage() {
+  print("SocketAll: SocketAll -type (s|t|f) [-port #]\n" +
+      "Usage: run SocketAll by giving it at least the type parameter.\n" +
+      "-type s | t | f        s for single; t for threaded; f for forked.\n" +
+      "-port 9123             port, which defaults to 9123. Range from 0 to " +
+                              " 65535.\n" +
+      "E.g.\n" +
+      "> SocketAll -type s\n" +
+      "> SocketAll -type s -port 9123\n")
+}
+
 func processArguments() -> SocketAllOptions? {
+  let args = Process.arguments
+  var i = 1
+  let len = args.count
+  var stream = CodeUnitStream()
+  var type: SocketAllType?
+  var port: UInt16?
+  func error(ti: Int = -1) {
+    type = nil
+    let t = args[ti < 0 ? i : ti]
+    print("\u{1b}[31mError:\u{1b}[0m Error while parsing the command-line " +
+        "options: ^\(t)\n")
+    printUsage()
+  }
+  func eatPortDigits() -> Bool {
+    if stream.eatWhileDigit() {
+      let s = stream.collectTokenString()
+      stream.eatSpace()
+      if stream.isEol {
+        let n = Int(s!) ?? -1
+        if n >= 0 && n <= 65535 {
+          port = UInt16(n)
+          return true
+        }
+      }
+    }
+    return false
+  }
+  while i < len {
+    switch args[i] {
+      case "-type":
+        i += 1
+        if i < len {
+          switch args[i] {
+            case "s":
+              type = .Single
+            case "t":
+              type = .Threaded
+            case "f":
+              type = .Forked
+            default:
+              error()
+              break
+          }
+        } else {
+          error(i - 1)
+          break
+        }
+      case "-types":
+        type = .Single
+      case "-typet":
+        type = .Threaded
+      case "-typef":
+        type = .Forked
+      case "-port":
+        i += 1
+        if i < len {
+          stream.codeUnits = Array(args[i].utf8)
+          if !eatPortDigits() {
+            error()
+            break
+          }
+        } else {
+          error(i - 1)
+          break
+        }
+      default:
+        stream.codeUnits = Array(args[i].utf8)
+        if stream.eatString("-port") {
+          stream.startIndex = stream.currentIndex
+          if !eatPortDigits() {
+            error()
+            break
+          }
+        } else {
+          error()
+          break
+        }
+    }
+    i += 1
+  }
+  if type != nil {
+    var o = SocketAllOptions()
+    o.type = type!
+    if port != nil {
+      o.port = port!
+    }
+    return o
+  }
+  if len == 1 {
+    printUsage()
+  }
   return nil
 }
 
 
 if let opt = processArguments() {
+  print("Starting the server on \(opt.hostName):\(opt.port)")
   var sa = try SocketAll(hostName: opt.hostName, port: opt.port)
   switch opt.type {
     case .Single:
@@ -92,12 +195,4 @@ if let opt = processArguments() {
     case .Forked:
       try sa.runForked()
   }
-} else {
-  print("SocketAll: SocketAll -type (s|t|f) [-port #]\n" +
-      "Usage: run SocketAll by giving it at least the type parameter.\n" +
-      "-type s | t | f        s for single; t for threaded; f for forked.\n" +
-      "-port 9123             port, which defaults to 9123.\n" +
-      "E.g.\n" +
-      "> SocketAll -type s\n" +
-      "> SocketAll -type s -port 9123\n")
 }
