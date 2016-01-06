@@ -187,7 +187,7 @@ Transfer rate:          94.62 [Kbytes/sec] received
 
 While forking the processes, it is relatively slower. But consider that with
 forking processes we don't have to worry about multiple threads and we could be
-able to use C code that is not meant to be thread safe, say in graphic libraries
+able to use C code that is not meant to be thread safe, say in graphics library
 that you want to use or any other kind of library for that matter. Scripting
 languages often have a Global Interpreter Lock that makes them single threaded
 for the most part, but it enables them to access C library code that is not
