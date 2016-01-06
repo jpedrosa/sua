@@ -80,12 +80,12 @@ struct SocketAllOptions {
 func printUsage() {
   print("SocketAll: SocketAll -type (s|t|f) [-port #]\n" +
       "Usage: run SocketAll by giving it at least the type parameter.\n" +
-      "-type s | t | f        s for single; t for threaded; f for forked.\n" +
-      "-port 9123             port, which defaults to 9123. Range from 0 to" +
+      "    -type s | t | f        s for single; t for threaded; f for forked.\n" +
+      "    -port 9123             port, which defaults to 9123. Range from 0 to" +
                               " 65535.\n" +
       "E.g.\n" +
-      "> SocketAll -type s\n" +
-      "> SocketAll -type s -port 9123\n")
+      "    > SocketAll -type s\n" +
+      "    > SocketAll -type s -port 9123\n")
 }
 
 func processArguments() -> SocketAllOptions? {
