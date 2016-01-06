@@ -28,7 +28,7 @@ public struct SocketAddress {
   // address.sin_addr.s_addr = inet_addr(ipString)
   // E.g.
   //     var sa = SocketAddress(hostName: "google.com")
-  //     address.sin_addr.s_addr = sa.ip4ToString()
+  //     address.sin_addr.s_addr = sa.ip4ToUInt32()
   mutating public func ip4ToUInt32() -> UInt32? {
     var hints = prepareHints()
     var info = UnsafeMutablePointer<addrinfo>()
