@@ -179,7 +179,7 @@ public struct SocketAddress {
   }
 
   // When an address cannot be resolved, this will return an error message that
-  // could be used to inform the user.
+  // could be used to inform the user with.
   public var errorMessage: String? {
     return String.fromCString(gai_strerror(status))
   }
