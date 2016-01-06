@@ -231,9 +231,8 @@ public class ServerSocket {
       let addrlen = UInt32(sizeofValue(address))
       if bind(fd, &address, addrlen) == -1 {
         throw ServerSocketError.BindError
-      } else {
-        listen(fd, SOMAXCONN)
       }
+      listen(fd, SOMAXCONN)
     } else {
       throw ServerSocketError.AddressError(message:
           socketAddress.errorMessage ?? "")
