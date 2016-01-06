@@ -81,7 +81,7 @@ func printUsage() {
   print("SocketAll: SocketAll -type (s|t|f) [-port #]\n" +
       "Usage: run SocketAll by giving it at least the type parameter.\n" +
       "-type s | t | f        s for single; t for threaded; f for forked.\n" +
-      "-port 9123             port, which defaults to 9123. Range from 0 to " +
+      "-port 9123             port, which defaults to 9123. Range from 0 to" +
                               " 65535.\n" +
       "E.g.\n" +
       "> SocketAll -type s\n" +
@@ -98,8 +98,8 @@ func processArguments() -> SocketAllOptions? {
   func error(ti: Int = -1) {
     type = nil
     let t = args[ti < 0 ? i : ti]
-    print("\u{1b}[31mError:\u{1b}[0m Error while parsing the command-line " +
-        "options: ^\(t)\n")
+    print("\u{1b}[1m\u{1b}[31mError:\u{1b}[0m Error while parsing the " +
+        "command-line options: ^\(t)\n")
     printUsage()
   }
   func eatPortDigits() -> Bool {
@@ -189,10 +189,13 @@ if let opt = processArguments() {
   var sa = try SocketAll(hostName: opt.hostName, port: opt.port)
   switch opt.type {
     case .Single:
+      print("Server type: Single. Single process, single thread.")
       sa.runSingle()
     case .Threaded:
+      print("Server type: Threaded. Multiple threads on a single process.")
       try sa.runThreaded()
     case .Forked:
+      print("Server type: Forked. Multile forked processes with single thread.")
       try sa.runForked()
   }
 }
