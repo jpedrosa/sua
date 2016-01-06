@@ -238,7 +238,8 @@ public class ServerSocket {
       var address = sa
       let addrlen = UInt32(sizeofValue(address))
       if bind(fd, &address, addrlen) == -1 {
-        throw ServerSocketError.BindError
+        throw ServerSocketError.BindError(message: "Port may be in use by " +
+            "another process.")
       }
       listen(fd, SOMAXCONN)
     } else {
@@ -301,7 +302,7 @@ public class ServerSocket {
 
 enum ServerSocketError: ErrorType {
   case AddressError(message: String)
-  case BindError
+  case BindError(message: String)
   case SocketStartError
   case CloexecSetupError
   case ReuseAddrSetupError
