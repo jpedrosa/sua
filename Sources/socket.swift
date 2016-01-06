@@ -225,6 +225,14 @@ public class ServerSocket {
     if fd == -1 {
       throw ServerSocketError.SocketStartError
     }
+    if fcntl(fd, F_SETFD, FD_CLOEXEC) == -1 {
+      throw ServerSocketError.CloexecSetupError
+    }
+    var v = 1
+    if setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &v,
+        socklen_t(sizeofValue(v))) == -1 {
+      throw ServerSocketError.ReuseAddrSetupError
+    }
     if let sa = socketAddress.ip4ToCSocketAddress(port) {
       cSocketAddress = sa
       var address = sa
@@ -295,6 +303,8 @@ enum ServerSocketError: ErrorType {
   case AddressError(message: String)
   case BindError
   case SocketStartError
+  case CloexecSetupError
+  case ReuseAddrSetupError
   case ForkError
   case AcceptError
 }
