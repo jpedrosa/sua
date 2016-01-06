@@ -9,10 +9,10 @@ them just ServerSocket, Socket and that is it!
 A ServerSocket is the building block that web frameworks and servers start from.
 Building on it come the HTTP header parsers and higher level libraries.
 
-I've come up with a new [ServerSocket](Sources/socket.swift) class that does a
+I've come up with a new [ServerSocket](../Sources/socket.swift) class that does a
 handful of things. It has support for single process server but also comes with
 support for forking processes for a multiple process server. And if threading is
-what we need, I've also come up with a [Thread](Sources/thread.swift) class that
+what we need, I've also come up with a [Thread](../Sources/thread.swift) class that
 makes it easy to upgrade the single process server to a multi-threaded server.
 
 Here are some basic examples of each one of them:
