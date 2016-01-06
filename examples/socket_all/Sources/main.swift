@@ -195,7 +195,8 @@ if let opt = processArguments() {
       print("Server type: Threaded. Multiple threads on a single process.")
       try sa.runThreaded()
     case .Forked:
-      print("Server type: Forked. Multile forked processes with single thread.")
+      print("Server type: Forked. Multiple forked processes with single " +
+          "thread.")
       try sa.runForked()
   }
 }
