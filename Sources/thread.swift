@@ -73,9 +73,9 @@ public class Thread {
   public var threadId = pthread_t()
 
   // Just a default initializer. Callback can be passed by a later call to #run
-  init() { }
+  public init() { }
 
-  init(fn: () -> Void) {
+  public init(fn: () -> Void) {
     run(fn)
   }
 
@@ -95,6 +95,6 @@ public class Thread {
 }
 
 
-enum ThreadError: ErrorType {
+public enum ThreadError: ErrorType {
   case JoinFailed
 }
