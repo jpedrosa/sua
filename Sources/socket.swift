@@ -249,7 +249,10 @@ public class ServerSocket {
   }
 
   func ensureProcessCleanup() {
-    signal(SIGCHLD, SIG_IGN)
+    var sa = sigaction()
+    sigemptyset(&sa.sa_mask)
+    sa.sa_flags = SA_NOCLDWAIT
+    sigaction(SIGCHLD, &sa, nil)
   }
 
   public func spawnAccept(fn: (Socket) -> Void) throws {
