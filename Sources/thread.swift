@@ -92,9 +92,17 @@ public class Thread {
     return self
   }
 
+  public func detach() throws -> Thread {
+    if pthread_detach(threadId) != 0 {
+      throw ThreadError.DetachFailed
+    }
+    return self
+  }
+
 }
 
 
 public enum ThreadError: ErrorType {
+  case DetachFailed
   case JoinFailed
 }
