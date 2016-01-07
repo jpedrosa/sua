@@ -223,27 +223,27 @@ public class ServerSocket {
     socketAddress = SocketAddress(hostName: hostName)
     fd = socket(AF_INET, Int32(SOCK_STREAM.rawValue), 0)
     if fd == -1 {
-      throw ServerSocketError.SocketStartError
+      throw ServerSocketError.SocketStart
     }
     if fcntl(fd, F_SETFD, FD_CLOEXEC) == -1 {
-      throw ServerSocketError.CloexecSetupError
+      throw ServerSocketError.CloexecSetup
     }
     var v = 1
     if setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &v,
         socklen_t(sizeofValue(v))) == -1 {
-      throw ServerSocketError.ReuseAddrSetupError
+      throw ServerSocketError.ReuseAddrSetup
     }
     if let sa = socketAddress.ip4ToCSocketAddress(port) {
       cSocketAddress = sa
       var address = sa
       let addrlen = UInt32(sizeofValue(address))
       if bind(fd, &address, addrlen) == -1 {
-        throw ServerSocketError.BindError(message: "Port may be in use by " +
+        throw ServerSocketError.Bind(message: "Port may be in use by " +
             "another process.")
       }
       listen(fd, SOMAXCONN)
     } else {
-      throw ServerSocketError.AddressError(message:
+      throw ServerSocketError.Address(message:
           socketAddress.errorMessage ?? "")
     }
   }
@@ -268,11 +268,11 @@ public class ServerSocket {
     // Create the child process.
     let cfd = rawAccept()
     if cfd == -1 {
-      throw ServerSocketError.AcceptError
+      throw ServerSocketError.Accept
     }
     let pid = fork()
     if pid < 0 {
-      throw ServerSocketError.ForkError
+      throw ServerSocketError.Fork
     }
     if pid == 0 {
       // This is the child process.
@@ -301,11 +301,11 @@ public class ServerSocket {
 
 
 enum ServerSocketError: ErrorType {
-  case AddressError(message: String)
-  case BindError(message: String)
-  case SocketStartError
-  case CloexecSetupError
-  case ReuseAddrSetupError
-  case ForkError
-  case AcceptError
+  case Address(message: String)
+  case Bind(message: String)
+  case SocketStart
+  case CloexecSetup
+  case ReuseAddrSetup
+  case Fork
+  case Accept
 }
