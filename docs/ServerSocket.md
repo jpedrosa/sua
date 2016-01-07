@@ -84,6 +84,21 @@ not some green thread used for concurrency only. It also means that you need to
 be careful as a user of it to be sure that the code that you use is thread safe,
 otherwise you could get some unpredictable errors at runtime.
 
+**Edit:** On the subject of threading, I may have pushed my luck by trying to
+come up with my own threading abstractions. Someone on Reddit reminded me that
+I could have tried to use Swift's libdispatch instead. But it does not interest
+me in particular. When researching the suggestion to use Thread#detach, I
+discovered that threading can be hard to get right even in a simple example when
+handling too many web server connections. While testing it with the Apache
+Benchmark tool and using threads, the "ab" command often hangs. And even when I
+use pthread calls directly to avoid using custom callbacks, it is still too
+unstable. Even now when the server is not crashing, the server can become too
+slow after being stressed out by many connections. Other alternatives like
+trying to come up with thread pools may have their own shortcomings, and perhaps
+would be a better solution when combined with process forking anyway. My final
+advice is to use threads sparingly if you can. E.g. when you have a simple
+computation algorithm that uses them.
+
 And that's my beef with threads. I don't want to be the guarantor who makes
 sure that all code that is thrown at it will be thread safe by default. I would
 rather preach the next version based on forking of processes, since then
