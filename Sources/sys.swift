@@ -3,10 +3,6 @@ import CSua
 import Glibc
 
 
-public enum SysError: ErrorType {
-  case InvalidOpenFileOperation(operation: String)
-}
-
 public enum FileOperation: Int {
   case R
   case W
