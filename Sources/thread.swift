@@ -87,14 +87,14 @@ public class Thread {
   // SO thread: http://stackoverflow.com/questions/17642433/why-pthread-causes-a-memory-leak
   public func join() throws -> Thread {
     if pthread_join(threadId, nil) != 0 {
-      throw ThreadError.JoinFailed
+      throw ThreadError.Join
     }
     return self
   }
 
   public func detach() throws -> Thread {
     if pthread_detach(threadId) != 0 {
-      throw ThreadError.DetachFailed
+      throw ThreadError.Detach
     }
     return self
   }
@@ -103,6 +103,6 @@ public class Thread {
 
 
 public enum ThreadError: ErrorType {
-  case DetachFailed
-  case JoinFailed
+  case Detach
+  case Join
 }
