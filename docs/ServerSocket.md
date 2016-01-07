@@ -99,45 +99,6 @@ would be a better solution when combined with process forking anyway. My final
 advice is to use threads sparingly if you can. E.g. when you have a simple
 computation algorithm that uses them.
 
-**Edit:** And if you are curious about what pthread direct example I've come up
-with, you can see it below:
-
-```swift
-let serverSocket = try ServerSocket(hostName: "127.0.0.1", port: 9123)
-
-defer {
-  serverSocket.close()
-}
-
-var socketMutex = Mutex()
-
-func runSocket(ctx: UnsafeMutablePointer<Void>) -> UnsafeMutablePointer<Void> {
-  pthread_detach(pthread_self())
-  socketMutex.lock()
-  let socket = UnsafePointer<Socket>(ctx).memory
-  defer { socket.close() }
-  var b = [UInt8](count: 1024, repeatedValue: 0)
-  let _ = socket.read(&b, maxBytes: b.count)
-  socket.write("Hello World\n")
-  socketMutex.unlock()
-  return ctx
-}
-
-
-while true {
-  if let socket = serverSocket.accept() {
-    var id = pthread_t()
-    var s = socket
-    pthread_create(&id, nil, runSocket, &s)
-  }
-}
-```
-(**Edit:** This pthread example seems to be the most stable one I've been able to create
-so far. While testing it just now, all of a sudden it started pumping out the
-responses without hanging. But it can still hang early on. At least it hasn't
-crashed on me yet. The mutex helps to tell the core Swift functions to keep out
-of it.)
-
 And that's my beef with threads. I don't want to be the guarantor who makes
 sure that all code that is thrown at it will be thread safe by default. I would
 rather preach the next version based on forking of processes, since then
