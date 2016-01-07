@@ -5,7 +5,8 @@ import Sua
 
 
 func printFileContent(path: String) throws {
-  printList(try IO.read(path))
+  let a = try IO.readBytes(path)
+  Stdout.writeBytes(a, maxBytes: a.count)
 }
 
 func printDirectoryEntries(path: String) throws {
