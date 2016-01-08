@@ -5,17 +5,17 @@ public struct Header: CustomStringConvertible {
   public var method = ""
   public var uri = ""
   public var httpVersion = ""
-  public var headerMap = [String: String]()
+  public var fields = [String: String]()
 
   public subscript(key: String) -> String? {
-    get { return headerMap[key] ?? nil }
-    set { headerMap[key] = newValue }
+    get { return fields[key] ?? nil }
+    set { fields[key] = newValue }
   }
 
   public var description: String {
     return "Header(method: \(inspect(method)), uri: \(inspect(uri)), " +
         "httpVersion: \(inspect(httpVersion)), " +
-        "headerMap: \(inspect(headerMap)))"
+        "fields: \(inspect(fields)))"
   }
 
 }

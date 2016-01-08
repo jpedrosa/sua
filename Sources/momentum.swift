@@ -63,7 +63,7 @@ public class Request: CustomStringConvertible {
 
   public var httpVersion: String { return header!.httpVersion }
 
-  public var headerMap: [String: String] { return header!.headerMap }
+  public var fields: [String: String] { return header!.fields }
 
   public subscript(key: String) -> String? { return header![key] }
 
@@ -73,7 +73,7 @@ public class Request: CustomStringConvertible {
     return "Request(method: \(inspect(method)), " +
         "uri: \(inspect(uri)), " +
         "httpVersion: \(inspect(httpVersion)), " +
-        "headerMap: \(inspect(headerMap)))"
+        "fields: \(inspect(fields)))"
   }
 
 }
@@ -83,7 +83,7 @@ public class Response {
 
   public let socket: Socket
   public var statusCode = 200
-  public var headerMap: [String: String] = ["Content-Type": "text/html"]
+  public var fields: [String: String] = ["Content-Type": "text/html"]
   var contentQueue = [[UInt8]]()
   var contentLength = 0
 
@@ -91,9 +91,9 @@ public class Response {
     self.socket = socket
   }
 
-  public func writeHead(statusCode: Int, headerMap: [String: String]) {
+  public func writeHead(statusCode: Int, fields: [String: String]) {
     self.statusCode = statusCode
-    self.headerMap = headerMap
+    self.fields = fields
   }
 
   public func write(string: String) {
@@ -115,9 +115,9 @@ public class Response {
     writeBytes(try IO.readBytes(path))
   }
 
-  func concatHeaderMap() -> String {
+  func concatFields() -> String {
     var s = ""
-    for (k, v) in headerMap {
+    for (k, v) in fields {
       s += "\(k): \(v)\r\n"
     }
     return s
@@ -125,7 +125,7 @@ public class Response {
 
   public func doFlush() {
     socket.write("HTTP/1.1 \(statusCode) \(STATUS_CODE[statusCode])" +
-        "\r\n\(concatHeaderMap())Content-Length: \(contentLength)\r\n\r\n")
+        "\r\n\(concatFields())Content-Length: \(contentLength)\r\n\r\n")
     for a in contentQueue {
       socket.writeBytes(a, maxBytes: a.count)
     }
