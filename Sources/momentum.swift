@@ -59,13 +59,13 @@ public class Request: CustomStringConvertible {
 
   public var method: String { return header!.method }
 
-  public var uri: String? { return header?.uri }
+  public var uri: String { return header!.uri }
 
-  public var httpVersion: String? { return header?.httpVersion }
+  public var httpVersion: String { return header!.httpVersion }
 
   public var headerMap: [String: String] { return header!.headerMap }
 
-  public subscript(key: String) -> String? { return header?[key] }
+  public subscript(key: String) -> String? { return header![key] }
 
   public var isReady: Bool { return header != nil }
 
