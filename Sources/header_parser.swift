@@ -145,7 +145,7 @@ public struct HeaderParser {
       tokenIndex = i
       index = i + 1
     } else {
-      try error("Could not parse the HTTP Method.")
+      throw HeaderParserError.Method
     }
   }
 
@@ -162,11 +162,11 @@ public struct HeaderParser {
         if let m = collectString(i) {
           header.method = m
         } else {
-          try error("Could not parse the HTTP Method.")
+          throw HeaderParserError.Method
         }
         break
       } else {
-        try error("Could not parse the HTTP Method.")
+        throw HeaderParserError.Method
       }
       i += 1
     } while i < len
@@ -198,7 +198,7 @@ public struct HeaderParser {
       index = i + 1
       entryParser = .UriStarted
     } else {
-      try error("Could not parse the URI.")
+      throw HeaderParserError.URI
     }
   }
 
@@ -215,11 +215,11 @@ public struct HeaderParser {
         if let u = collectString(i) {
           header.uri = u
         } else {
-          try error("Could not parse the URI.")
+          throw HeaderParserError.URI
         }
         break
       } else {
-        try error("Could not parse the URI.")
+        throw HeaderParserError.URI
       }
       i += 1
     } while i < len
@@ -235,7 +235,7 @@ public struct HeaderParser {
       index = i + 1
       entryParser = .HttpVersionStarted
     } else {
-      try error("Could not parse the HTTP version.")
+      throw HeaderParserError.Version
     }
   }
 
@@ -246,7 +246,7 @@ public struct HeaderParser {
       if let v = collectString(i) {
         header.httpVersion = v
       } else {
-        try error("Could not parse the HTTP version.")
+        throw HeaderParserError.Version
       }
     }
     repeat {
@@ -267,7 +267,7 @@ public struct HeaderParser {
         try process()
         break
       } else {
-        try error("Could not parse the HTTP version.")
+        throw HeaderParserError.Version
       }
       i += 1
     } while i < len
@@ -281,7 +281,7 @@ public struct HeaderParser {
       index += 1
       entryParser = .Key
     } else {
-      try error("Could not parse the Line Feed (/n).")
+      throw HeaderParserError.LineFeed
     }
   }
 
@@ -294,7 +294,7 @@ public struct HeaderParser {
       index += 1
       entryParser = .Key
     } else {
-      try error("Could not parse the Carriage Return (/r).")
+      throw HeaderParserError.CarriageReturn
     }
   }
 
@@ -312,7 +312,7 @@ public struct HeaderParser {
       index += 1
       entryParser = .HeaderExit
     } else {
-      try error("Could not parse the key.")
+      throw HeaderParserError.Key
     }
   }
 
@@ -321,7 +321,7 @@ public struct HeaderParser {
       done = true
       index = length
     } else {
-      try error("Could not parse the Line Feed (/n).")
+      throw HeaderParserError.LineFeed
     }
   }
 
@@ -332,7 +332,7 @@ public struct HeaderParser {
       if let k = collectString(i) {
         keyToken = k
       } else {
-        try error("Could not parse the key.")
+        throw HeaderParserError.Key
       }
     }
     repeat {
@@ -350,7 +350,7 @@ public struct HeaderParser {
         try process()
         break
       } else {
-        try error("Could not parse the key.")
+        throw HeaderParserError.Key
       }
       i += 1
     } while i < len
@@ -365,7 +365,7 @@ public struct HeaderParser {
       entryParser = .Space
       linedUpParser = .Value
     } else {
-      try error("Could not parse the colon (:).")
+      throw HeaderParserError.Colon
     }
   }
 
@@ -376,7 +376,7 @@ public struct HeaderParser {
       index = i + 1
       entryParser = .ValueStarted
     } else {
-      try error("Could not parse the value.")
+      throw HeaderParserError.Value
     }
   }
 
@@ -396,7 +396,7 @@ public struct HeaderParser {
         header[keyToken] = collectString(i)
         break
       } else {
-        try error("Could not parse the value.")
+        throw HeaderParserError.Value
       }
       i += 1
     } while i < len
@@ -405,13 +405,15 @@ public struct HeaderParser {
     }
   }
 
-  func error(message: String) throws {
-    throw HeaderParserError.InvalidInput(message: message)
-  }
-
 }
 
-
 enum HeaderParserError: ErrorType {
-  case InvalidInput(message: String)
+  case Method
+  case URI
+  case Version
+  case LineFeed
+  case CarriageReturn
+  case Key
+  case Colon
+  case Value
 }
