@@ -41,7 +41,7 @@ in other languages. And it has a shorter name to boot! And lots of
 While this project is still in an experimental phase, it has started to become
 more useful with classes like [FileBrowser](Sources/file_browser.swift),
 [RNG](Sources/rng.swift), [File](Sources/file.swift),
-[CodeUnitStream](Sources/codeunitstream.swift), [Stopwatch](Sources/tick.swift),
+[ByteStream](Sources/byte_stream.swift), [Stopwatch](Sources/tick.swift),
 etc.
 
 We still miss a class for dealing with DateTime. And that's a big miss. But I

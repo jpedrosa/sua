@@ -92,7 +92,7 @@ func processArguments() -> SocketAllOptions? {
   let args = Process.arguments
   var i = 1
   let len = args.count
-  var stream = CodeUnitStream()
+  var stream = ByteStream()
   var type: SocketAllType?
   var port: UInt16?
   func error(ti: Int = -1) {
@@ -145,7 +145,7 @@ func processArguments() -> SocketAllOptions? {
       case "-port":
         i += 1
         if i < len {
-          stream.codeUnits = Array(args[i].utf8)
+          stream.bytes = Array(args[i].utf8)
           if !eatPortDigits() {
             error()
             break
@@ -155,7 +155,7 @@ func processArguments() -> SocketAllOptions? {
           break
         }
       default:
-        stream.codeUnits = Array(args[i].utf8)
+        stream.bytes = Array(args[i].utf8)
         if stream.eatString("-port") {
           stream.startIndex = stream.currentIndex
           if !eatPortDigits() {

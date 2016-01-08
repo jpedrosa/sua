@@ -9,7 +9,7 @@ been creating.
 
 For Sua I recently added support for reading from Standard Input and also
 a helper class (or struct) for parsing bytes which I used in Dart quite a bit,
-called [CodeUnitStream](../../Sources/codeunitstream.swift).
+called [ByteStream](../../Sources/byte_stream.swift).
 
 Based on those advancements, I was able to create this Word Counter example in very few
 lines of code, since most of the code is now found in pretty reusable libraries.
@@ -31,7 +31,7 @@ files. Here's a sample run:
 
 ```
 $ wc ../../Sources/*
- 2022  7145 46064 ../../Sources/codeunitstream.swift
+ 2022  7145 46064 ../../Sources/byte_stream.swift
     9    14    83 ../../Sources/dir.swift
    75   255  1882 ../../Sources/file_browser.swift
   198   654  4550 ../../Sources/file.swift
