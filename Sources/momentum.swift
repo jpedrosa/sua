@@ -88,9 +88,9 @@ public class Response {
     self.socket = socket
   }
 
-  public func writeHead(statusCode: Int, fields: [String: String]) {
-    self.statusCode = statusCode
-    self.fields = fields
+  public subscript(key: String) -> String? {
+    get { return fields[key] }
+    set { fields[key] = newValue }
   }
 
   public func write(string: String) {
