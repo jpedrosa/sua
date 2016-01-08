@@ -82,7 +82,7 @@ public class Response {
   public var statusCode = 200
   public var fields: [String: String] = ["Content-Type": "text/html"]
   var contentQueue = [[UInt8]]()
-  var contentLength = 0
+  public var contentLength = 0
 
   init(socket: Socket) {
     self.socket = socket
@@ -94,9 +94,7 @@ public class Response {
   }
 
   public func write(string: String) {
-    let a = [UInt8](string.utf8)
-    contentQueue.append(a)
-    contentLength += a.count
+    writeBytes([UInt8](string.utf8))
   }
 
   public func writeBytes(bytes: [UInt8]) {
@@ -122,6 +120,11 @@ public class Response {
     for a in contentQueue {
       socket.writeBytes(a, maxBytes: a.count)
     }
+  }
+
+  public var contentType: String? {
+    get { return fields["Content-Type"] }
+    set { fields["Content-Type"] = newValue }
   }
 
 }
