@@ -18,7 +18,7 @@ public class PosixStdin {
     var a: [String?] = []
     let len = 1024
     var buffer = [UInt8](count: len, repeatedValue: 0)
-    var stream = CodeUnitStream()
+    var stream = ByteStream()
     var n = try doRead(&buffer, maxBytes: len)
     let hasFn = fn != nil
     while n > 0 {
@@ -51,7 +51,7 @@ public class PosixStdin {
     var a: [UInt8] = []
     let len = 1024
     var buffer = [UInt8](count: len, repeatedValue: 0)
-    var stream = CodeUnitStream()
+    var stream = ByteStream()
     var n = try doRead(&buffer, maxBytes: len)
     let hasFn = fn != nil
     while n > 0 {
