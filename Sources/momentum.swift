@@ -1,16 +1,36 @@
 
+public typealias MomentumHandler = (req: Request, res: Response) -> Void
 
 public class Momentum {
 
   public static func listen(port: UInt16, hostName: String = "127.0.0.1",
-      handler: (req: Request, res: Response) -> Void) throws {
+      handler: MomentumHandler) throws {
     try doListen(port, hostName: hostName) { socket in
       defer { socket.close() }
       do {
         let request = try Request(socket: socket)
         if request.isReady {
           let response = Response(socket: socket)
-          handler(req: request, res: response)
+
+          // Look for static handlers.
+          var handled = false
+          if Momentum.haveHandlers {
+            if request.method == "GET" {
+              if let ah = Momentum.handlersGet[request.uri] {
+                handled = true
+                ah(req: request, res: response)
+              }
+            } else if request.method == "POST" {
+              if let ah = Momentum.handlersPost[request.uri] {
+                handled = true
+                ah(req: request, res: response)
+              }
+            }
+          }
+
+          if !handled {
+            handler(req: request, res: response)
+          }
           response.doFlush()
         }
       } catch {
@@ -27,6 +47,22 @@ public class Momentum {
     while true {
       try server.spawnAccept(handler)
     }
+  }
+
+  public static var haveHandlers = false
+
+  static var handlersGet = [String: MomentumHandler]()
+
+  public static func get(uri: String, handler: MomentumHandler) {
+    handlersGet[uri] = handler
+    haveHandlers = true
+  }
+
+  static var handlersPost = [String: MomentumHandler]()
+
+  public static func post(uri: String, handler: MomentumHandler) {
+    handlersPost[uri] = handler
+    haveHandlers = true
   }
 
 }
@@ -83,6 +119,7 @@ public class Response {
   public var fields: [String: String] = ["Content-Type": "text/html"]
   var contentQueue = [[UInt8]]()
   public var contentLength = 0
+  var flushed = false
 
   init(socket: Socket) {
     self.socket = socket
@@ -115,11 +152,13 @@ public class Response {
   }
 
   public func doFlush() {
+    if flushed { return }
     socket.write("HTTP/1.1 \(statusCode) \(STATUS_CODE[statusCode])" +
         "\r\n\(concatFields())Content-Length: \(contentLength)\r\n\r\n")
     for a in contentQueue {
       socket.writeBytes(a, maxBytes: a.count)
     }
+    flushed = true
   }
 
   public var contentType: String? {
