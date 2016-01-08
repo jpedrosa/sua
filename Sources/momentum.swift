@@ -2,7 +2,7 @@
 
 public class Momentum {
 
-  public static func listen(port: UInt16 = 8777, hostName: String = "127.0.0.1",
+  public static func listen(port: UInt16, hostName: String = "127.0.0.1",
       handler: (socket: Socket) -> Void) throws {
     let server = try ServerSocket(hostName: hostName, port: port)
     while true {
