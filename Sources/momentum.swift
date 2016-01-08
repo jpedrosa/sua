@@ -11,14 +11,20 @@ public class Momentum {
   }
 
   public static func handle(socket: Socket,
-      fn: (req: Request, res: Response) -> Void) throws {
-    let request = try Request(socket: socket)
-    if request.isReady {
-      let response = Response(socket: socket)
-      fn(req: request, res: response)
-      response.doFlush()
+      fn: (req: Request, res: Response) -> Void) {
+    defer { socket.close() }
+    do {
+      let request = try Request(socket: socket)
+      if request.isReady {
+        let response = Response(socket: socket)
+        fn(req: request, res: response)
+        response.doFlush()
+      }
+    } catch {
+      // For now, just ignore it. Could be handled better.
+      // It helps to catch it here so that it does not complicate
+      // the callback code with a throw clause.
     }
-    socket.close()
   }
 
 }
