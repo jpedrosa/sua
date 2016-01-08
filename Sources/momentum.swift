@@ -102,10 +102,6 @@ public class Response {
     contentLength += a.count
   }
 
-  public func end(string: String) {
-    write(string)
-  }
-
   public func writeBytes(bytes: [UInt8]) {
     contentLength += bytes.count
     contentQueue.append(bytes)
