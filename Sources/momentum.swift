@@ -30,7 +30,7 @@ public class Momentum {
 }
 
 
-public class Request {
+public class Request: CustomStringConvertible {
 
   var header: Header?
 
