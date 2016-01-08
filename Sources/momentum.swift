@@ -14,9 +14,9 @@ public class Momentum {
           response.doFlush()
         }
       } catch {
-        // For now, just ignore it. Could be handled better.
-        // It helps to catch it here so that it does not complicate
-        // the callback code with a throw clause.
+        // Ignore it. By catching the errors here the server can continue to
+        // operate. The user code can catch its own errors in its handler
+        // callback in case they want to log it or some such.
       }
     }
   }
