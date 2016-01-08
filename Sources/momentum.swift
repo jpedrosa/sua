@@ -63,7 +63,7 @@ public class Request: CustomStringConvertible {
 
   public var httpVersion: String? { return header?.httpVersion }
 
-  public var headerMap: [String: String]? { return header?.headerMap }
+  public var headerMap: [String: String] { return header!.headerMap }
 
   public subscript(key: String) -> String? { return header?[key] }
 
