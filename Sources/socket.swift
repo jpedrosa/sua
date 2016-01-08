@@ -199,6 +199,10 @@ public struct Socket {
     return Sys.writeString(fd, string: string)
   }
 
+  public func writeBytes(bytes: [UInt8], maxBytes: Int) -> Int {
+    return Sys.writeBytes(fd, bytes: bytes, maxBytes: maxBytes)
+  }
+
   public func read(inout buffer: [UInt8], maxBytes: Int) -> Int {
     return recv(fd, &buffer, maxBytes, 0)
   }

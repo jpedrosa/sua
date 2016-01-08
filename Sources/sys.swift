@@ -112,6 +112,12 @@ public struct PosixSys {
     return write(fd, address: &a, length: a.count)
   }
 
+  public func writeBytes(fd: Int32, bytes: [UInt8], maxBytes: Int)
+      -> Int {
+    var a = bytes
+    return write(fd, address: &a, length: maxBytes)
+  }
+
   public func close(fd: Int32) -> Int32 {
     return retry { Glibc.close(fd) }
   }

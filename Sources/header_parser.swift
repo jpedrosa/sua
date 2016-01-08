@@ -110,10 +110,10 @@ public struct HeaderParser {
     }
   }
 
-  mutating public func parse(charCodes: [UInt8]) throws {
-    stream = charCodes
+  mutating public func parse(bytes: [UInt8], maxBytes: Int = -1) throws {
+    stream = bytes
     index = 0
-    length = stream.count
+    length = maxBytes < 0 ? bytes.count : maxBytes
     while index < length {
       try next()
     }
