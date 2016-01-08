@@ -3,27 +3,32 @@
 public class Momentum {
 
   public static func listen(port: UInt16, hostName: String = "127.0.0.1",
+      handler: (req: Request, res: Response) -> Void) throws {
+    let server = try ServerSocket(hostName: hostName, port: port)
+    while true {
+      try server.spawnAccept() { socket in
+        defer { socket.close() }
+        do {
+          let request = try Request(socket: socket)
+          if request.isReady {
+            let response = Response(socket: socket)
+            handler(req: request, res: response)
+            response.doFlush()
+          }
+        } catch {
+          // For now, just ignore it. Could be handled better.
+          // It helps to catch it here so that it does not complicate
+          // the callback code with a throw clause.
+        }
+      }
+    }
+  }
+
+  public static func doListen(port: UInt16, hostName: String = "127.0.0.1",
       handler: (socket: Socket) -> Void) throws {
     let server = try ServerSocket(hostName: hostName, port: port)
     while true {
       try server.spawnAccept(handler)
-    }
-  }
-
-  public static func handle(socket: Socket,
-      fn: (req: Request, res: Response) -> Void) {
-    defer { socket.close() }
-    do {
-      let request = try Request(socket: socket)
-      if request.isReady {
-        let response = Response(socket: socket)
-        fn(req: request, res: response)
-        response.doFlush()
-      }
-    } catch {
-      // For now, just ignore it. Could be handled better.
-      // It helps to catch it here so that it does not complicate
-      // the callback code with a throw clause.
     }
   }
 
