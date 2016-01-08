@@ -11,18 +11,18 @@ public struct ByteStream {
   public var lineEndIndex = 0
   public var milestoneIndex = 0
 
-  public init(codeUnits: [UInt8] = [], startIndex: Int = 0,
+  public init(bytes: [UInt8] = [], startIndex: Int = 0,
       lineEndIndex: Int = 0) {
     self.startIndex = startIndex
     self.lineEndIndex = lineEndIndex
-    _bytes = codeUnits
+    _bytes = bytes
     currentIndex = startIndex
     if lineEndIndex == 0 {
-      self.lineEndIndex = codeUnits.count
+      self.lineEndIndex = bytes.count
     }
   }
 
-  public var codeUnits: [UInt8] {
+  public var bytes: [UInt8] {
     get { return _bytes }
     set {
       _bytes = newValue
@@ -390,7 +390,7 @@ public struct ByteStream {
       o.currentIndex = po.currentIndex
       return o
     } else {
-      var o = ByteStream(codeUnits: po._bytes,
+      var o = ByteStream(bytes: po._bytes,
           startIndex: po.startIndex, lineEndIndex: po.lineEndIndex)
       o.currentIndex = po.currentIndex
       return o
@@ -398,7 +398,7 @@ public struct ByteStream {
   }
 
   public func clone() -> ByteStream {
-    var o = ByteStream(codeUnits: _bytes, startIndex: startIndex,
+    var o = ByteStream(bytes: _bytes, startIndex: startIndex,
         lineEndIndex: lineEndIndex)
     o.currentIndex = currentIndex
     return o
@@ -2009,12 +2009,12 @@ public struct ByteStream {
     let len = _bytes.count
     let si = startIndex
     if si >= len {
-      codeUnits = [UInt8](buffer[0..<maxBytes])
+      bytes = [UInt8](buffer[0..<maxBytes])
     } else {
       var a = [UInt8](_bytes[si..<len])
       a += buffer[0..<maxBytes]
       let offset = currentIndex - si
-      codeUnits = a
+      bytes = a
       currentIndex = offset
     }
   }
