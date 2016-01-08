@@ -4,7 +4,7 @@ import Sua
 
 if !Stdin.isTerminal {
 
-  var stream = CodeUnitStream()
+  var stream = ByteStream()
   var bytesCount = 0
   var newLineCount = 0
   var wordCount = 0
@@ -17,7 +17,7 @@ if !Stdin.isTerminal {
     }
     //p(line)
     //p(String.fromCharCodes(line))
-    stream.codeUnits = line
+    stream.bytes = line
     while !stream.isEol {
       // 32 - space; 10 - new line; 9 - tab; 13 - carriage return
       // 160 - unicode space: \u00a0
