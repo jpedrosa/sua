@@ -57,7 +57,7 @@ public class Request: CustomStringConvertible {
     } while n > 0 && !headerParser.isDone
   }
 
-  public var method: String? { return header?.method }
+  public var method: String { return header!.method }
 
   public var uri: String? { return header?.uri }
 
