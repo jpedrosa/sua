@@ -51,6 +51,7 @@ public struct HeaderParser {
   var tokenBuffer = [UInt8](count: 1024, repeatedValue: 0)
   var tokenBufferEnd = 0
   var done = false
+  var _bodyIndex = -1
 
   public init() { }
 
@@ -119,7 +120,7 @@ public struct HeaderParser {
     }
     if tokenIndex >= 0 {
       addToTokenBuffer(stream, startIndex: tokenIndex, endIndex: length)
-      tokenIndex = 0
+      tokenIndex = -1
     }
   }
 
@@ -307,6 +308,7 @@ public struct HeaderParser {
       entryParser = .KeyStarted
     } else if c == 10 { // \n
       done = true
+      _bodyIndex = index + 1
       index = length // Header exit.
     } else if c == 13 { // \r
       index += 1
@@ -319,6 +321,7 @@ public struct HeaderParser {
   mutating func inHeaderExit() throws {
     if stream[index] == 10 { // \n
       done = true
+      _bodyIndex = index + 1
       index = length
     } else {
       throw HeaderParserError.LineFeed
@@ -404,6 +407,8 @@ public struct HeaderParser {
       index = i
     }
   }
+
+  public var bodyIndex: Int { return _bodyIndex }
 
 }
 
