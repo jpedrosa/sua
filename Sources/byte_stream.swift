@@ -2019,4 +2019,17 @@ public struct ByteStream {
     }
   }
 
+  public static func printAscii(bytes: [UInt8]) {
+    let len = bytes.count
+    var a = [UInt8](count: len, repeatedValue: 0)
+    for i in 0..<len {
+      let c = bytes[i]
+      a[i] = (c == 10 || c == 13 || (c >= 32 && c <= 126)) ? c : 46
+    }
+    Stdout.writeBytes(a, maxBytes: len)
+    if a[len - 1] != 10 {
+      print("")
+    }
+  }
+
 }

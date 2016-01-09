@@ -1,4 +1,5 @@
 
+
 public typealias MomentumHandler = (req: Request, res: Response) -> Void
 
 public class Momentum {
@@ -74,6 +75,7 @@ public class Request: CustomStringConvertible {
 
   init(socket: Socket) throws {
     var headerParser = HeaderParser()
+    defer { header = headerParser.header }
     let len = 1024
     var buffer = [UInt8](count: len, repeatedValue: 0)
     var n = 0
@@ -82,12 +84,14 @@ public class Request: CustomStringConvertible {
       if n > 0 {
         do {
           try headerParser.parse(buffer, maxBytes: n)
-          header = headerParser.header
         } catch {
           break
         }
       }
     } while n > 0 && !headerParser.isDone
+    if n != 0 && headerParser.isDone && headerParser.header.method == "POST" {
+      // TODO @Joao: Set up body parsing.
+    }
   }
 
   public var method: String { return header!.method }
