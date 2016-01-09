@@ -120,7 +120,7 @@ public struct HeaderParser {
     }
     if tokenIndex >= 0 {
       addToTokenBuffer(stream, startIndex: tokenIndex, endIndex: length)
-      tokenIndex = -1
+      tokenIndex = 0 // Set it at 0 to continue supporting addToTokenBuffer.
     }
   }
 
