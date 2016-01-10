@@ -159,6 +159,7 @@ public struct BodyParser {
   var nameValue = ""
   var fileNameValue = ""
   var contentTypeValue = ""
+  var boundaryMatch = [Int]()
 
   public init() { }
 
@@ -247,6 +248,8 @@ public struct BodyParser {
         try inContentBody()
       case .ContentData:
         try inContentData()
+      case .ContentDataStarted:
+        try inContentDataStarted()
       default: () // Ignore for now.
     }
   }
@@ -440,7 +443,6 @@ public struct BodyParser {
     entryParser = .MatchToken
     linedUpParser = .ContentDispositionEnd
     tokenIndex = index
-    try inMatchToken()
   }
 
   mutating func inContentDispositionEnd() throws {
@@ -493,6 +495,7 @@ public struct BodyParser {
       index += 1
       nameValue = ""
       entryParser = .NameValueStarted
+      tokenIndex = index
     } else {
       throw BodyParserError.NameValue
     }
@@ -510,7 +513,7 @@ public struct BodyParser {
           throw BodyParserError.NameValue
         }
         entryParser = .NameValueEnd
-        index += 1
+        index = i + 1
         break
       } else if c >= 32 { // Space.
         // ignore
@@ -532,6 +535,7 @@ public struct BodyParser {
     } else if stream[index] == 13 { // Carriage return.
       entryParser = .LineFeed
       linedUpParser = .ContentBody
+      index += 1
     } else {
       throw BodyParserError.NameValue
     }
@@ -659,9 +663,11 @@ public struct BodyParser {
     let len = length
     let shadowLasti = shadowMatch.count - 1
     repeat {
-      if stream[i] == shadowMatch[tokenBufferEnd + i] {
-        if tokenBufferEnd + i == shadowLasti {
+      let ci = i - tokenIndex
+      if stream[i] == shadowMatch[tokenBufferEnd + ci] {
+        if ci == shadowLasti {
           entryParser = linedUpParser
+          index = i + 1
           tokenIndex = -1
           break
         }
@@ -688,6 +694,40 @@ public struct BodyParser {
   mutating func inContentData() throws {
     tokenIndex = index
     entryParser = .ContentDataStarted
+    boundaryMatch = []
+  }
+
+  mutating func inContentDataStarted() throws {
+    var i = index
+    let len = length
+    let blasti = boundary.count - 1
+    OUT: repeat {
+      let c = stream[i]
+      if BoundaryCharTable.TABLE[c] {
+        var a = [Int]()
+        for j in 0..<boundaryMatch.count {
+          let m = boundaryMatch[j]
+          if boundary.match(m, c: c) {
+            if m == blasti {
+              p("the end")
+              body.fields[nameValue] = collectString(i - boundary.count - 2)
+              index = length
+              break OUT
+            } else {
+              a.append(m + 1)
+            }
+          }
+        }
+        if c == 45 {
+          a.append(1)
+        }
+        boundaryMatch = a
+      }
+      i += 1
+    } while i < len
+    if i >= len {
+      index = i
+    }
   }
 
   mutating func inSpace() throws {
