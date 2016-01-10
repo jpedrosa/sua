@@ -69,11 +69,17 @@ struct BodyTokenMatcher {
     bytes = [UInt8](string.utf8)
   }
 
+  init(bytes: [UInt8]) {
+    self.bytes = bytes
+  }
+
   subscript(index: Int) -> UInt8 { return bytes[index] }
 
   func match(index: Int, c: UInt8) -> Bool {
     return bytes[index] == c
   }
+
+  var count: Int { return bytes.count }
 
   static let CONTENT_DISPOSITION = BodyTokenMatcher(
       string: "Content-Disposition")
@@ -83,6 +89,10 @@ struct BodyTokenMatcher {
   static let FILENAME = BodyTokenMatcher(string: "filename")
 
   static let CONTENT_TYPE = BodyTokenMatcher(string: "Content-Type")
+
+  static let FORM_DATA = BodyTokenMatcher(string: "form-data")
+
+  static let _EMPTY = BodyTokenMatcher(string: "")
 
 }
 
@@ -98,15 +108,31 @@ enum BodyParserEntry {
   case ValueStarted
   case Space
   case LineFeed
-  case CarriageReturn
   case Semicolon
   case Equal
   case BeginMultipart
   case BeginMultipartStarted
+  case MatchToken
   case ContentDisposition
-  case ContentDispositionStarted
+  case ContentDispositionEnd
+  case FormData
+  case FormDataEnd
+  case Name
+  case NameEnd
+  case NameValue
+  case NameValueStarted
+  case NameValueEnd
+  case FileName
+  case FileNameEnd
+  case FileNameValue
+  case FileNameValueStarted
+  case FileNameValueEnd
   case ContentType
-  case ContentTypeStarted
+  case ContentTypeEnd
+  case ContentTypeValue
+  case ContentTypeValueStarted
+  case ContentValue
+  case ContentBody
   case ContentData
   case ContentDataStarted
   case ContentFile
@@ -128,7 +154,11 @@ public struct BodyParser {
   var tokenBuffer = [UInt8](count: 1024, repeatedValue: 0)
   var tokenBufferEnd = 0
   var done = false
-  var boundary = [UInt8]()
+  var boundary = BodyTokenMatcher._EMPTY
+  var shadowMatch = BodyTokenMatcher._EMPTY
+  var nameValue = ""
+  var fileNameValue = ""
+  var contentTypeValue = ""
 
   public init() { }
 
@@ -171,16 +201,52 @@ public struct BodyParser {
         try inBeginMultipart()
       case .BeginMultipartStarted:
         try inBeginMultipartStarted()
-      // case .Space:
-      //   try inSpace()
-      // case .LineFeed:
-      //   try inLineFeed()
-      // case .CarriageReturn:
-      //   try inCarriageReturn()
-      // case .Key:
-      //   try inKey()
-      // case .Colon:
-      //   try inColon()
+      case .ContentDisposition:
+        try inContentDisposition()
+      case .ContentDispositionEnd:
+        try inContentDispositionEnd()
+      case .LineFeed:
+        try inLineFeed()
+      case .MatchToken:
+        try inMatchToken()
+      case .Space:
+        try inSpace()
+      case .FormData:
+        try inFormData()
+      case .FormDataEnd:
+        try inFormDataEnd()
+      case .Name:
+        try inName()
+      case .NameEnd:
+        try inNameEnd()
+      case .NameValue:
+        try inNameValue()
+      case .NameValueStarted:
+        try inNameValueStarted()
+      case .NameValueEnd:
+        try inNameValueEnd()
+      case .FileName:
+        try inFileName()
+      case .FileNameEnd:
+        try inFileNameEnd()
+      case .FileNameValue:
+        try inFileNameValue()
+      case .FileNameValueStarted:
+        try inFileNameValueStarted()
+      case .FileNameValueEnd:
+        try inFileNameValueEnd()
+      case .ContentType:
+        try inContentType()
+      case .ContentTypeEnd:
+        try inContentTypeEnd()
+      case .ContentTypeValue:
+        try inContentTypeValue()
+      case .ContentTypeValueStarted:
+        try inContentTypeValueStarted()
+      case .ContentBody:
+        try inContentBody()
+      case .ContentData:
+        try inContentData()
       default: () // Ignore for now.
     }
   }
@@ -256,11 +322,12 @@ public struct BodyParser {
       if BoundaryCharTable.TABLE[c] {
         // Ignore.
       } else if c == 13 {
-        entryParser = .ContentDisposition
-        boundary = collectToken(i)
+        boundary = BodyTokenMatcher(bytes: collectToken(i))
         if boundary.count <= 2 {
           throw BodyParserError.Key
         }
+        entryParser = .LineFeed
+        linedUpParser = .ContentDisposition
         break
       } else {
         throw BodyParserError.BeginMultipart
@@ -350,13 +417,293 @@ public struct BodyParser {
         index = length // Done. Exit.
         break
       } else {
-        throw HeaderParserError.Value
+        throw BodyParserError.Value
       }
       i += 1
     } while i < len
     if i >= len {
       index = i
     }
+  }
+
+  mutating func inLineFeed() throws {
+    if stream[index] == 10 { // \n
+      index += 1
+      entryParser = linedUpParser
+    } else {
+      throw BodyParserError.LineFeed
+    }
+  }
+
+  mutating func inContentDisposition() throws {
+    shadowMatch = BodyTokenMatcher.CONTENT_DISPOSITION
+    entryParser = .MatchToken
+    linedUpParser = .ContentDispositionEnd
+    tokenIndex = index
+    try inMatchToken()
+  }
+
+  mutating func inContentDispositionEnd() throws {
+    if stream[index] == 58 { // :
+      index += 1
+      entryParser = .Space
+      linedUpParser = .FormData
+    } else {
+      throw BodyParserError.ContentDisposition
+    }
+  }
+
+  mutating func inFormData() throws {
+    shadowMatch = BodyTokenMatcher.FORM_DATA
+    entryParser = .MatchToken
+    linedUpParser = .FormDataEnd
+    tokenIndex = index
+    try inMatchToken()
+  }
+
+  mutating func inFormDataEnd() throws {
+    if stream[index] == 59 { // ;
+      index += 1
+      entryParser = .Space
+      linedUpParser = .Name
+    } else {
+      throw BodyParserError.FormData
+    }
+  }
+
+  mutating func inName() throws {
+    shadowMatch = BodyTokenMatcher.NAME
+    entryParser = .MatchToken
+    linedUpParser = .NameEnd
+    tokenIndex = index
+    try inMatchToken()
+  }
+
+  mutating func inNameEnd() throws {
+    if stream[index] == 61 { // =
+      index += 1
+      entryParser = .NameValue
+    } else {
+      throw BodyParserError.Name
+    }
+  }
+
+  mutating func inNameValue() throws {
+    if stream[index] == 34 { // "
+      index += 1
+      nameValue = ""
+      entryParser = .NameValueStarted
+    } else {
+      throw BodyParserError.NameValue
+    }
+  }
+
+  mutating func inNameValueStarted() throws {
+    var i = index
+    let len = length
+    repeat {
+      let c = stream[i]
+      if c == 34 { // "
+        if let s = collectString(i) {
+          nameValue = s
+        } else {
+          throw BodyParserError.NameValue
+        }
+        entryParser = .NameValueEnd
+        index += 1
+        break
+      } else if c >= 32 { // Space.
+        // ignore
+      } else {
+        throw BodyParserError.NameValue
+      }
+      i += 1
+    } while i < len
+    if i >= len {
+      index = i
+    }
+  }
+
+  mutating func inNameValueEnd() throws {
+    if stream[index] == 59 { // ;
+      index += 1
+      entryParser = .Space
+      linedUpParser = .FileName
+    } else if stream[index] == 13 { // Carriage return.
+      entryParser = .LineFeed
+      linedUpParser = .ContentBody
+    } else {
+      throw BodyParserError.NameValue
+    }
+  }
+
+  mutating func inFileName() throws {
+    shadowMatch = BodyTokenMatcher.FILENAME
+    entryParser = .MatchToken
+    linedUpParser = .FileNameEnd
+    tokenIndex = index
+    try inMatchToken()
+  }
+
+  mutating func inFileNameEnd() throws {
+    if stream[index] == 61 { // =
+      index += 1
+      entryParser = .FileNameValue
+    } else {
+      throw BodyParserError.FileName
+    }
+  }
+
+  mutating func inFileNameValue() throws {
+    if stream[index] == 34 { // "
+      index += 1
+      fileNameValue = ""
+      entryParser = .FileNameValueStarted
+    } else {
+      throw BodyParserError.FileNameValue
+    }
+  }
+
+  mutating func inFileNameValueStarted() throws {
+    var i = index
+    let len = length
+    repeat {
+      let c = stream[i]
+      if c == 34 { // "
+        if let s = collectString(i) {
+          fileNameValue = s
+        } else {
+          throw BodyParserError.FileNameValue
+        }
+        entryParser = .FileNameValueEnd
+        index += 1
+        break
+      } else if c >= 32 { // Space.
+        // ignore
+      } else {
+        throw BodyParserError.FileNameValue
+      }
+      i += 1
+    } while i < len
+    if i >= len {
+      index = i
+    }
+  }
+
+  mutating func inFileNameValueEnd() throws {
+    if stream[index] == 13 { // Carriage return.
+      entryParser = .LineFeed
+      linedUpParser = .ContentType
+    } else {
+      throw BodyParserError.FileNameValue
+    }
+  }
+
+  mutating func inContentType() throws {
+    shadowMatch = BodyTokenMatcher.CONTENT_TYPE
+    entryParser = .MatchToken
+    linedUpParser = .ContentTypeEnd
+    tokenIndex = index
+    try inMatchToken()
+  }
+
+  mutating func inContentTypeEnd() throws {
+    if stream[index] == 58 { // :
+      index += 1
+      entryParser = .Space
+      linedUpParser = .ContentTypeValue
+    } else {
+      throw BodyParserError.ContentDisposition
+    }
+  }
+
+  mutating func inContentTypeValue() throws {
+    if stream[index] > 32 {
+      tokenIndex = index
+      contentTypeValue = ""
+      index += 1
+      entryParser = .ContentTypeValueStarted
+    } else {
+      throw BodyParserError.ContentTypeValue
+    }
+  }
+
+  mutating func inContentTypeValueStarted() throws {
+    var i = index
+    let len = length
+    repeat {
+      let c = stream[i]
+      if c == 13 { // "
+        if let s = collectString(i) {
+          contentTypeValue = s
+        } else {
+          throw BodyParserError.FileNameValue
+        }
+        entryParser = .ContentBody
+        index += 1
+        break
+      } else if c > 32 { // Space.
+        // ignore
+      } else {
+        throw BodyParserError.ContentTypeValue
+      }
+      i += 1
+    } while i < len
+    if i >= len {
+      index = i
+    }
+  }
+
+  mutating func inMatchToken() throws {
+    var i = index
+    let len = length
+    let shadowLasti = shadowMatch.count - 1
+    repeat {
+      if stream[i] == shadowMatch[tokenBufferEnd + i] {
+        if tokenBufferEnd + i == shadowLasti {
+          entryParser = linedUpParser
+          tokenIndex = -1
+          break
+        }
+      } else {
+        throw BodyParserError.MatchToken
+      }
+      i += 1
+    } while i < len
+    if i >= len {
+      index = i
+    }
+  }
+
+  mutating func inContentBody() throws {
+    if stream[index] == 13 {
+      index += 1
+      entryParser = .LineFeed
+      linedUpParser = .ContentData
+    } else {
+      throw BodyParserError.ContentBody
+    }
+  }
+
+  mutating func inContentData() throws {
+    tokenIndex = index
+    entryParser = .ContentDataStarted
+  }
+
+  mutating func inSpace() throws {
+    var i = index
+    var c = stream[i]
+    let len = length
+    while c == 32 {
+      i += 1
+      if i >= len {
+        index = i
+        return
+      }
+      c = stream[i]
+    }
+    index = i
+    entryParser = linedUpParser
   }
 
 }
@@ -367,4 +714,14 @@ enum BodyParserError: ErrorType {
   case Key
   case Value
   case BeginMultipart
+  case MatchToken
+  case ContentDisposition
+  case LineFeed
+  case FormData
+  case Name
+  case NameValue
+  case FileName
+  case FileNameValue
+  case ContentBody
+  case ContentTypeValue
 }
