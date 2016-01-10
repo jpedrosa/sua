@@ -160,6 +160,9 @@ public struct BodyParser {
   var fileNameValue = ""
   var contentTypeValue = ""
   var boundaryMatch = [Int]()
+  var boundTest1 = false // Match for the boundary token without line ending.
+  var boundTest2 = false // Match for the boundary token plus first - suffix.
+  var boundTest3 = false // Match for the boundary token plus -- suffix.
 
   public init() { }
 
@@ -695,24 +698,46 @@ public struct BodyParser {
     tokenIndex = index
     entryParser = .ContentDataStarted
     boundaryMatch = []
+    boundTest1 = false
+    boundTest2 = false
+    boundTest3 = false
   }
 
   mutating func inContentDataStarted() throws {
     var i = index
     let len = length
     let blasti = boundary.count - 1
-    OUT: repeat {
+    repeat {
       let c = stream[i]
+      if boundTest3 && c == 13 {
+        body.fields[nameValue] = collectString(i - boundary.count - 5)
+        index = length
+        break
+      }
+      boundTest3 = false
+      if boundTest2 && c == 45 {
+        boundTest3 = true
+      }
+      boundTest2 = false
+      if boundTest1 {
+        if c == 13 {
+          body.fields[nameValue] = collectString(i - boundary.count - 3)
+          entryParser = .LineFeed
+          linedUpParser = .ContentDisposition
+          index = i + 1
+          break
+        } else if c == 45 {
+          boundTest2 = true
+        }
+      }
+      boundTest1 = false
       if BoundaryCharTable.TABLE[c] {
         var a = [Int]()
         for j in 0..<boundaryMatch.count {
           let m = boundaryMatch[j]
           if boundary.match(m, c: c) {
             if m == blasti {
-              p("the end")
-              body.fields[nameValue] = collectString(i - boundary.count - 2)
-              index = length
-              break OUT
+              boundTest1 = true
             } else {
               a.append(m + 1)
             }
