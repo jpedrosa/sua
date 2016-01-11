@@ -19,37 +19,6 @@ public class File: CustomStringConvertible {
     }
   }
 
-  public static let NEW_LINE = "\n"
-  public static let WINDOWS_NEW_LINE = "\r\n"
-
-/*  func puts(v: ) {
-    var f = _f;
-    if (v is List) {
-      var i, len = v.length;
-      for (i = 0; i < len; i++) {
-        putStringEnsureNewLine(f, v[i]);
-      }
-    } else if (v is Iterable) {
-      for (var e in v) {
-        putStringEnsureNewLine(f, e);
-      }
-    } else {
-      write(v is String ? v : v.toString());
-    }
-  }
-
-  putStringEnsureNewLine(f, s) {
-    if (s is! String) {
-      s = s.toString();
-    }
-    Str.withNewLinePreference(s, IO.isWindows, (s, newLineStr) {
-      write(s);
-      if (newLineStr != null) {
-        write(newLineStr);
-      }
-      });
-  }*/
-
   public func print(v: String) {
     write(v)
   }
