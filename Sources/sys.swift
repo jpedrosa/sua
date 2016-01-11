@@ -4,23 +4,16 @@ import Glibc
 
 
 public enum FileOperation: Int {
-  case R
-  case W
-  case A
-  case Read
-  case Write
-  case Append
+  case R // Read
+  case W // Write
+  case A // Append
 }
 
 public enum PopenOperation: String {
-  case R
-  case W
-  case RE
-  case WE
-  case Read
-  case Write
-  case ReadWithCloexec
-  case WriteWithCloexec
+  case R // Read
+  case W // Write
+  case RE // ReadWithCloexec
+  case WE // WriteWithCloexec
 }
 
 
@@ -81,9 +74,9 @@ public struct PosixSys {
       mode: UInt32 = DEFAULT_FILE_MODE) -> Int32 {
     var flags: Int32 = 0
     switch operation {
-      case .R, .Read: flags = O_RDONLY
-      case .W, .Write: flags = O_RDWR | O_CREAT | O_TRUNC
-      case .A, .Append: flags = O_RDWR | O_CREAT | O_APPEND
+      case .R: flags = O_RDONLY
+      case .W: flags = O_RDWR | O_CREAT | O_TRUNC
+      case .A: flags = O_RDWR | O_CREAT | O_APPEND
     }
     flags |= O_CLOEXEC
     return open(filePath, flags: flags, mode: mode)
@@ -195,10 +188,10 @@ public struct PosixSys {
       -> UnsafeMutablePointer<FILE> {
     var op = "r"
     switch operation {
-      case .R, .Read: op = "r"
-      case .W, .Write: op = "w"
-      case .RE, .ReadWithCloexec: op = "re"
-      case .WE, .WriteWithCloexec: op = "we"
+      case .R: op = "r"
+      case .W: op = "w"
+      case .RE: op = "re"
+      case .WE: op = "we"
     }
     return Glibc.popen(command, op)
   }
