@@ -708,10 +708,6 @@ public struct BodyParser {
     }
   }
 
-  var isContentFile: Bool {
-    return !fileNameValue.isEmpty || !contentTypeValue.isEmpty
-  }
-
   mutating func inContentData() throws {
     tokenIndex = index
     entryParser = .ContentDataStarted
@@ -719,7 +715,7 @@ public struct BodyParser {
     boundTest1 = false
     boundTest2 = false
     boundTest3 = false
-    if isContentFile {
+    if !fileNameValue.isEmpty || !contentTypeValue.isEmpty {
       tempFile = try TempFile(prefix: "bodyparser", suffix: "upload")
     }
   }
