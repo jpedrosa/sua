@@ -19,6 +19,15 @@ public class File: CustomStringConvertible {
     }
   }
 
+  public func printList(string: String) {
+    // 10 - new line
+    write(string)
+    if string.isEmpty || string.utf16.codeUnitAt(string.utf16.count - 1) != 10 {
+      let a: [UInt8] = [10]
+      writeBytes(a)
+    }
+  }
+
   public func print(v: String) {
     write(v)
   }
