@@ -19,6 +19,8 @@ public class File: CustomStringConvertible {
     }
   }
 
+  deinit { close() }
+
   public func printList(string: String) {
     // 10 - new line
     write(string)
