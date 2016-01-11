@@ -142,8 +142,6 @@ enum BodyParserEntry {
 }
 
 
-public var flushCount = 0
-
 public struct BodyParser {
 
   var stream = [UInt8]()
@@ -276,7 +274,6 @@ public struct BodyParser {
       tokenIndex = 0 // Set it at 0 to continue supporting addToTokenBuffer.
       if let tf = tempFile {
         if tokenBufferEnd >= 4096 {
-          flushCount += 1
           let len = tokenBufferEnd - 80
           tf.writeBytes(tokenBuffer, maxBytes: len)
           for i in 0..<80 {
