@@ -10,10 +10,10 @@ public enum FileOperation: Int {
 }
 
 public enum PopenOperation: String {
-  case R // Read
-  case W // Write
-  case RE // ReadWithCloexec
-  case WE // WriteWithCloexec
+  case R = "r" // Read
+  case W = "w" // Write
+  case RE = "re" // ReadWithCloexec
+  case WE = "we" // WriteWithCloexec
 }
 
 
@@ -186,14 +186,7 @@ public struct PosixSys {
 
   public func popen(command: String, operation: PopenOperation = .R)
       -> UnsafeMutablePointer<FILE> {
-    var op = "r"
-    switch operation {
-      case .R: op = "r"
-      case .W: op = "w"
-      case .RE: op = "re"
-      case .WE: op = "we"
-    }
-    return Glibc.popen(command, op)
+    return Glibc.popen(command, operation.rawValue)
   }
 
   public func pclose(fp: UnsafeMutablePointer<FILE>) -> Int32 {
