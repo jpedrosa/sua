@@ -20,6 +20,7 @@ public struct Header: CustomStringConvertible {
 
 }
 
+
 enum HeaderParserEntry {
   case Method
   case MethodStarted
@@ -38,6 +39,8 @@ enum HeaderParserEntry {
   case ValueStarted
 }
 
+
+// Supports streaming.
 public struct HeaderParser {
 
   var stream = [UInt8]()
@@ -411,6 +414,7 @@ public struct HeaderParser {
   public var bodyIndex: Int { return _bodyIndex }
 
 }
+
 
 enum HeaderParserError: ErrorType {
   case Method

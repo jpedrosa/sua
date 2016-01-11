@@ -142,6 +142,7 @@ enum BodyParserEntry {
 }
 
 
+// Supports streaming.
 public struct BodyParser {
 
   var stream = [UInt8]()
