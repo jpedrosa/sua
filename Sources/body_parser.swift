@@ -4,7 +4,7 @@ public struct BodyFile {
 
   public var name = ""
   public var contentType = ""
-  public var data: [UInt8]
+  public var file: File
 
 }
 
@@ -163,6 +163,7 @@ public struct BodyParser {
   var boundTest1 = false // Match for the boundary token without line ending.
   var boundTest2 = false // Match for the boundary token plus first - suffix.
   var boundTest3 = false // Match for the boundary token plus -- suffix.
+  var tempFile: TempFile?
 
   public init() { }
 
@@ -694,6 +695,10 @@ public struct BodyParser {
     }
   }
 
+  var isContentFile: Bool {
+    return !fileNameValue.isEmpty || !contentTypeValue.isEmpty
+  }
+
   mutating func inContentData() throws {
     tokenIndex = index
     entryParser = .ContentDataStarted
@@ -701,6 +706,9 @@ public struct BodyParser {
     boundTest1 = false
     boundTest2 = false
     boundTest3 = false
+    if isContentFile {
+      tempFile = try TempFile(prefix: "bodyparser", suffix: "upload")
+    }
   }
 
   mutating func inContentDataStarted() throws {
@@ -711,9 +719,11 @@ public struct BodyParser {
       let c = stream[i]
       if boundTest3 && c == 13 {
         let ei = i - boundary.count - 5
-        if !fileNameValue.isEmpty || !contentTypeValue.isEmpty {
+        if isContentFile {
+          tempFile!.writeBytes(collectToken(ei))
           body.files[nameValue] = BodyFile(name: fileNameValue,
-              contentType: contentTypeValue, data: collectToken(ei))
+              contentType: contentTypeValue, file: tempFile!)
+          tempFile = nil
         } else {
           body.fields[nameValue] = collectString(ei)
         }
@@ -729,9 +739,11 @@ public struct BodyParser {
       if boundTest1 {
         if c == 13 {
           let ei = i - boundary.count - 3
-          if !fileNameValue.isEmpty || !contentTypeValue.isEmpty {
+          if isContentFile {
+            tempFile!.writeBytes(collectToken(ei))
             body.files[nameValue] = BodyFile(name: fileNameValue,
-                contentType: contentTypeValue, data: collectToken(ei))
+                contentType: contentTypeValue, file: tempFile!)
+            tempFile = nil
           } else {
             body.fields[nameValue] = collectString(ei)
           }
@@ -773,6 +785,16 @@ public struct BodyParser {
       index += 1
     }
     entryParser = linedUpParser
+  }
+
+  // Call this to help remove the temp files.
+  //
+  // When BodyParser is used from a main file, outside functions, temp files
+  // could persist after the program has finished running.
+  mutating func close() {
+    for (_, bf) in body.files {
+      (bf.file as! TempFile).closeAndUnlink()
+    }
   }
 
 }
