@@ -64,6 +64,11 @@ public class RNG {
     return n / Double(UInt64(1) << 53)
   }
 
+  public func nextUInt64() -> UInt64 {
+    xorShift128()
+    return state0 &+ state1
+  }
+
   func next(bits: Int) -> Int {
     xorShift128()
     let b = 64 - bits

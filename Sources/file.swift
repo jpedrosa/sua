@@ -196,3 +196,36 @@ public class File: CustomStringConvertible {
 public enum FileError: ErrorType {
   case FileException(message: String)
 }
+
+
+// The file will be closed and removed automatically when it can be garbage
+// collected.
+public class TempFile: File {
+
+  init(prefix: String = "", suffix: String = "", directory: String? = nil)
+      throws {
+    var d = "/tmp/"
+    if let ad = directory {
+      d = ad
+      let len = d.utf16.count
+      if len == 0 || d.utf16.codeUnitAt(len - 1) != 47 { // /
+        d += "/"
+      }
+    }
+    var path = ""
+    repeat {
+      path = "\(d)\(prefix)\(RNG().nextUInt64())\(suffix)"
+    } while File.exists(path)
+    try super.init(path: path, mode: .W)
+  }
+
+  deinit {
+    closeAndUnlink()
+  }
+
+  public func closeAndUnlink() {
+    close()
+    Sys.unlink(path)
+  }
+
+}
