@@ -2,9 +2,9 @@
 
 public struct BodyFile {
 
-  public var name: String?
-  public var type: String?
-  public var path = ""
+  public var name = ""
+  public var contentType = ""
+  public var data: [UInt8]
 
 }
 
@@ -712,7 +712,13 @@ public struct BodyParser {
     repeat {
       let c = stream[i]
       if boundTest3 && c == 13 {
-        body.fields[nameValue] = collectString(i - boundary.count - 5)
+        let ei = i - boundary.count - 5
+        if !fileNameValue.isEmpty || !contentTypeValue.isEmpty {
+          body.files[nameValue] = BodyFile(name: fileNameValue,
+              contentType: contentTypeValue, data: collectToken(ei))
+        } else {
+          body.fields[nameValue] = collectString(ei)
+        }
         index = length // Body exit.
         done = true
         break
@@ -724,7 +730,13 @@ public struct BodyParser {
       boundTest2 = false
       if boundTest1 {
         if c == 13 {
-          body.fields[nameValue] = collectString(i - boundary.count - 3)
+          let ei = i - boundary.count - 3
+          if !fileNameValue.isEmpty || !contentTypeValue.isEmpty {
+            body.files[nameValue] = BodyFile(name: fileNameValue,
+                contentType: contentTypeValue, data: collectToken(ei))
+          } else {
+            body.fields[nameValue] = collectString(ei)
+          }
           entryParser = .LineFeed
           linedUpParser = .ContentDisposition
           index = i + 1
@@ -759,18 +771,9 @@ public struct BodyParser {
   }
 
   mutating func inSpace() throws {
-    var i = index
-    var c = stream[i]
-    let len = length
-    while c == 32 {
-      i += 1
-      if i >= len {
-        index = i
-        return
-      }
-      c = stream[i]
+    while index < length && stream[index] == 32 {
+      index += 1
     }
-    index = i
     entryParser = linedUpParser
   }
 
