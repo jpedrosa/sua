@@ -6,6 +6,11 @@ public struct BodyFile {
   public var contentType = ""
   public var file: File
 
+  // Handy method that can both rename and move the file to a new directory.
+  public func rename(path: String) throws {
+    try File.rename(file.path, newPath: path)
+  }
+
 }
 
 
