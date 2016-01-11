@@ -536,8 +536,7 @@ public struct BodyParser {
       entryParser = .Space
       linedUpParser = .FileName
     } else if stream[index] == 13 { // Carriage return.
-      entryParser = .LineFeed
-      linedUpParser = .ContentBody
+      entryParser = .ContentBody
       index += 1
     } else {
       throw BodyParserError.NameValue
@@ -642,14 +641,14 @@ public struct BodyParser {
     let len = length
     repeat {
       let c = stream[i]
-      if c == 13 { // "
+      if c == 13 {
         if let s = collectString(i) {
           contentTypeValue = s
         } else {
           throw BodyParserError.FileNameValue
         }
         entryParser = .ContentBody
-        index += 1
+        index = i + 1
         break
       } else if c > 32 { // Space.
         // ignore
@@ -687,10 +686,9 @@ public struct BodyParser {
   }
 
   mutating func inContentBody() throws {
-    if stream[index] == 13 {
+    if stream[index] == 10 {
       index += 1
-      entryParser = .LineFeed
-      linedUpParser = .ContentData
+      entryParser = .ContentData
     } else {
       throw BodyParserError.ContentBody
     }
