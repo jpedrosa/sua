@@ -2,6 +2,7 @@
 
 public typealias MomentumHandler = (req: Request, res: Response) -> Void
 
+
 public class Momentum {
 
   public static func listen(port: UInt16, hostName: String = "127.0.0.1",
@@ -10,30 +11,28 @@ public class Momentum {
       defer { socket.close() }
       do {
         let request = try Request(socket: socket)
-        if request.isReady {
-          let response = Response(socket: socket)
+        let response = Response(socket: socket)
 
-          // Look for static handlers.
-          var handled = false
-          if Momentum.haveHandlers {
-            if request.method == "GET" {
-              if let ah = Momentum.handlersGet[request.uri] {
-                handled = true
-                ah(req: request, res: response)
-              }
-            } else if request.method == "POST" {
-              if let ah = Momentum.handlersPost[request.uri] {
-                handled = true
-                ah(req: request, res: response)
-              }
+        // Look for static handlers.
+        var handled = false
+        if Momentum.haveHandlers {
+          if request.method == "GET" {
+            if let ah = Momentum.handlersGet[request.uri] {
+              handled = true
+              ah(req: request, res: response)
+            }
+          } else if request.method == "POST" {
+            if let ah = Momentum.handlersPost[request.uri] {
+              handled = true
+              ah(req: request, res: response)
             }
           }
-
-          if !handled {
-            handler(req: request, res: response)
-          }
-          response.doFlush()
         }
+
+        if !handled {
+          handler(req: request, res: response)
+        }
+        response.doFlush()
       } catch {
         // Ignore it. By catching the errors here the server can continue to
         // operate. The user code can catch its own errors in its handler
@@ -71,40 +70,53 @@ public class Momentum {
 
 public class Request: CustomStringConvertible {
 
-  var header: Header?
+  var header: Header
+  var _body: Body?
 
   init(socket: Socket) throws {
     var headerParser = HeaderParser()
-    defer { header = headerParser.header }
+    header = headerParser.header
     let len = 1024
     var buffer = [UInt8](count: len, repeatedValue: 0)
     var n = 0
     repeat {
       n = socket.read(&buffer, maxBytes: len)
       if n > 0 {
-        do {
-          try headerParser.parse(buffer, maxBytes: n)
-        } catch {
-          break
-        }
+        try headerParser.parse(buffer, maxBytes: n)
       }
     } while n > 0 && !headerParser.isDone
-    if n != 0 && headerParser.isDone && headerParser.header.method == "POST" {
-      // TODO @Joao: Set up body parsing.
+
+    header = headerParser.header
+
+    if n != 0 && headerParser.isDone && header.method == "POST" {
+      var bodyParser = BodyParser()
+      let bi = headerParser.bodyIndex
+      if bi != -1 {
+        try bodyParser.parse(buffer, index: bi, maxBytes: len)
+      }
+      if !bodyParser.isDone {
+        repeat {
+          n = socket.read(&buffer, maxBytes: len)
+          if n > 0 {
+            try bodyParser.parse(buffer, index: 0, maxBytes: n)
+          }
+        } while n > 0 && !headerParser.isDone
+      }
+      _body = bodyParser.body
     }
   }
 
-  public var method: String { return header!.method }
+  public var method: String { return header.method }
 
-  public var uri: String { return header!.uri }
+  public var uri: String { return header.uri }
 
-  public var httpVersion: String { return header!.httpVersion }
+  public var httpVersion: String { return header.httpVersion }
 
-  public var fields: [String: String] { return header!.fields }
+  public var fields: [String: String] { return header.fields }
 
-  public subscript(key: String) -> String? { return header![key] }
+  public subscript(key: String) -> String? { return header[key] }
 
-  public var isReady: Bool { return header != nil }
+  public var body: Body? { return _body }
 
   public var description: String {
     return "Request(method: \(inspect(method)), " +
