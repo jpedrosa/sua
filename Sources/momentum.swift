@@ -33,10 +33,11 @@ public class Momentum {
           handler(req: request, res: response)
         }
         response.doFlush()
-      } catch {
+      } catch (let e) {
         // Ignore it. By catching the errors here the server can continue to
         // operate. The user code can catch its own errors in its handler
         // callback in case they want to log it or some such.
+        print("Momentum error: \(e)")
       }
     }
   }
@@ -122,7 +123,8 @@ public class Request: CustomStringConvertible {
     return "Request(method: \(inspect(method)), " +
         "uri: \(inspect(uri)), " +
         "httpVersion: \(inspect(httpVersion)), " +
-        "fields: \(inspect(fields)))"
+        "fields: \(inspect(fields)), " +
+        "body: \(inspect(_body)))"
   }
 
 }

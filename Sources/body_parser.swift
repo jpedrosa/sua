@@ -412,7 +412,7 @@ public struct BodyParser {
       tokenIndex = i
       index = i + 1
       entryParser = .ValueStarted
-    } else if stream[i] == 13 {
+    } else if stream[i] == 0 {
       body[keyToken] = ""
       done = true
       index = length // Done. Exit.
@@ -432,7 +432,7 @@ public struct BodyParser {
         break
       } else if c >= 32 {
         // ignore
-      } else if c == 13 {
+      } else if c == 0 {
         body[keyToken] = collectString(i)
         done = true
         index = length // Done. Exit.
