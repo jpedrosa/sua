@@ -33,8 +33,14 @@ public class File: CustomStringConvertible {
   }
 
   public func read(maxBytes: Int = -1) throws -> String? {
-    let a = try readCChar(maxBytes < 0 ? length : maxBytes)
-    return String.fromCharCodes(a)
+    if maxBytes < 0 {
+      let a = try readAllCChar()
+      return String.fromCharCodes(a)
+    } else {
+      var a = [CChar](count: maxBytes, repeatedValue: 0)
+      try readCChar(&a, maxBytes: maxBytes)
+      return String.fromCharCodes(a)
+    }
   }
 
   public func readBytes(inout buffer: [UInt8], maxBytes: Int) throws -> Int {
@@ -50,19 +56,22 @@ public class File: CustomStringConvertible {
     return a
   }
 
-  public func readCChar(maxBytes: Int = -1) throws -> [CChar] {
-    let len = maxBytes < 0 ? length : maxBytes
-    var a = [CChar](count: len, repeatedValue: 0)
-    let n = try doRead(&a, maxBytes: len)
-    if n < maxBytes {
-      a = [CChar](a[0..<n])
+  public func readCChar(inout buffer: [CChar], maxBytes: Int) throws -> Int {
+    return try doRead(&buffer, maxBytes: maxBytes)
+  }
+
+  public func readAllCChar() throws -> [CChar] {
+    var a = [CChar](count: length, repeatedValue: 0)
+    let n = try readCChar(&a, maxBytes: a.count)
+    if n != a.count {
+      throw FileError.Read
     }
     return a
   }
 
   public func readLines() throws -> [String?] {
     var r: [String?] = []
-    let a = try readCChar()
+    let a = try readAllCChar()
     var si = 0
     for i in 0..<a.count {
       if a[i] == 10 {

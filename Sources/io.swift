@@ -37,9 +37,9 @@ public class IO {
   }
 
   public static func readCChar(filePath: String) throws -> [CChar] {
-    var a: [CChar]?
-    try File.open(filePath, mode: .R) { f in a = try! f.readCChar() }
-    return a!
+    let f = try File(path: filePath)
+    defer { f.close() }
+    return try f.readAllCChar()
   }
 
   public static func write(filePath: String, string: String) throws -> Int {
