@@ -564,6 +564,7 @@ public struct BodyParser {
   mutating func inFileNameValue() throws {
     if stream[index] == 34 { // "
       index += 1
+      tokenIndex = index
       fileNameValue = ""
       entryParser = .FileNameValueStarted
     } else {
@@ -583,7 +584,7 @@ public struct BodyParser {
           throw BodyParserError.FileNameValue
         }
         entryParser = .FileNameValueEnd
-        index += 1
+        index = i + 1
         break
       } else if c >= 32 { // Space.
         // ignore
@@ -601,6 +602,7 @@ public struct BodyParser {
     if stream[index] == 13 { // Carriage return.
       entryParser = .LineFeed
       linedUpParser = .ContentType
+      index += 1
     } else {
       throw BodyParserError.FileNameValue
     }
@@ -711,7 +713,8 @@ public struct BodyParser {
       let c = stream[i]
       if boundTest3 && c == 13 {
         body.fields[nameValue] = collectString(i - boundary.count - 5)
-        index = length
+        index = length // Body exit.
+        done = true
         break
       }
       boundTest3 = false
