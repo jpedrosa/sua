@@ -5,11 +5,16 @@ public class File: CustomStringConvertible {
   var _fd: Int32
   public let path: String
 
-  init(path: String, mode: FileOperation = .R) throws {
+  init(path: String, fd: Int32) {
+    self.path = path
+    self._fd = fd
+  }
+
+  public init(path: String, mode: FileOperation = .R) throws {
     self.path = path
     _fd = Sys.openFile(path, operation: mode)
     if _fd == -1 {
-      throw FileError.FileException(message: "Failed to open file.")
+      throw FileError.Open
     }
   }
 
@@ -115,12 +120,10 @@ public class File: CustomStringConvertible {
 
   public func doRead(address: UnsafeMutablePointer<Void>, maxBytes: Int) throws
       -> Int {
-    if maxBytes < 0 {
-      try _error("Wrong read parameter value: negative maxBytes")
-    }
+    assert(maxBytes >= 0)
     let n = Sys.read(_fd, address: address, length: maxBytes)
     if n == -1 {
-      try _error("Failed to read from file")
+      throw FileError.Read
     }
     return n
   }
@@ -173,19 +176,14 @@ public class File: CustomStringConvertible {
 
   public static func delete(path: String) throws {
     if Sys.unlink(path) == -1 {
-      throw FileError.FileException(message: "Failed to delete file.")
+      throw FileError.Delete
     }
   }
 
   public static func rename(oldPath: String, newPath: String) throws {
     if Sys.rename(oldPath, newPath: newPath) == -1 {
-      throw FileError.FileException(message: "Failed to rename the file.")
+      throw FileError.Rename
     }
-  }
-
-  func _error(message: String) throws {
-    close()
-    throw FileError.FileException(message: message)
   }
 
   public var description: String { return "File(path: \(inspect(path)))" }
@@ -194,12 +192,20 @@ public class File: CustomStringConvertible {
 
 
 public enum FileError: ErrorType {
-  case FileException(message: String)
+  case Open
+  case Delete
+  case Rename
+  case Read
 }
 
 
 // The file will be closed and removed automatically when it can be garbage
 // collected.
+//
+// The file will be created with the file mode of read/write by the user.
+//
+// **Note**: If the process is cancelled (CTRL+C) or does not terminate
+// normally, the files may not be removed automatically.
 public class TempFile: File {
 
   init(prefix: String = "", suffix: String = "", directory: String? = nil)
@@ -212,11 +218,22 @@ public class TempFile: File {
         d += "/"
       }
     }
+
+    var fd: Int32 = -1
+    var attempts = 0
     var path = ""
-    repeat {
+    while fd == -1 {
       path = "\(d)\(prefix)\(RNG().nextUInt64())\(suffix)"
-    } while File.exists(path)
-    try super.init(path: path, mode: .W)
+      fd = Sys.openFile(path, operation: .W, mode: PosixSys.USER_RW_FILE_MODE)
+      if attempts >= 100 {
+        throw TempFileError.Create(message: "Too many attempts.")
+      } else if attempts % 10 == 0 {
+        IO.sleep(0.00000001)
+      }
+      attempts += 1
+    }
+
+    super.init(path: path, fd: fd)
   }
 
   deinit {
@@ -228,4 +245,9 @@ public class TempFile: File {
     Sys.unlink(path)
   }
 
+}
+
+
+public enum TempFileError: ErrorType {
+  case Create(message: String)
 }

@@ -58,6 +58,8 @@ public struct PosixSys {
   public static let DEFAULT_FILE_MODE = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP |
       S_IROTH
 
+  public static let USER_RW_FILE_MODE: UInt32 = S_IRUSR | S_IWUSR
+
   public static let SEEK_SET: Int32 = 0
   public static let SEEK_CUR: Int32 = 1
   public static let SEEK_END: Int32 = 2
