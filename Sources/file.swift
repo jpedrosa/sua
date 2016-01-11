@@ -24,7 +24,7 @@ public class File: CustomStringConvertible {
     write(string)
     if string.isEmpty || string.utf16.codeUnitAt(string.utf16.count - 1) != 10 {
       let a: [UInt8] = [10]
-      writeBytes(a)
+      writeBytes(a, maxBytes: a.count)
     }
   }
 
@@ -74,12 +74,12 @@ public class File: CustomStringConvertible {
     return Sys.writeString(_fd, string: string)
   }
 
-  public func writeBytes(bytes: [UInt8]) -> Int {
-    return Sys.write(_fd, address: bytes, length: bytes.count)
+  public func writeBytes(bytes: [UInt8], maxBytes: Int) -> Int {
+    return Sys.write(_fd, address: bytes, length: maxBytes)
   }
 
-  public func writeCChar(bytes: [CChar]) -> Int {
-    return Sys.write(_fd, address: bytes, length: bytes.count)
+  public func writeCChar(bytes: [CChar], maxBytes: Int) -> Int {
+    return Sys.write(_fd, address: bytes, length: maxBytes)
   }
 
   public func flush() {

@@ -51,14 +51,18 @@ public class IO {
   public static func writeBytes(filePath: String,
       bytes: [UInt8]) throws -> Int {
     var n: Int? = -1
-    try File.open(filePath, mode: .W) { f in n = f.writeBytes(bytes) }
+    try File.open(filePath, mode: .W) { f in
+      n = f.writeBytes(bytes, maxBytes: bytes.count)
+    }
     return n!
   }
 
   public static func writeCChar(filePath: String,
       bytes: [CChar]) throws -> Int {
     var n: Int? = -1
-    try File.open(filePath, mode: .W) { f in n = f.writeCChar(bytes) }
+    try File.open(filePath, mode: .W) { f in
+      n = f.writeCChar(bytes, maxBytes: bytes.count)
+    }
     return n!
   }
 

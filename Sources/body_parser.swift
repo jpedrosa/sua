@@ -272,6 +272,16 @@ public struct BodyParser {
     if tokenIndex >= 0 {
       addToTokenBuffer(stream, startIndex: tokenIndex, endIndex: length)
       tokenIndex = 0 // Set it at 0 to continue supporting addToTokenBuffer.
+      if let tf = tempFile {
+        if tokenBufferEnd >= 4096 {
+          let len = tokenBufferEnd - 80
+          tf.writeBytes(tokenBuffer, maxBytes: len)
+          for i in 0..<80 {
+            tokenBuffer[i] = tokenBuffer[len + i]
+          }
+          tokenBufferEnd = 80
+        }
+      }
     }
   }
 
@@ -729,7 +739,8 @@ public struct BodyParser {
       if boundTest3 && c == 13 {
         let ei = i - boundary.count - 5
         if let tf = tempFile {
-          tf.writeBytes(collectToken(ei))
+          let bb = collectToken(ei)
+          tf.writeBytes(bb, maxBytes: bb.count)
           body.files[nameValue] = BodyFile(name: fileNameValue,
               contentType: contentTypeValue, file: tf)
           tempFile = nil
@@ -749,7 +760,8 @@ public struct BodyParser {
         if c == 13 {
           let ei = i - boundary.count - 3
           if let tf = tempFile {
-            tf.writeBytes(collectToken(ei))
+            let bb = collectToken(ei)
+            tf.writeBytes(bb, maxBytes: bb.count)
             body.files[nameValue] = BodyFile(name: fileNameValue,
                 contentType: contentTypeValue, file: tf)
             tempFile = nil
