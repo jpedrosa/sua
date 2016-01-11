@@ -5,7 +5,8 @@ public class File: CustomStringConvertible {
   var _fd: Int32
   public let path: String
 
-  init(path: String, fd: Int32) {
+  // Lower level constructor. The validity of the fd parameter is not checked.
+  public init(path: String, fd: Int32) {
     self.path = path
     self._fd = fd
   }
