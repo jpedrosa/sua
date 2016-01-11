@@ -31,9 +31,9 @@ public class IO {
   }
 
   public static func readBytes(filePath: String) throws -> [UInt8] {
-    var a: [UInt8]?
-    try File.open(filePath, mode: .R) { f in a = try! f.readBytes() }
-    return a!
+    let f = try File(path: filePath)
+    defer { f.close() }
+    return try f.readAllBytes()
   }
 
   public static func readCChar(filePath: String) throws -> [CChar] {
@@ -76,4 +76,9 @@ public class IO {
     try PopenStream.readBytes(command, maxBytes: maxBytes, fn: fn)
   }
 
+}
+
+
+enum IOError: ErrorType {
+  case readBytes
 }

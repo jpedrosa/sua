@@ -37,12 +37,15 @@ public class File: CustomStringConvertible {
     return String.fromCharCodes(a)
   }
 
-  public func readBytes(maxBytes: Int = -1) throws -> [UInt8] {
-    let len = maxBytes < 0 ? length : maxBytes
-    var a = [UInt8](count: len, repeatedValue: 0)
-    let n = try doRead(&a, maxBytes: len)
-    if n < maxBytes {
-      a = [UInt8](a[0..<n])
+  public func readBytes(inout buffer: [UInt8], maxBytes: Int) throws -> Int {
+    return try doRead(&buffer, maxBytes: maxBytes)
+  }
+
+  public func readAllBytes() throws -> [UInt8] {
+    var a = [UInt8](count: length, repeatedValue: 0)
+    let n = try readBytes(&a, maxBytes: a.count)
+    if n != a.count {
+      throw FileError.Read
     }
     return a
   }
