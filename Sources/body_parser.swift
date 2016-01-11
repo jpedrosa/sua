@@ -732,10 +732,10 @@ public struct BodyParser {
       let c = stream[i]
       if boundTest3 && c == 13 {
         let ei = i - boundary.count - 5
-        if isContentFile {
-          tempFile!.writeBytes(collectToken(ei))
+        if let tf = tempFile {
+          tf.writeBytes(collectToken(ei))
           body.files[nameValue] = BodyFile(name: fileNameValue,
-              contentType: contentTypeValue, file: tempFile!)
+              contentType: contentTypeValue, file: tf)
           tempFile = nil
         } else {
           body.fields[nameValue] = collectString(ei)
@@ -752,10 +752,10 @@ public struct BodyParser {
       if boundTest1 {
         if c == 13 {
           let ei = i - boundary.count - 3
-          if isContentFile {
-            tempFile!.writeBytes(collectToken(ei))
+          if let tf = tempFile {
+            tf.writeBytes(collectToken(ei))
             body.files[nameValue] = BodyFile(name: fileNameValue,
-                contentType: contentTypeValue, file: tempFile!)
+                contentType: contentTypeValue, file: tf)
             tempFile = nil
           } else {
             body.fields[nameValue] = collectString(ei)
