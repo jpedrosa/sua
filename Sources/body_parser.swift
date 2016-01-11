@@ -133,6 +133,7 @@ enum BodyParserEntry {
   case ContentTypeValueStarted
   case ContentValue
   case ContentBody
+  case ContentBodyStarted
   case ContentData
   case ContentDataStarted
   case ContentFile
@@ -250,6 +251,8 @@ public struct BodyParser {
         try inContentTypeValueStarted()
       case .ContentBody:
         try inContentBody()
+      case .ContentBodyStarted:
+        try inContentBodyStarted()
       case .ContentData:
         try inContentData()
       case .ContentDataStarted:
@@ -689,7 +692,17 @@ public struct BodyParser {
   mutating func inContentBody() throws {
     if stream[index] == 10 {
       index += 1
-      entryParser = .ContentData
+      entryParser = .ContentBodyStarted
+    } else {
+      throw BodyParserError.ContentBody
+    }
+  }
+
+  mutating func inContentBodyStarted() throws {
+    if stream[index] == 13 {
+      index += 1
+      entryParser = .LineFeed
+      linedUpParser = .ContentData
     } else {
       throw BodyParserError.ContentBody
     }
