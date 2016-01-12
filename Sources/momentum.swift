@@ -158,7 +158,7 @@ public class Response {
   }
 
   public func sendFile(path: String) throws {
-    writeBytes(try IO.readBytes(path))
+    writeBytes(try IO.readAllBytes(path))
   }
 
   func concatFields() -> String {

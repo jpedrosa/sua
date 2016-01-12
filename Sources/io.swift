@@ -30,13 +30,13 @@ public class IO {
     return a!
   }
 
-  public static func readBytes(filePath: String) throws -> [UInt8] {
+  public static func readAllBytes(filePath: String) throws -> [UInt8] {
     let f = try File(path: filePath)
     defer { f.close() }
     return try f.readAllBytes()
   }
 
-  public static func readCChar(filePath: String) throws -> [CChar] {
+  public static func readAllCChar(filePath: String) throws -> [CChar] {
     let f = try File(path: filePath)
     defer { f.close() }
     return try f.readAllCChar()
