@@ -146,15 +146,10 @@ public class File: CustomStringConvertible {
   }
 
   public static func open(path: String, mode: FileOperation = .R,
-      fn: ((f: File) -> Void )?) throws -> File {
+      fn: (f: File) throws -> Void) throws {
     let f = try File(path: path, mode: mode)
-    defer {
-      f.close()
-    }
-    if let af = fn {
-      af(f: f)
-    }
-    return f
+    defer { f.close() }
+    try fn(f: f)
   }
 
   public static func exists(path: String) -> Bool {

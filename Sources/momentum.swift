@@ -1,6 +1,6 @@
 
 
-public typealias MomentumHandler = (req: Request, res: Response) -> Void
+public typealias MomentumHandler = (req: Request, res: Response) throws -> Void
 
 
 public class Momentum {
@@ -19,18 +19,18 @@ public class Momentum {
           if request.method == "GET" {
             if let ah = Momentum.handlersGet[request.uri] {
               handled = true
-              ah(req: request, res: response)
+              try ah(req: request, res: response)
             }
           } else if request.method == "POST" {
             if let ah = Momentum.handlersPost[request.uri] {
               handled = true
-              ah(req: request, res: response)
+              try ah(req: request, res: response)
             }
           }
         }
 
         if !handled {
-          handler(req: request, res: response)
+          try handler(req: request, res: response)
         }
         response.doFlush()
       } catch (let e) {
