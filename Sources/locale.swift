@@ -98,6 +98,38 @@ public class Locale {
     return sb
   }
 
+  public func formatDouble(f: Double, precision: Int = 2) -> String {
+    var p = 1
+    for _ in 0..<precision {
+      p *= 10
+    }
+    let neutral = Sys.abs(Sys.round((f * Double(p))))
+    var s = ""
+    let a = "\(neutral)".characters
+    let len = a.count
+    var dot = len - precision
+    if f < 0 {
+      s += "-"
+    }
+    if dot <= 0 {
+      dot = 1
+    }
+    let pad = precision - len
+    var i = 0
+    while i <= pad {
+      s += i == dot ? ".0" : "0"
+      i += 1
+    }
+    for c in a {
+      if i == dot {
+        s += "."
+      }
+      s.append(c)
+      i += 1
+    }
+    return s
+  }
+
   // Default, constant locale that can be used when the format requires
   // American, English or standard system compatibility.
   public static let one = Locale()

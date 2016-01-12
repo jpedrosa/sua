@@ -237,6 +237,18 @@ public struct PosixSys {
     Glibc.gmtime_r(&n, buffer)
   }
 
+  public func abs(n: Int32) -> Int32 {
+    return Glibc.abs(n)
+  }
+
+  public func abs(n: Int) -> Int {
+    return Glibc.labs(n)
+  }
+
+  public func round(f: Double) -> Int {
+    return Int(Glibc.round(f))
+  }
+
   // The environ variable is made available by the CSua sister project
   // dependency.
   public var environment: [String: String] {
