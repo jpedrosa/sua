@@ -18,16 +18,16 @@ public class IO {
     Sys.fflush()
   }
 
-  public static func read(filePath: String) throws -> String {
-    var s: String?
-    try File.open(filePath, mode: .R) { f in s = try! f.read() }
-    return s!
+  public static func read(filePath: String) throws -> String? {
+    let f = try File(path: filePath)
+    defer { f.close() }
+    return try f.read()
   }
 
   public static func readLines(filePath: String) throws -> [String?] {
-    var a: [String?]?
-    try File.open(filePath, mode: .R) { f in a = try! f.readLines() }
-    return a!
+    let f = try File(path: filePath)
+    defer { f.close() }
+    return try f.readLines()
   }
 
   public static func readAllBytes(filePath: String) throws -> [UInt8] {
@@ -43,27 +43,23 @@ public class IO {
   }
 
   public static func write(filePath: String, string: String) throws -> Int {
-    var n: Int? = -1
-    try File.open(filePath, mode: .W) { f in n = f.write(string) }
-    return n!
+    let f = try File(path: filePath)
+    defer { f.close() }
+    return f.write(string)
   }
 
   public static func writeBytes(filePath: String,
       bytes: [UInt8]) throws -> Int {
-    var n: Int? = -1
-    try File.open(filePath, mode: .W) { f in
-      n = f.writeBytes(bytes, maxBytes: bytes.count)
-    }
-    return n!
+    let f = try File(path: filePath)
+    defer { f.close() }
+    return f.writeBytes(bytes, maxBytes: bytes.count)
   }
 
   public static func writeCChar(filePath: String,
       bytes: [CChar]) throws -> Int {
-    var n: Int? = -1
-    try File.open(filePath, mode: .W) { f in
-      n = f.writeCChar(bytes, maxBytes: bytes.count)
-    }
-    return n!
+    let f = try File(path: filePath)
+    defer { f.close() }
+    return f.writeCChar(bytes, maxBytes: bytes.count)
   }
 
   public static func popen(command: String, lineLength: Int32 = 80,
