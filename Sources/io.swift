@@ -44,21 +44,21 @@ public class IO {
   }
 
   public static func write(filePath: String, string: String) throws -> Int {
-    let f = try File(path: filePath)
+    let f = try File(path: filePath, mode: .W)
     defer { f.close() }
     return f.write(string)
   }
 
   public static func writeBytes(filePath: String, bytes: [UInt8],
       maxBytes: Int) throws -> Int {
-    let f = try File(path: filePath)
+    let f = try File(path: filePath, mode: .W)
     defer { f.close() }
     return f.writeBytes(bytes, maxBytes: maxBytes)
   }
 
   public static func writeCChar(filePath: String, bytes: [CChar],
       maxBytes: Int) throws -> Int {
-    let f = try File(path: filePath)
+    let f = try File(path: filePath, mode: .W)
     defer { f.close() }
     return f.writeCChar(bytes, maxBytes: maxBytes)
   }
