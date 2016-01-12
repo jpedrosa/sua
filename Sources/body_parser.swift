@@ -736,6 +736,17 @@ public struct BodyParser {
     }
   }
 
+  mutating func storeFile(endIndex: Int) {
+    let bb = collectToken(endIndex)
+    tempFile!.writeBytes(bb, maxBytes: bb.count)
+    if let oldFile = body.files[nameValue] {
+      (oldFile.file as! TempFile).closeAndUnlink()
+    }
+    body.files[nameValue] = BodyFile(name: fileNameValue,
+        contentType: contentTypeValue, file: tempFile!)
+    tempFile = nil
+  }
+
   mutating func inContentDataStarted() throws {
     var i = index
     let len = length
@@ -744,12 +755,8 @@ public struct BodyParser {
       let c = stream[i]
       if boundTest3 && c == 13 {
         let ei = i - boundary.count - 5
-        if let tf = tempFile {
-          let bb = collectToken(ei)
-          tf.writeBytes(bb, maxBytes: bb.count)
-          body.files[nameValue] = BodyFile(name: fileNameValue,
-              contentType: contentTypeValue, file: tf)
-          tempFile = nil
+        if tempFile != nil {
+          storeFile(ei)
         } else {
           body.fields[nameValue] = collectString(ei)
         }
@@ -765,12 +772,8 @@ public struct BodyParser {
       if boundTest1 {
         if c == 13 {
           let ei = i - boundary.count - 3
-          if let tf = tempFile {
-            let bb = collectToken(ei)
-            tf.writeBytes(bb, maxBytes: bb.count)
-            body.files[nameValue] = BodyFile(name: fileNameValue,
-                contentType: contentTypeValue, file: tf)
-            tempFile = nil
+          if tempFile != nil {
+            storeFile(ei)
           } else {
             body.fields[nameValue] = collectString(ei)
           }
