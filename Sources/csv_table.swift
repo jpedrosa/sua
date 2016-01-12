@@ -247,8 +247,36 @@ public struct CSVTable {
     }
   }
 
+  public var data: String {
+    var s = "\(serialId)\n"
+    var comma = false
+    for c in _header {
+      if comma { s += "," }
+      s += CSVTable.escape(c)
+      comma = true
+    }
+    s += "\n"
+    if !_rows.isEmpty {
+      for row in _rows {
+        var comma = false
+        for c in row {
+          if comma { s += "," }
+          s += CSVTable.escape(c)
+          comma = true
+        }
+        s += "\n"
+      }
+      s += "\n"
+    }
+    return s
+  }
+
+  public func save() throws {
+    try IO.write(path, string: data)
+  }
+
   // This makes sure the data is escaped for double quote, comma and new line.
-  func escape(string: String) -> String {
+  public static func escape(string: String) -> String {
     let len = string.utf16.count
     var i = 0
     while i < len {
@@ -278,32 +306,15 @@ public struct CSVTable {
     return string
   }
 
-  public var data: String {
-    var s = "\(serialId)\n"
-    var comma = false
-    for c in _header {
-      if comma { s += "," }
+  public static func create(path: String, header: [String]) throws -> CSVTable {
+    var s = "0\nid"
+    for c in header {
+      s += ","
       s += escape(c)
-      comma = true
     }
     s += "\n"
-    if !_rows.isEmpty {
-      for row in _rows {
-        var comma = false
-        for c in row {
-          if comma { s += "," }
-          s += escape(c)
-          comma = true
-        }
-        s += "\n"
-      }
-      s += "\n"
-    }
-    return s
-  }
-
-  public func save() throws {
-    try IO.write(path, string: data)
+    try IO.write(path, string: s)
+    return try CSVTable(path: path)
   }
 
 }
