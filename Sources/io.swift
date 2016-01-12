@@ -18,10 +18,11 @@ public class IO {
     Sys.fflush()
   }
 
-  public static func read(filePath: String) throws -> String? {
+  public static func read(filePath: String, maxBytes: Int = -1) throws
+      -> String? {
     let f = try File(path: filePath)
     defer { f.close() }
-    return try f.read()
+    return try f.read(maxBytes)
   }
 
   public static func readLines(filePath: String) throws -> [String?] {
@@ -48,18 +49,18 @@ public class IO {
     return f.write(string)
   }
 
-  public static func writeBytes(filePath: String,
-      bytes: [UInt8]) throws -> Int {
+  public static func writeBytes(filePath: String, bytes: [UInt8],
+      maxBytes: Int) throws -> Int {
     let f = try File(path: filePath)
     defer { f.close() }
-    return f.writeBytes(bytes, maxBytes: bytes.count)
+    return f.writeBytes(bytes, maxBytes: maxBytes)
   }
 
-  public static func writeCChar(filePath: String,
-      bytes: [CChar]) throws -> Int {
+  public static func writeCChar(filePath: String, bytes: [CChar],
+      maxBytes: Int) throws -> Int {
     let f = try File(path: filePath)
     defer { f.close() }
-    return f.writeCChar(bytes, maxBytes: bytes.count)
+    return f.writeCChar(bytes, maxBytes: maxBytes)
   }
 
   public static func popen(command: String, lineLength: Int32 = 80,
