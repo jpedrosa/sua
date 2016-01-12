@@ -309,6 +309,14 @@ public struct BodyParser {
     return String.fromCharCodes(collectToken(endIndex))
   }
 
+  mutating func collectFormUrlDecodedString(endIndex: Int) -> String? {
+    let a = collectToken(endIndex)
+    if let b = HexaUtils.formUrlDecode(a, maxBytes: a.count) {
+      return String.fromCharCodes(b)
+    }
+    return nil
+  }
+
   mutating func inBody() throws {
     let i = index
     let c = stream[i]
@@ -383,7 +391,7 @@ public struct BodyParser {
     var i = index
     let len = length
     func process() throws {
-      if let k = collectString(i) {
+      if let k = collectFormUrlDecodedString(i) {
         keyToken = k
       } else {
         throw BodyParserError.Key
@@ -433,12 +441,12 @@ public struct BodyParser {
       let c = stream[i]
       if c == 38 { // &
         entryParser = .NextKey
-        body[keyToken] = collectString(i)
+        body[keyToken] = collectFormUrlDecodedString(i)
         break
       } else if c >= 32 {
         // ignore
       } else if c == 0 {
-        body[keyToken] = collectString(i)
+        body[keyToken] = collectFormUrlDecodedString(i)
         done = true
         index = length // Done. Exit.
         break
