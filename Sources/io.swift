@@ -74,8 +74,3 @@ public class IO {
   }
 
 }
-
-
-enum IOError: ErrorType {
-  case readBytes
-}
