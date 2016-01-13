@@ -22,7 +22,8 @@ sweeter.
 Great news! With the [Momentum](docs/Momentum.md) web server, and a handful of
 supporting classes like [HeaderParser](Sources/header_parser.swift),
 [BodyParser](Sources/body_parser.swift),
-[Template.supplant](Sources/template.swift), we have found a use for many APIs.
+[Template.supplant](Sources/template.swift),
+[CSVTable](Sources/csv_table.swift), we have found a use for many APIs.
 It helped to put to use some of the earlier APIs, with many of them being
 refactored as they started to mature.
 
