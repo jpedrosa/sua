@@ -21,7 +21,7 @@ enum CSVTableParserEntry {
 // The very first column is already labeled by default with "id".
 //
 // * From the third row onwards we find the actual data rows. They all start
-// the id column.
+// with the id column.
 //
 // * All rows should end with just the newline character(\n or 10).
 //
