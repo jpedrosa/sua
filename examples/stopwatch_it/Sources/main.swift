@@ -32,7 +32,7 @@ FileBrowser.recurseDir("/home/dewd/t_") { (name, type, path) in
     var fp = "\(path)\(name)"
     try! File.open(fp) { f in
       do {
-        var a = try f.readBytes()
+        var a = try f.readAllBytes()
         m[fp] = String(MurmurHash3.hash32Bytes(a, maxBytes: a.count))
       } catch {
         p("(failed to read file: \(fp))")
