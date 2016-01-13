@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>TODO in Sua</title>
+  <style>
+    .doneButton {
+      width: 120px;
+    }
+    .notDoneButton {
+      width: 120px;
+    }
+    .donePanel {
+      background-color: #EEFFEE;
+    }
+    .doneDescription {
+      text-decoration: line-through;
+    }
+    .deleteButton {
+      padding: 0px;
+      width: 16px;
+      height: 16px;
+      background-color: white;
+      color: red;
+      border: 1px solid gray;
+    }
+    body {
+      background-image: url("/bg.png");
+    }
+  </style>
+</head>
+<body>
+<p>List of todos:</p>
+[S%= list S]
+<form name="todoForm" method="post" action="../add">
+  <input type="text" name="description" placeholder="Description">
+  <button type="submit">Add</button>
+</form>
+<br />
+<p>Choose a background image for this page and upload it below:</p>
+<form name="pictureForm" action="/setbg" method="post" enctype="multipart/form-data">
+  <input type="file" name="picture">
+  <input type="submit">
+</form>
+<script>
+  function toggleDone(index) {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      if (xhttp.readyState == 4 && xhttp.status == 200) {
+        location.reload();
+      }
+    };
+    xhttp.open("POST", "/update", true);
+    xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    xhttp.send("toggleDone=" + index);
+  }
+  function deleteTodo(index) {
+    if (confirm("Confirm the deletion of the todo?")) {
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+        if (xhttp.readyState == 4 && xhttp.status == 200) {
+          location.reload();
+        }
+      };
+      xhttp.open("POST", "/delete", true);
+      xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+      xhttp.send("index=" + index);
+    }
+  }
+</script>
+</body>
+</html>

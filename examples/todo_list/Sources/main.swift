@@ -109,12 +109,16 @@ if Process.arguments.count == 1 {
   let d = Process.arguments[1]
   if let st = File.stat(d) {
     if st.isDirectory {
+      let cd = Dir.cwd ?? ""
       if d.utf16.codeUnitAt(d.utf16.count - 1) != 47 { // /
-        webDirectoryPath = "\(d)/"
+        webDirectoryPath = "\(cd)/\(d)/"
       } else {
-        webDirectoryPath = d
+        webDirectoryPath = "\(cd)/\(d)"
       }
-      try Momentum.listen(8777) { req, res in
+      let port: UInt16 = 8777
+      print("Starting the server on 127.0.0.1:\(8777)")
+      print("Serving from the \(webDirectoryPath) directory.")
+      try Momentum.listen(port) { req, res in
         res.statusCode = 404
         res.write("<p>Error 404: Could not find the page.</p>\(req)")
       }
