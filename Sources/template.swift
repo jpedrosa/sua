@@ -30,13 +30,14 @@ public class Template {
           i += 1
         }
         var c = a[i]
-        if c == 95 || (c >= 65 && c <= 90) || (c >= 97 && c <= 122) {
+        if (c >= 97 && c <= 122) || (c >= 65 && c <= 90) || c == 95 {
           let tokenIndex = i
           repeat {
             i += 1
             c = a[i]
-          } while i < clen && (c == 95 || (c >= 65 && c <= 90) || // _ A-Z
-              (c >= 97 && c <= 122) || (c >= 48 && c <= 57)) && // a-z 0-9
+          } while i < clen && ((c >= 97 && c <= 122) || // a-z
+              (c >= 65 && c <= 90) || (c >= 48 && c <= 57) || // A-Z 0-9
+              c == 95) && // _
               !(c == 83 && a[i + 1] == 93) // S]
           let ei = i
           while i < clen && a[i] == 32 {
