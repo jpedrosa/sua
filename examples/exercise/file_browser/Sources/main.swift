@@ -5,7 +5,7 @@ import Sua
 
 
 func printFileContent(path: String) throws {
-  let a = try IO.readBytes(path)
+  let a = try IO.readAllBytes(path)
   Stdout.writeBytes(a, maxBytes: a.count)
 }
 
