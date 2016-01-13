@@ -24,7 +24,11 @@ var sa = SocketAddress(hostName: addressName)
 p(sa.ip4ToUInt32())
 p(sa.ip4ToString())
 p(sa.ip6ToString())
-printList(sa.ip4ToStringList() ?? [])
+if let a = sa.ip4ToStringList() {
+  for ip in a {
+    printList(ip)
+  }
+}
 
 
 var count = 0
