@@ -56,7 +56,7 @@ public struct CSVTable {
   var _row = [String]()
   var unescapedColumnValue = ""
 
-  init(path: String) throws {
+  public init(path: String) throws {
     _path = path
     try load()
   }

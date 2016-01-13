@@ -89,7 +89,7 @@ Momentum.get("/bg.png") { req, res in
 Momentum.post("/setbg") { req, res in
   if let b = req.body,
       let bf = b.files["picture"] {
-    try bf.rename(bgImagePath)
+    try bf.rename("\(webDirectoryPath)bg.png")
   }
   res.redirectTo("/list")
 }
@@ -109,6 +109,11 @@ if Process.arguments.count == 1 {
   let d = Process.arguments[1]
   if let st = File.stat(d) {
     if st.isDirectory {
+      if d.utf16.codeUnitAt(d.utf16.count - 1) != 47 { // /
+        webDirectoryPath = "\(d)/"
+      } else {
+        webDirectoryPath = d
+      }
       try Momentum.listen(8777) { req, res in
         res.statusCode = 404
         res.write("<p>Error 404: Could not find the page.</p>\(req)")
