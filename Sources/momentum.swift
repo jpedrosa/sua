@@ -82,9 +82,7 @@ public class Request: CustomStringConvertible {
     var n = 0
     repeat {
       n = socket.read(&buffer, maxBytes: len)
-      if n > 0 {
-        try headerParser.parse(buffer, maxBytes: n)
-      }
+      try headerParser.parse(buffer, maxBytes: n)
     } while n > 0 && !headerParser.isDone
 
     header = headerParser.header
@@ -92,16 +90,14 @@ public class Request: CustomStringConvertible {
     if n != 0 && headerParser.isDone && header.method == "POST" {
       var bodyParser = BodyParser()
       let bi = headerParser.bodyIndex
-      if bi != -1 {
+      if bi != -1 && buffer[bi] != 0 {
         try bodyParser.parse(buffer, index: bi, maxBytes: len)
       }
       if !bodyParser.isDone {
         repeat {
           n = socket.read(&buffer, maxBytes: len)
-          if n > 0 {
-            try bodyParser.parse(buffer, index: 0, maxBytes: n)
-          }
-        } while n > 0 && !headerParser.isDone
+          try bodyParser.parse(buffer, index: 0, maxBytes: n)
+        } while n > 0 && !bodyParser.isDone
       }
       _body = bodyParser.body
     }
