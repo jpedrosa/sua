@@ -84,30 +84,33 @@ try File.open("/home/dewd/t_/nope_new.txt", mode: .W) { f in
 }
 
 try File.open("/home/dewd/t_/nope_new.txt", mode: .R) { f in
-  p(try! f.readBytes())
+  p(try f.readAllBytes())
 }
 
 try File.open("/home/dewd/t_/nope_new.txt", mode: .R) { f in p(try! f.read()) }
 
-p(try! IO.readLines("/home/dewd/t_/sample.txt"))
+p(try IO.readLines("/home/dewd/t_/sample.txt"))
 
-p(try IO.writeBytes("/home/dewd/t_/many_tries.txt", bytes: a))
+p(try IO.writeBytes("/home/dewd/t_/many_tries.txt", bytes: a,
+      maxBytes: a.count))
 
 p(Dir.cwd)
 
-p(try! IO.readBytes("/home/dewd/t_/swift_playground/a.out"))
+p(try IO.readAllBytes("/home/dewd/t_/swift_playground/a.out"))
 
 let jug: [CChar] = [125, 0, 1, -67, -10]
 
-p(try IO.writeCChar("/home/dewd/t_/byte_depot.txt", bytes: jug))
+p(try IO.writeCChar("/home/dewd/t_/byte_depot.txt", bytes: jug,
+      maxBytes: jug.count))
 
-p(try! IO.readCChar("/home/dewd/t_/swift_playground/a.out"))
+p(try IO.readAllCChar("/home/dewd/t_/swift_playground/a.out"))
 
 let spoil: [UInt8] = [255, 244, 50, 120, 0]
 
-p(try IO.writeBytes("/home/dewd/t_/spoil.bin", bytes: spoil))
+p(try IO.writeBytes("/home/dewd/t_/spoil.bin", bytes: spoil,
+      maxBytes: spoil.count))
 
-p(try! IO.readCChar("/home/dewd/t_/spoil.bin"))
+p(try IO.readAllCChar("/home/dewd/t_/spoil.bin"))
 
 try File.open("/home/dewd/t_/nope_new.txt", mode: .R) { f in
   p("isOpen? \(f.isOpen); fd: \(f.fd)")
