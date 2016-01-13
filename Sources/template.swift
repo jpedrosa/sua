@@ -53,6 +53,8 @@ public class Template {
               }
             }
           }
+        } else {
+          i -= 1
         }
       }
       i += 1
