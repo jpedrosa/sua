@@ -17,6 +17,17 @@ sweeter.
 
 ----------
 
+**News - January 13, 2016**
+
+Great news! With the [Momentum](docs/Momentum.md) web server, and a handful of
+supporting classes like [HeaderParser](Sources/header_parser.swift),
+[BodyParser](Sources/body_parser.swift),
+[Template.supplant](Sources/template.swift), we have found a use for many APIs.
+It helped to put to use some of the earlier APIs, with many of them being
+refactored as they started to mature.
+
+----------
+
 **News - December 30, 2015**
 
 We have added the [LICENSE.txt](LICENSE.txt) file and took the opportunity to
@@ -82,6 +93,7 @@ Progress Notes
 --------------
 *LATEST*
 
+* [Momentum](docs/Momentum.md)
 * [ServerSocket](docs/ServerSocket.md)
 * [Time](docs/Time.md)
 * [File Browser](docs/File_Browser.md)
