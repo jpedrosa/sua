@@ -20,7 +20,7 @@ address.sin_family = UInt16(AF_INET)
 address.sin_addr.s_addr = inet_addr("127.0.0.1") //INADDR_ANY
 var portNumber: UInt16 = 9123
 
-address.sin_port = ByteOrder.htons(portNumber)
+address.sin_port = portNumber.bigEndian
 
 var addrlen = UInt32(sizeofValue(address))
 
