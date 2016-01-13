@@ -247,6 +247,22 @@ public struct CSVTable {
     }
   }
 
+  mutating public func updateColumn(index: String, columnIndex: Int,
+        value: String) {
+    let n = findIndex(index)
+    if n >= 0 {
+      _rows[n][columnIndex] = value
+    }
+  }
+
+  mutating public func select(index: String) -> [String]? {
+    let n = findIndex(index)
+    if n >= 0 {
+      return _rows[n]
+    }
+    return nil
+  }
+
   public var data: String {
     var s = "\(serialId)\n"
     var comma = false
