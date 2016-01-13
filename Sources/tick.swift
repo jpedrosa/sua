@@ -11,7 +11,7 @@ public class Tick {
 
   public static var millis: Int {
     var ts = timespec()
-    clock_gettime(CLOCK_REALTIME, &ts)
+    clock_gettime(CLOCK_MONOTONIC, &ts)
     return (ts.tv_sec * 1000) + Int(ts.tv_nsec / 1000000)
   }
 
