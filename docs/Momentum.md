@@ -233,3 +233,9 @@ Percentage of the requests served within a certain time (ms)
 
 Some of the APIs could be used on their own separate from the Sua project. Be
 sure to borrow them for your own needs! :-)
+
+And a screenshot of the TodoList:
+
+![Todo List screenshot](../examples/todo_list/docs/images/todolist.png)
+
+Have fun!
