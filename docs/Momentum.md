@@ -164,7 +164,7 @@ if Process.arguments.count == 1 {
 ```
 
 In the end, creating the
-[TodoList example](../examples/todo_list/Sources/main.swift) really pushed
+[TodoList example](../examples/todo_list) really pushed
 me to come up with all the tools that would allow it to be possible.
 
 The BodyParser class can parse form content and files, and will return them via
