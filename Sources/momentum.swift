@@ -179,6 +179,11 @@ public class Response {
     flushed = true
   }
 
+  public func redirectTo(url: String) {
+    statusCode = 302
+    fields["Location"] = url
+  }
+
   public var contentType: String? {
     get { return fields["Content-Type"] }
     set { fields["Content-Type"] = newValue }
