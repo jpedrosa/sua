@@ -113,8 +113,6 @@ enum BodyParserEntry {
   case ValueStarted
   case Space
   case LineFeed
-  case Semicolon
-  case Equal
   case BeginMultipart
   case BeginMultipartStarted
   case MatchToken
@@ -143,7 +141,6 @@ enum BodyParserEntry {
   case ContentDataStarted
   case ContentFile
   case ContentFileStarted
-  case EndMultipart
 }
 
 
