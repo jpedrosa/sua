@@ -15,38 +15,30 @@ public class Popen {
     return FileStream(fp: fp)
   }
 
+  public static func doClose(fs: FileStream) {
+    if let fp = fs.fp {
+      Sys.pclose(fp)
+      fs.fp = nil
+    }
+  }
+
   public static func readAllCChar(command: String) throws -> [CChar] {
     let fs = try doPopen(command)
-    defer {
-      if let afp = fs.fp {
-        Sys.pclose(afp)
-        fs.fp = nil
-      }
-    }
+    defer { doClose(fs) }
     return try fs.readAllCChar(command)
   }
 
   public static func readLines(command: String, fn: (string: String?)
       -> Void) throws {
     let fs = try doPopen(command)
-    defer {
-      if let afp = fs.fp {
-        Sys.pclose(afp)
-        fs.fp = nil
-      }
-    }
+    defer { doClose(fs) }
     try fs.readLines(command, fn: fn)
   }
 
   public static func readByteLines(command: String, maxBytes: Int = 80,
       fn: (bytes: [UInt8], length: Int) -> Void) throws {
     let fs = try doPopen(command)
-    defer {
-      if let afp = fs.fp {
-        Sys.pclose(afp)
-        fs.fp = nil
-      }
-    }
+    defer { doClose(fs) }
     try fs.readByteLines(command, maxBytes: maxBytes, fn: fn)
   }
 
