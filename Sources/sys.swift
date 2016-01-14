@@ -45,7 +45,7 @@ public typealias CTimespec = timespec
 
 public typealias CTime = tm
 
-typealias CFilePointer = UnsafeMutablePointer<FILE>
+public typealias CFilePointer = UnsafeMutablePointer<FILE>
 
 
 func statStruct() -> CStat {
@@ -119,7 +119,7 @@ public struct PosixSys {
     return retry { Glibc.close(fd) }
   }
 
-  public func fflush(stream: UnsafeMutablePointer<FILE> = nil) -> Int32 {
+  public func fflush(stream: CFilePointer = nil) -> Int32 {
     return Glibc.fflush(stream)
   }
 
@@ -179,21 +179,21 @@ public struct PosixSys {
   }
 
   public func fgets(buffer: UnsafeMutablePointer<CChar>, length: Int32,
-      fp: UnsafeMutablePointer<FILE>) -> UnsafeMutablePointer<CChar> {
+      fp: CFilePointer) -> UnsafeMutablePointer<CChar> {
     return Glibc.fgets(buffer, length, fp)
   }
 
   public func fread(buffer: UnsafeMutablePointer<Void>, size: Int,
-      nmemb: Int, fp: UnsafeMutablePointer<FILE>) -> Int {
+      nmemb: Int, fp: CFilePointer) -> Int {
     return Glibc.fread(buffer, size, nmemb, fp)
   }
 
   public func popen(command: String, operation: PopenOperation = .R)
-      -> UnsafeMutablePointer<FILE> {
+      -> CFilePointer {
     return Glibc.popen(command, operation.rawValue)
   }
 
-  public func pclose(fp: UnsafeMutablePointer<FILE>) -> Int32 {
+  public func pclose(fp: CFilePointer) -> Int32 {
     return Glibc.pclose(fp)
   }
 
