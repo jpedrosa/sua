@@ -201,11 +201,6 @@ public struct PosixSys {
     return Glibc.pclose(fp)
   }
 
-  public func getenv(key: String) -> String? {
-    let vp = Glibc.getenv(key)
-    return vp != nil ? String.fromCString(vp) : nil
-  }
-
   public func isatty(fd: Int32) -> Bool {
     return Glibc.isatty(fd) == 1
   }
@@ -255,6 +250,19 @@ public struct PosixSys {
     return Int(Glibc.round(f))
   }
 
+  public func getenv(name: String) -> String? {
+    let vp = Glibc.getenv(name)
+    return vp != nil ? String.fromCString(vp) : nil
+  }
+
+  public func setenv(name: String, value: String) -> Int32 {
+    return Glibc.setenv(name, value, 1)
+  }
+
+  public func unsetenv(name: String) -> Int32 {
+    return Glibc.unsetenv(name)
+  }
+
   // The environ variable is made available by the CSua sister project
   // dependency.
   public var environment: [String: String] {
@@ -267,8 +275,8 @@ public struct PosixSys {
       }
       let np = UnsafePointer<CChar>(nm)
       if let s = String.fromCString(np) {
-        let (key, value) = s.splitOnce("=")
-        env[key!] = value ?? ""
+        let (name, value) = s.splitOnce("=")
+        env[name!] = value ?? ""
       }
       i += 1
     }

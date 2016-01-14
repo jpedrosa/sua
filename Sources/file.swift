@@ -376,15 +376,29 @@ public class FilePath {
   }
 
   public static func expandPath(path: String) -> String {
-    var bytes = path.bytes
+    let bytes = path.bytes
     let len = bytes.count
+    if len > 0 {
+      var i = 0
+      if bytes[0] == 126 { // ~
+        if len == 1 {
+          return IO.env["USER"] ?? ""
+        }
+      }
+      return doExpandPath(bytes, startIndex: i, maxBytes: bytes.count)
+    }
+    return ""
+  }
+
+  public static func doExpandPath(bytes: [UInt8], startIndex: Int,
+      maxBytes: Int) -> String {
     var i = 0
     var a = [String]()
     var ai = -1
     var sb = ""
     func add() {
       let si = i
-      i = skipChars(bytes, startIndex: i + 1, maxBytes: len)
+      i = skipChars(bytes, startIndex: i + 1, maxBytes: maxBytes)
       ai += 1
       let s = String.fromCharCodes(bytes, start: si, end: i - 1) ?? ""
       if ai < a.count {
@@ -392,22 +406,22 @@ public class FilePath {
       } else {
         a.append(s)
       }
-      i = skipSlashes(bytes, startIndex: i + 1, maxBytes: len)
+      i = skipSlashes(bytes, startIndex: i + 1, maxBytes: maxBytes)
     }
     func stepBack() {
       if ai >= 0 {
         ai -= 1
       }
-      i = skipSlashes(bytes, startIndex: i + 2, maxBytes: len)
+      i = skipSlashes(bytes, startIndex: i + 2, maxBytes: maxBytes)
     }
-    if len > 0 {
-      let lasti = len - 1
+    if maxBytes > 0 {
+      let lasti = maxBytes - 1
       var c = bytes[0]
       if c == 47 { // /
         sb += "/"
-        i = skipSlashes(bytes, startIndex: 1, maxBytes: len)
+        i = skipSlashes(bytes, startIndex: 1, maxBytes: maxBytes)
       }
-      while i < len {
+      while i < maxBytes {
         c = bytes[i]
         if c == 46 { // .
           if i < lasti {
@@ -424,7 +438,7 @@ public class FilePath {
                 stepBack()
               }
             } else if c == 47 { // /
-              i = skipSlashes(bytes, startIndex: i + 2, maxBytes: len)
+              i = skipSlashes(bytes, startIndex: i + 2, maxBytes: maxBytes)
             } else {
               add()
             }

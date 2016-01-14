@@ -63,4 +63,28 @@ public class IO {
     return f.writeCChar(bytes, maxBytes: maxBytes)
   }
 
+  public static var env: Environment {
+    return Environment()
+  }
+
+}
+
+
+public struct Environment: SequenceType {
+
+  public subscript(name: String) -> String? {
+    get { return Sys.getenv(name) }
+    set {
+      if newValue == nil {
+        Sys.unsetenv(name)
+      } else {
+        Sys.setenv(name, value: newValue ?? "")
+      }
+    }
+  }
+
+  public func generate() -> DictionaryGenerator<String, String> {
+    return Sys.environment.generate()
+  }
+
 }
