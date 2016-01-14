@@ -63,22 +63,4 @@ public class IO {
     return f.writeCChar(bytes, maxBytes: maxBytes)
   }
 
-  public static func popen(command: String) throws -> String? {
-    return try Popen.read(command)
-  }
-
-  public static func popenAllCChar(command: String) throws -> [CChar] {
-    return try Popen.readAllCChar(command)
-  }
-
-  public static func popenLines(command: String, lineLength: Int32 = 80,
-      fn: (string: String?) -> Void) throws {
-    try Popen.readLines(command, lineLength: lineLength, fn: fn)
-  }
-
-  public static func popenByteLines(command: String, maxBytes: Int = 80,
-      fn: (bytes: [UInt8], length: Int) -> Void) throws {
-    try Popen.readByteLines(command, maxBytes: maxBytes, fn: fn)
-  }
-
 }

@@ -45,6 +45,8 @@ public typealias CTimespec = timespec
 
 public typealias CTime = tm
 
+typealias CFilePointer = UnsafeMutablePointer<FILE>
+
 
 func statStruct() -> CStat {
   return stat()
