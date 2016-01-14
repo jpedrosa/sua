@@ -109,6 +109,9 @@ public extension String {
     return (left, right)
   }
 
+  // Just a very handy method for returning the String bytes.
+  public var bytes: [UInt8] { return [UInt8](utf8) }
+
 }
 
 

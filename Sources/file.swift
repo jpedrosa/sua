@@ -145,6 +145,8 @@ public class File: CustomStringConvertible {
     }
   }
 
+  public var description: String { return "File(path: \(inspect(path)))" }
+
   public static func open(path: String, mode: FileOperation = .R,
       fn: (f: File) throws -> Void) throws {
     let f = try File(path: path, mode: mode)
@@ -174,7 +176,26 @@ public class File: CustomStringConvertible {
     }
   }
 
-  public var description: String { return "File(path: \(inspect(path)))" }
+  // Aliases for handy FilePath methods.
+  public static func join(firstPath: String, secondPath: String) -> String {
+    return FilePath.join(firstPath, secondPath: secondPath)
+  }
+
+  public static func baseName(path: String, suffix: String? = nil) -> String {
+    return FilePath.baseName(path, suffix: suffix)
+  }
+
+  public static func dirName(path: String) -> String {
+    return FilePath.dirName(path)
+  }
+
+  public static func extName(path: String) -> String {
+    return FilePath.extName(path)
+  }
+
+  public static func expandPath(path: String) -> String {
+    return FilePath.expandPath(path)
+  }
 
 }
 
@@ -238,4 +259,192 @@ public class TempFile: File {
 
 public enum TempFileError: ErrorType {
   case Create(message: String)
+}
+
+
+public class FilePath {
+
+  public static func join(firstPath: String, secondPath: String) -> String {
+    let fpa = firstPath.bytes
+    let i = skipTrailingSlashes(fpa, lastIndex: fpa.count - 1)
+    let fps = String.fromCharCodes(fpa, start: 0, end: i) ?? ""
+    if !secondPath.isEmpty && secondPath.utf16.codeUnitAt(0) == 47 { // /
+      return "\(fps)\(secondPath)"
+    }
+    return "\(fps)/\(secondPath)"
+  }
+
+  public static func skipTrailingSlashes(bytes: [UInt8], lastIndex: Int)
+      -> Int {
+    var i = lastIndex
+    while i >= 0 && bytes[i] == 47 { // /
+      i -= 1
+    }
+    return i
+  }
+
+  public static func skipTrailingChars(bytes: [UInt8], lastIndex: Int) -> Int {
+    var i = lastIndex
+    while i >= 0 && bytes[i] != 47 { // /
+      i -= 1
+    }
+    return i
+  }
+
+  public static func baseName(path: String, suffix: String? = nil) -> String {
+    let bytes = path.bytes
+    let len = bytes.count
+    var ei = skipTrailingSlashes(bytes, lastIndex: len - 1)
+    if ei >= 0 {
+      var si = 0
+      if ei > 0 {
+        si = skipTrailingChars(bytes, lastIndex: ei - 1) + 1
+      }
+      if let sf = suffix {
+        ei = skipSuffix(bytes, suffix: sf, lastIndex: ei)
+      }
+      return String.fromCharCodes(bytes, start: si, end: ei) ?? ""
+    }
+    return "/"
+  }
+
+  public static func skipSuffix(bytes: [UInt8], suffix: String, lastIndex: Int)
+      -> Int {
+    var a = suffix.bytes
+    var i = lastIndex
+    var j = a.count - 1
+    while i >= 0 && j >= 0 && bytes[i] == a[j] {
+      i -= 1
+      j -= 1
+    }
+    return j < 0 ? i : lastIndex
+  }
+
+  public static func dirName(path: String) -> String {
+    let bytes = path.bytes
+    let len = bytes.count
+    var i = skipTrailingSlashes(bytes, lastIndex: len - 1)
+    if i > 0 {
+      //var ei = i
+      i = skipTrailingChars(bytes, lastIndex: i - 1)
+      let ci = i
+      i = skipTrailingSlashes(bytes, lastIndex: i - 1)
+      if i >= 0 {
+        return String.fromCharCodes(bytes, start: 0, end: i) ?? ""
+      } else if ci > 0 {
+        return String.fromCharCodes(bytes, start: ci - 1, end: len - 1) ?? ""
+      } else if ci == 0 {
+        return "/"
+      }
+    } else if i == 0 {
+      // Ignore.
+    } else {
+      return String.fromCharCodes(bytes,
+          start: len - (len > 1 ? 2 : 1), end: len) ?? ""
+    }
+    return "."
+  }
+
+  public static func extName(path: String) -> String {
+    let bytes = path.bytes
+    var i = bytes.count - 1
+    if bytes[i] != 46 {
+      while i >= 0 && bytes[i] != 46 { // Skip trailing chars.
+        i -= 1
+      }
+      return String.fromCharCodes(bytes, start: i) ?? ""
+    }
+    return ""
+  }
+
+  public static func skipSlashes(bytes: [UInt8], startIndex: Int,
+      maxBytes: Int) -> Int {
+    var i = startIndex
+    while i < maxBytes && bytes[i] == 47 {
+      i += 1
+    }
+    return i
+  }
+
+  public static func skipChars(bytes: [UInt8], startIndex: Int,
+      maxBytes: Int) -> Int {
+    var i = startIndex
+    while i < maxBytes && bytes[i] != 47 {
+      i += 1
+    }
+    return i
+  }
+
+  public static func expandPath(path: String) -> String {
+    var bytes = path.bytes
+    let len = bytes.count
+    var i = 0
+    var a = [String]()
+    var ai = -1
+    var sb = ""
+    func add() {
+      let si = i
+      i = skipChars(bytes, startIndex: i + 1, maxBytes: len)
+      ai += 1
+      let s = String.fromCharCodes(bytes, start: si, end: i - 1) ?? ""
+      if ai < a.count {
+        a[ai] = s
+      } else {
+        a.append(s)
+      }
+      i = skipSlashes(bytes, startIndex: i + 1, maxBytes: len)
+    }
+    func stepBack() {
+      if ai >= 0 {
+        ai -= 1
+      }
+      i = skipSlashes(bytes, startIndex: i + 2, maxBytes: len)
+    }
+    if len > 0 {
+      let lasti = len - 1
+      var c = bytes[0]
+      if c == 47 { // /
+        sb += "/"
+        i = skipSlashes(bytes, startIndex: 1, maxBytes: len)
+      }
+      while i < len {
+        c = bytes[i]
+        if c == 46 { // .
+          if i < lasti {
+            c = bytes[i + 1]
+            if c == 46 { // ..
+              if i < lasti - 1 {
+                c = bytes[i + 2]
+                if c == 47 { // /
+                  stepBack()
+                } else {
+                  add()
+                }
+              } else {
+                stepBack()
+              }
+            } else if c == 47 { // /
+              i = skipSlashes(bytes, startIndex: i + 2, maxBytes: len)
+            } else {
+              add()
+            }
+          } else {
+            break
+          }
+        } else {
+          add()
+        }
+      }
+      var slash = false
+      for i in 0...ai {
+        if slash {
+          sb += "/"
+        }
+        sb += a[i]
+        slash = true
+      }
+    }
+    return sb
+  }
+
 }
