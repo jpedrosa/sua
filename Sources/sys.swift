@@ -188,6 +188,10 @@ public struct PosixSys {
     return Glibc.fread(buffer, size, nmemb, fp)
   }
 
+  public func fclose(fp: CFilePointer) -> Int32 {
+    return Glibc.fclose(fp)
+  }
+
   public func popen(command: String, operation: PopenOperation = .R)
       -> CFilePointer {
     return Glibc.popen(command, operation.rawValue)
