@@ -130,7 +130,7 @@ public class Response {
 
   public let socket: Socket
   public var statusCode = 200
-  public var fields: [String: String] = ["Content-Type": "text/html"]
+  public var fields = ["Content-Type": "text/html"]
   var contentQueue = [[UInt8]]()
   public var contentLength = 0
   var flushed = false
