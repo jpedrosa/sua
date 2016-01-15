@@ -44,7 +44,7 @@ dictionary:
 var e = IO.env
 p(e["USER"])           // Prints the user name.
 e["USER"] = nil
-p(e["USER"])           // Now prints new. The key is gone, too!
+p(e["USER"])           // Now prints nil. The key is gone, too!
 ```
 
 That's still not too different from other languages. In Dart, for example, we
