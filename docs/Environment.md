@@ -57,8 +57,8 @@ nil value, only it is wrapped in code that is checked by the compiler. It is
 annoying at first. When I was first trying Swift, when I was just trying to
 "silence" the compiler, it even helped me to cause related bugs. The thing is,
 though, that while other languages are trying to get rid of their nil values,
-with Swift it is an OK value that we can use in a semantically posive way, as in
-the dictionary code:
+with Swift it is an OK value that we can use in a semantically, positive way. As
+in this dictionary code:
 
 ```swift
 var h = ["flowers": "red", "violets": "blue"]
