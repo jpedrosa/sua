@@ -73,7 +73,9 @@ other names in other languages. It could be their maps, hashes, etc.
 But we are still missing the other line that we haven't talked about,
 specifically the one with this code:
 
-```swift public func generate() -> DictionaryGenerator<String, String> {```
+```swift
+public func generate() -> DictionaryGenerator<String, String> {
+```
 
 What this does, in combination with the SequenceType Protocol is that it allows
 us to iterate over the items of a dictionary with the "for in" loop. Like this:
