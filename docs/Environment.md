@@ -17,10 +17,10 @@ public struct Environment: SequenceType {
   public subscript(name: String) -> String? {
     get { return Sys.getenv(name) }
     set {
-      if newValue == nil {
-        Sys.unsetenv(name)
+      if let v = newValue {
+        Sys.setenv(name, value: v)
       } else {
-        Sys.setenv(name, value: newValue ?? "")
+        Sys.unsetenv(name)
       }
     }
   }
