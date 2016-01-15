@@ -375,22 +375,31 @@ public class FilePath {
     return i
   }
 
+  static func checkHome(path: String?) throws -> String {
+    if let hd = path {
+      return hd
+    } else {
+      throw FilePathError.ExpandPath(message: "Invalid home directory.")
+    }
+  }
+
   public static func expandPath(path: String) throws -> String {
     let bytes = path.bytes
     let len = bytes.count
     if len > 0 {
       var i = 0
-      var homeDir: String?
-      if bytes[0] == 126 { // ~
+      let fc = bytes[0]
+      if fc == 126 { // ~
+        var homeDir = ""
         if len == 1 || bytes[1] == 47 { // /
-          homeDir = IO.env["HOME"]
+          homeDir = try checkHome(IO.env["HOME"])
           i = 1
         } else {
           i = skipChars(bytes, startIndex: 1, maxBytes: len)
           if let name = String.fromCharCodes(bytes, start: 1, end: i - 1) {
             let ps = Sys.getpwnam(name)
             if ps != nil {
-              homeDir = String.fromCString(ps.memory.pw_dir)
+              homeDir = try checkHome(String.fromCString(ps.memory.pw_dir))
             } else {
               throw FilePathError.ExpandPath(message: "User does not exist.")
             }
@@ -398,15 +407,24 @@ public class FilePath {
             throw FilePathError.ExpandPath(message: "Invalid name.")
           }
         }
-      }
-      if let hd = homeDir {
         if i >= len {
-          return hd
+          return homeDir
         }
-        return join(hd, secondPath: doExpandPath(bytes, startIndex: i,
-            maxBytes: bytes.count))
+        return join(homeDir, secondPath: doExpandPath(bytes, startIndex: i,
+            maxBytes: len))
+      } else if fc != 47 { // /
+        if let cd = Dir.cwd {
+          if fc == 46 { // .
+            let za = join(cd, secondPath: path).bytes
+            return doExpandPath(za, startIndex: 0, maxBytes: za.count)
+          }
+          return join(cd, secondPath: doExpandPath(bytes, startIndex: 0,
+              maxBytes: len))
+        } else {
+          throw FilePathError.ExpandPath(message: "Invalid current directory.")
+        }
       }
-      return doExpandPath(bytes, startIndex: i, maxBytes: bytes.count)
+      return doExpandPath(bytes, startIndex: i, maxBytes: len)
     }
     return ""
   }
