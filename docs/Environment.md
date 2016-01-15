@@ -34,11 +34,11 @@ public struct Environment: SequenceType {
 
 That creates a kind of a class, actually a struct, but it works almost like a
 class. The subscript method makes it so that we can work with the instance as
-though it was a dictionary, with code between square brackes: ```env["this"]```,
-```env["that"] = "other"```. Now for the catch. Since Swift kind of embraces
-nil/null types with the usage of optionals, it seems to be standard that when a
-nil value is assigned to the dictionary, it actually removes the key from the
-dictionary:
+though it was a dictionary, with code between square brackets:
+```env["this"]```, ```env["that"] = "other"```. Now for the catch. Since Swift
+kind of embraces nil/null types with the usage of optionals, it seems to be
+standard that when a nil value is assigned to the dictionary, it actually
+removes the key from the dictionary:
 
 ```swift
 var e = IO.env
