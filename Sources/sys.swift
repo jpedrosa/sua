@@ -283,6 +283,10 @@ public struct PosixSys {
     return env
   }
 
+  public func getpwnam(name: String) -> UnsafeMutablePointer<passwd> {
+    return Glibc.getpwnam(name)
+  }
+
   public func retry(fn: () -> Int32) -> Int32 {
     var value = fn()
     while value == -1 {

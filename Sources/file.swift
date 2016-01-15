@@ -193,8 +193,8 @@ public class File: CustomStringConvertible {
     return FilePath.extName(path)
   }
 
-  public static func expandPath(path: String) -> String {
-    return FilePath.expandPath(path)
+  public static func expandPath(path: String) throws -> String {
+    return try FilePath.expandPath(path)
   }
 
 }
@@ -375,15 +375,36 @@ public class FilePath {
     return i
   }
 
-  public static func expandPath(path: String) -> String {
+  public static func expandPath(path: String) throws -> String {
     let bytes = path.bytes
     let len = bytes.count
     if len > 0 {
       var i = 0
+      var homeDir: String?
       if bytes[0] == 126 { // ~
-        if len == 1 {
-          return IO.env["USER"] ?? ""
+        if len == 1 || bytes[1] == 47 { // /
+          homeDir = IO.env["HOME"]
+          i = 1
+        } else {
+          i = skipChars(bytes, startIndex: 1, maxBytes: len)
+          if let name = String.fromCharCodes(bytes, start: 1, end: i - 1) {
+            let ps = Sys.getpwnam(name)
+            if ps != nil {
+              homeDir = String.fromCString(ps.memory.pw_dir)
+            } else {
+              throw FilePathError.ExpandPath(message: "User does not exist.")
+            }
+          } else {
+            throw FilePathError.ExpandPath(message: "Invalid name.")
+          }
         }
+      }
+      if let hd = homeDir {
+        if i >= len {
+          return hd
+        }
+        return join(hd, secondPath: doExpandPath(bytes, startIndex: i,
+            maxBytes: bytes.count))
       }
       return doExpandPath(bytes, startIndex: i, maxBytes: bytes.count)
     }
@@ -392,7 +413,7 @@ public class FilePath {
 
   public static func doExpandPath(bytes: [UInt8], startIndex: Int,
       maxBytes: Int) -> String {
-    var i = 0
+    var i = startIndex
     var a = [String]()
     var ai = -1
     var sb = ""
@@ -461,6 +482,11 @@ public class FilePath {
     return sb
   }
 
+}
+
+
+enum FilePathError: ErrorType {
+  case ExpandPath(message: String)
 }
 
 
