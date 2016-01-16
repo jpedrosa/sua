@@ -260,7 +260,7 @@ public struct BodyParser {
         try inContentData()
       case .ContentDataStarted:
         try inContentDataStarted()
-      default: () // Ignore for now.
+      default: throw BodyParserError.ContentBody
     }
   }
 
@@ -850,4 +850,5 @@ enum BodyParserError: ErrorType {
   case FileNameValue
   case ContentBody
   case ContentTypeValue
+  case Unreachable
 }
