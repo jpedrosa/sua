@@ -4,6 +4,8 @@ public enum FileGlobTokenizer: Tokenizer {
   case OptionalNameComma
   case OptionalName
   case OptionalNameMaybeEmpty
+  case SetChar
+  case SetClose
   case SetMinusChar
   case SetLowerCaseMinus
   case SetUpperCaseMinus
@@ -58,6 +60,10 @@ class FileGlobLexer: CommonLexer {
         return inOptionalName()
       case .OptionalNameMaybeEmpty:
         return inOptionalNameMaybeEmpty()
+      case .SetChar:
+        return inSetChar()
+      case .SetClose:
+        return inSetClose()
       case .SetMinusChar:
         return inSetMinusChar()
       case .SetLowerCaseMinus:
@@ -114,6 +120,24 @@ class FileGlobLexer: CommonLexer {
     return inOptionalName()
   }
 
+  func inSetChar() -> FileGlobTokenType {
+    if stream.eatCloseBracket() {
+      status.tokenizer = T.Body
+      return .SymCBSet
+    } else if stream.eatSlash() {
+      status.tokenizer = T.Body
+      return .Separator
+    }
+    stream.eatWhileNeitherTwo(93, c2: 47) // ] /
+    return .SetChar
+  }
+
+  func inSetClose() -> FileGlobTokenType {
+    stream.eatCloseBracket()
+    status.tokenizer = T.Body
+    return .SymCBSet
+  }
+
   func inSetMinusChar() -> FileGlobTokenType {
     stream.next()
     status.tokenizer = T.Set
@@ -121,27 +145,52 @@ class FileGlobLexer: CommonLexer {
   }
 
   func inSetLowerCaseMinus() -> FileGlobTokenType {
-    if stream.eatMinus() && stream.matchLowerCase() >= 0 {
+    stream.eatMinus()
+    if stream.matchLowerCase() >= 0 {
       status.tokenizer = T.SetMinusChar
       return .SymMinusSet
+    } else if stream.matchCloseBracket() {
+      status.tokenizer = T.SetClose
+      return .SetChar
     }
     return inText()
   }
 
   func inSetUpperCaseMinus() -> FileGlobTokenType {
-    if stream.eatMinus() && stream.matchUpperCase() >= 0 {
+    stream.eatMinus()
+    if stream.matchUpperCase() >= 0 {
       status.tokenizer = T.SetMinusChar
       return .SymMinusSet
+    } else if stream.matchCloseBracket() {
+      status.tokenizer = T.SetClose
+      return .SetChar
     }
     return inText()
   }
 
   func inSetDigitMinus() -> FileGlobTokenType {
-    if stream.eatMinus() && stream.matchDigit() >= 0 {
+    stream.eatMinus()
+    if stream.matchDigit() >= 0 {
       status.tokenizer = T.SetMinusChar
       return .SymMinusSet
+    } else if stream.matchCloseBracket() {
+      status.tokenizer = T.SetClose
+      return .SetChar
     }
     return inText()
+  }
+
+  func handleFirstSetChar(t: Tokenizer, type: FileGlobTokenType)
+      -> FileGlobTokenType {
+    if stream.matchMinus() {
+      status.tokenizer = t
+      return type
+    } else if stream.matchCloseBracket() {
+      status.tokenizer = T.SetClose
+      return .SetChar
+    }
+    status.tokenizer = T.SetChar
+    return .SetChar
   }
 
   func inSet() -> FileGlobTokenType {
@@ -150,23 +199,11 @@ class FileGlobLexer: CommonLexer {
       status.tokenizer = T.Body
       return .SymCBSet
     } else if stream.eatLowerCase() {
-      if stream.matchMinus() {
-        status.tokenizer = T.SetLowerCaseMinus
-        return .SetLowerChar
-      }
-      return inText()
+      return handleFirstSetChar(T.SetLowerCaseMinus, type: .SetLowerChar)
     } else if stream.eatUpperCase() {
-      if stream.matchMinus() {
-        status.tokenizer = T.SetUpperCaseMinus
-        return .SetUpperChar
-      }
-      return inText()
+      return handleFirstSetChar(T.SetUpperCaseMinus, type: .SetUpperChar)
     } else if stream.eatDigit() {
-      if stream.matchMinus() {
-        status.tokenizer = T.SetDigitMinus
-        return .SetDigitChar
-      }
-      return inText()
+      return handleFirstSetChar(T.SetDigitMinus, type: .SetDigitChar)
     } else if stream.next() != nil {
       return .Name
     }
