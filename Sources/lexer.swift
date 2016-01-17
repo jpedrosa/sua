@@ -1,29 +1,5 @@
 
 
-public protocol LexerByteStream {
-  var bytes: [UInt8] { get }
-  var startIndex: Int { get set }
-  var currentIndex: Int { get set }
-  var isEol: Bool { get }
-  var currentTokenString: String? { get }
-  var lineEndIndex: Int { get set }
-  func findIndex(c: UInt8, startAt: Int) -> Int
-}
-
-
-extension ByteStream: LexerByteStream { }
-
-
-public protocol LexerStatus {
-  var defaultTokenizer: Tokenizer? { get set }
-  var lineCount: Int { get set }
-  var newLineKeyword: TokenType? { get set }
-  var lineStartIndex: Int { get set }
-  var tokenizer: Tokenizer? { get set }
-  var spaceTokenizer: Tokenizer? { get set }
-}
-
-
 public protocol Tokenizer { }
 
 
@@ -31,14 +7,6 @@ public protocol TokenType { }
 
 
 protocol Lexer {
-
-  var stream: LexerByteStream { get }
-  var status: LexerStatus { get }
-  var lineCount: Int { get set }
-  var lineStartIndex: Int { get set }
-  var newLineKeyword: Int { get }
-
-  init(stream: LexerByteStream)
 
   func next(entry: Tokenizer) -> TokenType?
 
@@ -50,7 +18,7 @@ protocol Lexer {
 }
 
 
-public struct CommonLexerStatus: LexerStatus {
+public struct CommonLexerStatus {
 
   public var defaultTokenizer: Tokenizer?
   public var lineCount = 0
@@ -71,67 +39,13 @@ public struct CommonLexerStatus: LexerStatus {
 }
 
 
-// public struct StoreLexerStatus: LexerStatus {
-//
-//   public var tokenizer: Tokenizer?
-//   public var spaceTokenizer: Tokenizer?
-//   var stored: [Tokenizer] = []
-//   var indent = 0
-//
-//   init(tokenizer: Tokenizer? = nil,
-//       spaceTokenizer: Tokenizer? = nil) {
-//     self.tokenizer = tokenizer
-//     self.spaceTokenizer = spaceTokenizer
-//   }
-//
-//   func clone() -> StoreLexerStatus {
-//     var o = StoreLexerStatus(tokenizer: tokenizer,
-//         spaceTokenizer: spaceTokenizer)
-//     o.indent = indent
-//     for t in stored {
-//       o.stored.append(t)
-//     }
-//     return o
-//   }
-//
-//   mutating func push(t: Tokenizer) {
-//     stored.append(t)
-//   }
-//
-//   mutating func pop() -> Tokenizer { return stored.removeLast() }
-//
-//   mutating func unshift(e: Tokenizer) {
-//     stored.insert(e, atIndex: 0)
-//   }
-//
-//   mutating func shift() -> Tokenizer {
-//     return stored.removeAtIndex(0)
-//   }
-//
-// }
-//
-//
-// func ==(lhs: StoreLexerStatus, rhs: StoreLexerStatus) -> Bool {
-//   return "\(lhs.tokenizer)" == "\(rhs.tokenizer)" &&
-//       lhs.indent == rhs.indent &&
-//       "\(lhs.spaceTokenizer)" == "\(rhs.spaceTokenizer)" &&
-//       (lhs.stored.count == rhs.stored.count &&
-//         "a\(lhs.stored)" == "\(rhs.stored)")
-// }
-
-
 public class CommonLexer: CustomStringConvertible {
 
   var stream: ByteStream
   var status: CommonLexerStatus
 
-  init(stream: ByteStream) {
-    self.stream = stream
-    self.status = CommonLexerStatus(tokenizer: nil)
-  }
-
-  init(stream: ByteStream, status: CommonLexerStatus) {
-    self.stream = stream
+  init(bytes: [UInt8], status: CommonLexerStatus) {
+    stream = ByteStream(bytes: bytes)
     self.status = status
   }
 
