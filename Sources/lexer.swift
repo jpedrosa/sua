@@ -18,8 +18,6 @@ protocol Lexer {
 
   var stream: ByteStream { get }
 
-  func next(entry: Tokenizer) -> TokenType?
-
   func parse(fn: (type: TokenType) throws -> Void) throws
 
   func parseTokenStrings(
