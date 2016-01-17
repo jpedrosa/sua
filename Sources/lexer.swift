@@ -105,8 +105,6 @@ func ==(lhs: StoreLexerStatus, rhs: StoreLexerStatus) -> Bool {
 public class CommonLexer: CustomStringConvertible {
 
   var defaultTokenizer: LexerTokenizer?
-  var entryTokenizer: LexerTokenizer?
-  var spaceTokenizer: LexerTokenizer?
   var lineCount = 0
   var newLineKeyword: TokenType?
   var lineStartIndex = 0
