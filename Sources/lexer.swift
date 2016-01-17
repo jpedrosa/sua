@@ -11,6 +11,7 @@ public protocol LexerToken {
   var startIndex: Int { get }
   var endIndex: Int { get }
   var type: TokenType { get }
+  var string: String { get }
 }
 
 
@@ -180,6 +181,17 @@ public class CommonLexer: Lexer, CustomStringConvertible {
             endIndex: self.stream.currentIndex,
             type: tt))
     }
+  }
+
+  func parseAllTokens() throws -> [CommonToken] {
+    var a = [CommonToken]()
+    try parse() { tt in
+      a.append(CommonToken(bytes: self.stream.bytes,
+            startIndex: self.stream.startIndex,
+            endIndex: self.stream.currentIndex,
+            type: tt))
+    }
+    return a
   }
 
   public var description: String {
