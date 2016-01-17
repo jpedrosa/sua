@@ -162,14 +162,14 @@ public class CommonLexer: CustomStringConvertible {
   func parse(fn: (type: TokenType?) -> Void) {
     let len = stream.bytes.count
     var ninc = 0
-    var hasNewLine = false
+    var haveNewLine = false
     let newLineKey = newLineKeyword
-    let hasNewLineKey = newLineKey != nil
+    let haveNewLineKey = newLineKey != nil
     var si = 0
     repeat {
       var i = stream.findIndex(UInt8(10), startAt: si)
-      hasNewLine = i >= 0
-      if !hasNewLine {
+      haveNewLine = i >= 0
+      if !haveNewLine {
         i = len
       } else if i > 0 && stream.bytes[i - 1] == 13 {
         // CR. Handle crlf newline.
@@ -184,13 +184,13 @@ public class CommonLexer: CustomStringConvertible {
         if stream.currentIndex >= len {
           break
         }
-        if hasNewLineKey && hasNewLine {
+        if haveNewLineKey && haveNewLine {
           stream.startIndex = i
           stream.currentIndex = i + ninc
           fn(type: newLineKey)
         }
       } else {
-        if hasNewLineKey && hasNewLine {
+        if haveNewLineKey && haveNewLine {
           stream.startIndex = i
           stream.currentIndex = i + ninc
           fn(type: newLineKey)
