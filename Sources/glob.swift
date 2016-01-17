@@ -31,9 +31,9 @@ class GlobLexer: CommonLexer {
   typealias T = GlobLexerTokenizer
 
   override init(stream: ByteStream) {
-    let st = CommonLexerStatus(tokenizer: T.Root, spaceTokenizer: nil)
+    var st = CommonLexerStatus(tokenizer: T.Root)
+    st.defaultTokenizer = T.Text
     super.init(stream: stream, status: st)
-    defaultTokenizer = T.Text
   }
 
   override func next(tokenizer: LexerTokenizer) -> TokenType {

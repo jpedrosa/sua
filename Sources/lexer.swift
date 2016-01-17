@@ -15,6 +15,10 @@ extension ByteStream: LexerByteStream { }
 
 
 public protocol LexerStatus {
+  var defaultTokenizer: LexerTokenizer? { get set }
+  var lineCount: Int { get set }
+  var newLineKeyword: TokenType? { get set }
+  var lineStartIndex: Int { get set }
   var tokenizer: LexerTokenizer? { get set }
   var spaceTokenizer: LexerTokenizer? { get set }
 }
@@ -48,73 +52,82 @@ protocol Lexer {
 
 public struct CommonLexerStatus: LexerStatus {
 
+  public var defaultTokenizer: LexerTokenizer?
+  public var lineCount = 0
+  public var newLineKeyword: TokenType?
+  public var lineStartIndex = 0
   public var tokenizer: LexerTokenizer?
   public var spaceTokenizer: LexerTokenizer?
 
-}
-
-
-public struct StoreLexerStatus: LexerStatus {
-
-  public var tokenizer: LexerTokenizer?
-  public var spaceTokenizer: LexerTokenizer?
-  var stored: [LexerTokenizer] = []
-  var indent = 0
-
-  init(tokenizer: LexerTokenizer? = nil,
-      spaceTokenizer: LexerTokenizer? = nil) {
+  init(tokenizer: LexerTokenizer?) {
+    defaultTokenizer = nil
+    lineCount = 0
+    newLineKeyword = nil
+    lineStartIndex = 0
     self.tokenizer = tokenizer
-    self.spaceTokenizer = spaceTokenizer
-  }
-
-  func clone() -> StoreLexerStatus {
-    var o = StoreLexerStatus(tokenizer: tokenizer,
-        spaceTokenizer: spaceTokenizer)
-    o.indent = indent
-    for t in stored {
-      o.stored.append(t)
-    }
-    return o
-  }
-
-  mutating func push(t: LexerTokenizer) {
-    stored.append(t)
-  }
-
-  mutating func pop() -> LexerTokenizer { return stored.removeLast() }
-
-  mutating func unshift(e: LexerTokenizer) {
-    stored.insert(e, atIndex: 0)
-  }
-
-  mutating func shift() -> LexerTokenizer {
-    return stored.removeAtIndex(0)
+    spaceTokenizer = nil
   }
 
 }
 
 
-func ==(lhs: StoreLexerStatus, rhs: StoreLexerStatus) -> Bool {
-  return "\(lhs.tokenizer)" == "\(rhs.tokenizer)" &&
-      lhs.indent == rhs.indent &&
-      "\(lhs.spaceTokenizer)" == "\(rhs.spaceTokenizer)" &&
-      (lhs.stored.count == rhs.stored.count &&
-        "a\(lhs.stored)" == "\(rhs.stored)")
-}
+// public struct StoreLexerStatus: LexerStatus {
+//
+//   public var tokenizer: LexerTokenizer?
+//   public var spaceTokenizer: LexerTokenizer?
+//   var stored: [LexerTokenizer] = []
+//   var indent = 0
+//
+//   init(tokenizer: LexerTokenizer? = nil,
+//       spaceTokenizer: LexerTokenizer? = nil) {
+//     self.tokenizer = tokenizer
+//     self.spaceTokenizer = spaceTokenizer
+//   }
+//
+//   func clone() -> StoreLexerStatus {
+//     var o = StoreLexerStatus(tokenizer: tokenizer,
+//         spaceTokenizer: spaceTokenizer)
+//     o.indent = indent
+//     for t in stored {
+//       o.stored.append(t)
+//     }
+//     return o
+//   }
+//
+//   mutating func push(t: LexerTokenizer) {
+//     stored.append(t)
+//   }
+//
+//   mutating func pop() -> LexerTokenizer { return stored.removeLast() }
+//
+//   mutating func unshift(e: LexerTokenizer) {
+//     stored.insert(e, atIndex: 0)
+//   }
+//
+//   mutating func shift() -> LexerTokenizer {
+//     return stored.removeAtIndex(0)
+//   }
+//
+// }
+//
+//
+// func ==(lhs: StoreLexerStatus, rhs: StoreLexerStatus) -> Bool {
+//   return "\(lhs.tokenizer)" == "\(rhs.tokenizer)" &&
+//       lhs.indent == rhs.indent &&
+//       "\(lhs.spaceTokenizer)" == "\(rhs.spaceTokenizer)" &&
+//       (lhs.stored.count == rhs.stored.count &&
+//         "a\(lhs.stored)" == "\(rhs.stored)")
+// }
 
 
 public class CommonLexer: CustomStringConvertible {
 
-  var defaultTokenizer: LexerTokenizer?
-  var lineCount = 0
-  var newLineKeyword: TokenType?
-  var lineStartIndex = 0
   var stream: ByteStream
   var status: CommonLexerStatus
 
   init(stream: ByteStream) {
     self.stream = stream
-    self.status = CommonLexerStatus()
+    self.status = CommonLexerStatus(tokenizer: nil)
   }
 
   init(stream: ByteStream, status: CommonLexerStatus) {
@@ -128,7 +141,7 @@ public class CommonLexer: CustomStringConvertible {
   }
 
   func parseLine(fn: (type: TokenType) throws -> Void) throws {
-    lineCount += 1
+    status.lineCount += 1
     while !stream.isEol {
       var tt: TokenType?
       if let st = status.spaceTokenizer {
@@ -138,7 +151,7 @@ public class CommonLexer: CustomStringConvertible {
         if let t = status.tokenizer {
           tt = next(t)
           if tt == nil {
-            if let dt = defaultTokenizer {
+            if let dt = status.defaultTokenizer {
               status.tokenizer = dt
               tt = next(dt)
             }
@@ -172,7 +185,7 @@ public class CommonLexer: CustomStringConvertible {
     let len = stream.bytes.count
     var ninc = 0
     var haveNewLine = false
-    let newLineKey = newLineKeyword
+    let newLineKey = status.newLineKeyword
     let haveNewLineKey = newLineKey != nil
     var si = 0
     repeat {
@@ -204,17 +217,17 @@ public class CommonLexer: CustomStringConvertible {
           stream.currentIndex = i + ninc
           try fn(type: newLineKey!)
         }
-        lineCount += 1
+        status.lineCount += 1
       }
       si = i + ninc
       stream.startIndex = si
       stream.currentIndex = si
-      lineStartIndex = si
+      status.lineStartIndex = si
       } while si < len
   }
 
   public var description: String {
-    return "CommonLexer(lineCount: \(lineCount))"
+    return "CommonLexer(status: \(status))"
   }
 
 }
