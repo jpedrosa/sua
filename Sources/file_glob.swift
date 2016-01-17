@@ -26,10 +26,10 @@ enum FileGlobTokenType: TokenType {
   case SymAsterisk           // *
   case SymQuestionMark       // ?
   case SymCircumflex         // ^
-  case SetName               // Second part of [a-b] It's "b".
-  case SetLowerName
-  case SetUpperName
-  case SetDigitName
+  case SetChar               // Second part of [a-b] It's "b".
+  case SetLowerChar
+  case SetUpperChar
+  case SetDigitChar
   case SymOBSet              // [
   case SymMinusSet           // -
   case SymCBSet              // ]
@@ -117,7 +117,7 @@ class FileGlobLexer: CommonLexer {
   func inSetMinusChar() -> FileGlobTokenType {
     stream.next()
     status.tokenizer = T.Set
-    return .SetName
+    return .SetChar
   }
 
   func inSetLowerCaseMinus() -> FileGlobTokenType {
@@ -152,19 +152,19 @@ class FileGlobLexer: CommonLexer {
     } else if stream.eatLowerCase() {
       if stream.matchMinus() {
         status.tokenizer = T.SetLowerCaseMinus
-        return .SetLowerName
+        return .SetLowerChar
       }
       return inText()
     } else if stream.eatUpperCase() {
       if stream.matchMinus() {
         status.tokenizer = T.SetUpperCaseMinus
-        return .SetUpperName
+        return .SetUpperChar
       }
       return inText()
     } else if stream.eatDigit() {
       if stream.matchMinus() {
         status.tokenizer = T.SetDigitMinus
-        return .SetDigitName
+        return .SetDigitChar
       }
       return inText()
     } else if stream.next() != nil {
