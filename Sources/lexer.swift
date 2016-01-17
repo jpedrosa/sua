@@ -51,11 +51,18 @@ public struct CommonLexerStatus {
 }
 
 
-public struct CommonToken: LexerToken {
+public struct CommonToken: LexerToken, CustomStringConvertible {
+
   public var bytes: [UInt8]
   public var startIndex: Int
   public var endIndex: Int
   public var type: TokenType
+
+  public var description: String {
+    return "CommonToken(startIndex: \(startIndex), endIndex: \(endIndex), " +
+        "type: \(type))"
+  }
+
 }
 
 
