@@ -1,4 +1,5 @@
 
+
 public enum GlobLexerTokenizer: LexerTokenizer {
   case OptionalNameComma
   case OptionalName
@@ -17,11 +18,11 @@ public enum GlobLexerTokenizer: LexerTokenizer {
 }
 
 
-enum GlobTokenType: TokenType {
-  case Text
-  case Separator
-  case Name
-  case Symbol
+enum GlobTokenType: String, TokenType {
+  case Text = "text"
+  case Separator = "separator"
+  case Name = "name"
+  case Symbol = "symbol"
 }
 
 
@@ -65,19 +66,6 @@ class GlobLexer: CommonLexer {
         return inRoot()
       case .Text:
         return inText()
-    }
-  }
-
-  static func keywordString(type: GlobTokenType) -> String {
-    switch type {
-      case .Text:
-        return "text"
-      case .Separator:
-        return "Separator"
-      case .Name:
-        return "Name"
-      case .Symbol:
-        return "Symbol"
     }
   }
 
