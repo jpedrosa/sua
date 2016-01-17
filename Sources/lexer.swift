@@ -15,16 +15,16 @@ extension ByteStream: LexerByteStream { }
 
 
 public protocol LexerStatus {
-  var defaultTokenizer: LexerTokenizer? { get set }
+  var defaultTokenizer: Tokenizer? { get set }
   var lineCount: Int { get set }
   var newLineKeyword: TokenType? { get set }
   var lineStartIndex: Int { get set }
-  var tokenizer: LexerTokenizer? { get set }
-  var spaceTokenizer: LexerTokenizer? { get set }
+  var tokenizer: Tokenizer? { get set }
+  var spaceTokenizer: Tokenizer? { get set }
 }
 
 
-public protocol LexerTokenizer { }
+public protocol Tokenizer { }
 
 
 public protocol TokenType { }
@@ -40,7 +40,7 @@ protocol Lexer {
 
   init(stream: LexerByteStream)
 
-  func next(entry: LexerTokenizer) -> TokenType?
+  func next(entry: Tokenizer) -> TokenType?
 
   func parse(fn: (type: TokenType) throws -> Void) throws
 
@@ -52,14 +52,14 @@ protocol Lexer {
 
 public struct CommonLexerStatus: LexerStatus {
 
-  public var defaultTokenizer: LexerTokenizer?
+  public var defaultTokenizer: Tokenizer?
   public var lineCount = 0
   public var newLineKeyword: TokenType?
   public var lineStartIndex = 0
-  public var tokenizer: LexerTokenizer?
-  public var spaceTokenizer: LexerTokenizer?
+  public var tokenizer: Tokenizer?
+  public var spaceTokenizer: Tokenizer?
 
-  init(tokenizer: LexerTokenizer?) {
+  init(tokenizer: Tokenizer?) {
     defaultTokenizer = nil
     lineCount = 0
     newLineKeyword = nil
@@ -73,13 +73,13 @@ public struct CommonLexerStatus: LexerStatus {
 
 // public struct StoreLexerStatus: LexerStatus {
 //
-//   public var tokenizer: LexerTokenizer?
-//   public var spaceTokenizer: LexerTokenizer?
-//   var stored: [LexerTokenizer] = []
+//   public var tokenizer: Tokenizer?
+//   public var spaceTokenizer: Tokenizer?
+//   var stored: [Tokenizer] = []
 //   var indent = 0
 //
-//   init(tokenizer: LexerTokenizer? = nil,
-//       spaceTokenizer: LexerTokenizer? = nil) {
+//   init(tokenizer: Tokenizer? = nil,
+//       spaceTokenizer: Tokenizer? = nil) {
 //     self.tokenizer = tokenizer
 //     self.spaceTokenizer = spaceTokenizer
 //   }
@@ -94,17 +94,17 @@ public struct CommonLexerStatus: LexerStatus {
 //     return o
 //   }
 //
-//   mutating func push(t: LexerTokenizer) {
+//   mutating func push(t: Tokenizer) {
 //     stored.append(t)
 //   }
 //
-//   mutating func pop() -> LexerTokenizer { return stored.removeLast() }
+//   mutating func pop() -> Tokenizer { return stored.removeLast() }
 //
-//   mutating func unshift(e: LexerTokenizer) {
+//   mutating func unshift(e: Tokenizer) {
 //     stored.insert(e, atIndex: 0)
 //   }
 //
-//   mutating func shift() -> LexerTokenizer {
+//   mutating func shift() -> Tokenizer {
 //     return stored.removeAtIndex(0)
 //   }
 //
@@ -136,7 +136,7 @@ public class CommonLexer: CustomStringConvertible {
   }
 
   // Override me.
-  func next(tokenizer: LexerTokenizer) -> TokenType? {
+  func next(tokenizer: Tokenizer) -> TokenType? {
     return nil
   }
 
