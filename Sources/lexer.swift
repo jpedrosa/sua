@@ -58,9 +58,13 @@ public struct CommonToken: LexerToken, CustomStringConvertible {
   public var endIndex: Int
   public var type: TokenType
 
+  public var string: String? {
+    return String.fromCharCodes(bytes, start: startIndex, end: endIndex - 1)
+  }
+
   public var description: String {
     return "CommonToken(startIndex: \(startIndex), endIndex: \(endIndex), " +
-        "type: \(type))"
+        "type: \(type), string: \(string))"
   }
 
 }
