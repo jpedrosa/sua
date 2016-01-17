@@ -38,9 +38,10 @@ protocol Lexer {
 
   func next(entry: LexerTokenizer) -> TokenType?
 
-  func parse(fn: (type: TokenType?) -> Void)
+  func parse(fn: (type: TokenType) throws -> Void) throws
 
-  func parseTokenStrings(fn: (type: TokenType?, string: String?) -> Void)
+  func parseTokenStrings(
+      fn: (type: TokenType, string: String) throws -> Void) throws
 
 }
 
@@ -126,7 +127,7 @@ public class CommonLexer: CustomStringConvertible {
     return nil
   }
 
-  func parseLine(fn: (type: TokenType?) -> Void) {
+  func parseLine(fn: (type: TokenType) throws -> Void) throws {
     lineCount += 1
     while !stream.isEol {
       var tt: TokenType?
@@ -138,6 +139,7 @@ public class CommonLexer: CustomStringConvertible {
           tt = next(t)
           if tt == nil {
             if let dt = defaultTokenizer {
+              status.tokenizer = dt
               tt = next(dt)
             }
           }
@@ -145,19 +147,28 @@ public class CommonLexer: CustomStringConvertible {
       }
       //p([stream.currentTokenString, status.tokenizer]);
       //p(status.stored);
-      fn(type: tt)
+      if let t = tt {
+        try fn(type: t)
+      } else {
+        throw CommonLexerError.TokenType
+      }
       stream.startIndex = stream.currentIndex
     }
     //p(status.indent);
   }
 
-  func parseTokenStrings(fn: (type: TokenType?, string: String?) -> Void) {
-    parse() { tt in
-      return fn(type: tt, string: self.stream.currentTokenString)
+  func parseTokenStrings(fn: (type: TokenType, string: String) throws -> Void)
+      throws {
+    try parse() { tt in
+      if let s = self.stream.currentTokenString {
+        return try fn(type: tt, string: s)
+      } else {
+        throw CommonLexerError.String
+      }
     }
   }
 
-  func parse(fn: (type: TokenType?) -> Void) {
+  func parse(fn: (type: TokenType) throws -> Void) throws {
     let len = stream.bytes.count
     var ninc = 0
     var haveNewLine = false
@@ -178,20 +189,20 @@ public class CommonLexer: CustomStringConvertible {
       }
       if i - si > 0 {
         stream.lineEndIndex = i
-        parseLine(fn)
+        try parseLine(fn)
         if stream.currentIndex >= len {
           break
         }
         if haveNewLineKey && haveNewLine {
           stream.startIndex = i
           stream.currentIndex = i + ninc
-          fn(type: newLineKey)
+          try fn(type: newLineKey!)
         }
       } else {
         if haveNewLineKey && haveNewLine {
           stream.startIndex = i
           stream.currentIndex = i + ninc
-          fn(type: newLineKey)
+          try fn(type: newLineKey!)
         }
         lineCount += 1
       }
@@ -206,4 +217,10 @@ public class CommonLexer: CustomStringConvertible {
     return "CommonLexer(lineCount: \(lineCount))"
   }
 
+}
+
+
+enum CommonLexerError: ErrorType {
+  case TokenType
+  case String
 }
