@@ -6,7 +6,17 @@ public protocol Tokenizer { }
 public protocol TokenType { }
 
 
+public protocol LexerToken {
+  var bytes: [UInt8] { get }
+  var startIndex: Int { get }
+  var endIndex: Int { get }
+  var type: TokenType { get }
+}
+
+
 protocol Lexer {
+
+  var stream: ByteStream { get }
 
   func next(entry: Tokenizer) -> TokenType?
 
@@ -14,6 +24,8 @@ protocol Lexer {
 
   func parseTokenStrings(
       fn: (type: TokenType, string: String) throws -> Void) throws
+
+  func parseTokens(fn: (token: LexerToken) throws -> Void) throws
 
 }
 
@@ -39,9 +51,17 @@ public struct CommonLexerStatus {
 }
 
 
-public class CommonLexer: CustomStringConvertible {
+public struct CommonToken: LexerToken {
+  public var bytes: [UInt8]
+  public var startIndex: Int
+  public var endIndex: Int
+  public var type: TokenType
+}
 
-  var stream: ByteStream
+
+public class CommonLexer: Lexer, CustomStringConvertible {
+
+  public var stream: ByteStream
   var status: CommonLexerStatus
 
   init(bytes: [UInt8], status: CommonLexerStatus) {
@@ -88,7 +108,7 @@ public class CommonLexer: CustomStringConvertible {
       throws {
     try parse() { tt in
       if let s = self.stream.currentTokenString {
-        return try fn(type: tt, string: s)
+        try fn(type: tt, string: s)
       } else {
         throw CommonLexerError.String
       }
@@ -138,6 +158,15 @@ public class CommonLexer: CustomStringConvertible {
       stream.currentIndex = si
       status.lineStartIndex = si
       } while si < len
+  }
+
+  func parseTokens(fn: (token: LexerToken) throws -> Void) throws {
+    try parse() { tt in
+      try fn(token: CommonToken(bytes: self.stream.bytes,
+            startIndex: self.stream.startIndex,
+            endIndex: self.stream.currentIndex,
+            type: tt))
+    }
   }
 
   public var description: String {
