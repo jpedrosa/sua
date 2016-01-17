@@ -204,11 +204,6 @@ public class CommonLexer: CustomStringConvertible {
       } while si < len
   }
 
-  func spawnStatus() -> LexerStatus {
-    return CommonLexerStatus(tokenizer: self.entryTokenizer,
-        spaceTokenizer: self.spaceTokenizer)
-  }
-
   public var description: String {
     return "CommonLexer(lineCount: \(lineCount))"
   }
