@@ -13,6 +13,8 @@ enum ByteMatcherEntry {
   case EatUntil
   case EatOn
   case EatBytesFromTable
+  case EatOneFromTable
+  case EatOneNotFromTable
 }
 
 
@@ -132,6 +134,12 @@ struct ByteMatcher {
         case .EatBytesFromTable:
           let table = (data as! FirstCharTableParam).table
           b = stream.eatBytesFromTable(table)
+        case .EatOneNotFromTable:
+          let table = (data as! FirstCharTableParam).table
+          b = stream.eatOneNotFromTable(table)
+        case .EatOneFromTable:
+          let table = (data as! FirstCharTableParam).table
+          b = stream.eatOneFromTable(table)
       }
       if !b && !data.optional { // No success and not optional.
         return false
@@ -213,6 +221,30 @@ struct ByteMatcher {
   mutating func eatBytesFromList(list: [[UInt8]], optional: Bool = false) {
     let a = ByteStream.makeFirstCharTable(list)
     self.list.append(FirstCharTableParam(entry: .EatBytesFromTable,
+        optional: optional, table: a))
+  }
+
+  mutating func eatOneNotFromStrings(list: [String], optional: Bool = false) {
+    let a = ByteStream.makeFirstCharTable(list)
+    self.list.append(FirstCharTableParam(entry: .EatOneNotFromTable,
+        optional: optional, table: a))
+  }
+
+  mutating func eatOneNotFromBytes(list: [[UInt8]], optional: Bool = false) {
+    let a = ByteStream.makeFirstCharTable(list)
+    self.list.append(FirstCharTableParam(entry: .EatOneNotFromTable,
+        optional: optional, table: a))
+  }
+
+  mutating func eatOneFromStrings(list: [String], optional: Bool = false) {
+    let a = ByteStream.makeFirstCharTable(list)
+    self.list.append(FirstCharTableParam(entry: .EatOneFromTable,
+        optional: optional, table: a))
+  }
+
+  mutating func eatOneFromBytes(list: [[UInt8]], optional: Bool = false) {
+    let a = ByteStream.makeFirstCharTable(list)
+    self.list.append(FirstCharTableParam(entry: .EatOneFromTable,
         optional: optional, table: a))
   }
 

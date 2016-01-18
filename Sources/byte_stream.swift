@@ -1909,24 +1909,45 @@ public struct ByteStream {
     return r
   }
 
-  /*func eatIfNotStringFromList(strings: [String]) -> Bool {
-    return matchIfNotStringFromList(strings, consume: true) >= 0
+  public mutating func eatOneNotFromTable(firstCharTable: FirstCharTable)
+      -> Bool {
+    return matchOneNotFromTable(firstCharTable, consume: true) != nil
   }
 
-  func matchIfNotStringFromList(strings: [String], consume: Bool = false)
-      -> Int {
-    var r = -1
+  public mutating func matchOneNotFromTable(firstCharTable: FirstCharTable,
+      consume: Bool = false) -> UInt8? {
     let i = currentIndex
     if i < lineEndIndex {
-      if matchStringFromList(strings) < 0 {
-        r = 1
+      let c = _bytes[i]
+      if firstCharTable[Int(c)] == nil {
         if consume {
           currentIndex = i + 1
         }
+        return c
       }
     }
-    return r
-  }*/
+    return nil
+  }
+
+  public mutating func eatOneFromTable(firstCharTable: FirstCharTable)
+      -> Bool {
+    return matchOneFromTable(firstCharTable, consume: true) != nil
+  }
+
+  public mutating func matchOneFromTable(firstCharTable: FirstCharTable,
+      consume: Bool = false) -> UInt8? {
+    let i = currentIndex
+    if i < lineEndIndex {
+      let c = _bytes[i]
+      if firstCharTable[Int(c)] != nil {
+        if consume {
+          currentIndex = i + 1
+        }
+        return c
+      }
+    }
+    return nil
+  }
 
   public mutating func eatWhileNotStringFromList(firstCharTable: FirstCharTable)
       -> Bool {
