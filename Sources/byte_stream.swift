@@ -1752,16 +1752,19 @@ public struct ByteStream {
 
   // String list matching
 
-  public mutating func makeFirstCharTable(strings: [String]) -> FirstCharTable {
-    let len = strings.count
+  public static func makeFirstCharTable(strings: [String]) -> FirstCharTable {
+    let a: [[UInt8]] = strings.map { $0.bytes }
+    return makeFirstCharTable(a)
+  }
+
+  public static func makeFirstCharTable(list: [[UInt8]]) -> FirstCharTable {
+    let len = list.count
     var a = FirstCharTable(count: 256, repeatedValue: nil)
     for i in 0..<len {
-      let za = [UInt8](strings[i].utf8)
-      let c = za[0]
-      let cint = Int(c)
-      var zz = a[cint]
-      if zz != nil {
-        zz!.append(za)
+      let za = list[i]
+      let cint = Int(za[0])
+      if a[cint] != nil {
+        a[cint]!.append(za)
       } else {
         a[cint] = [za]
       }
@@ -1769,12 +1772,12 @@ public struct ByteStream {
     return a
   }
 
-  public mutating func eatStringFromList(firstCharTable: FirstCharTable)
+  public mutating func eatBytesFromTable(firstCharTable: FirstCharTable)
       -> Bool {
-    return matchStringFromList(firstCharTable, consume: true) >= 0
+    return matchBytesFromTable(firstCharTable, consume: true) >= 0
   }
 
-  public mutating func matchStringFromList(firstCharTable: FirstCharTable,
+  public mutating func matchBytesFromTable(firstCharTable: FirstCharTable,
       consume: Bool = false) -> Int {
     var r = -1
     let i = currentIndex
