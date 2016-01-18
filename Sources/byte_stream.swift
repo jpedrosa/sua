@@ -1879,33 +1879,28 @@ public struct ByteStream {
 
   public mutating func matchUntilIncludingBytes(bytes: [UInt8],
       consume: Bool = false) -> Int {
-    var r = -1
     var i = currentIndex
-    let zlen = bytes.count
-    let len = lineEndIndex - zlen + 1
-    if i < len {
-      let fc = bytes[0]
-      while i < len {
-        if _bytes[i] == fc {
-          var zi = 1
-          while zi < zlen {
-            if _bytes[i + zi] != bytes[zi] {
-              break
-            }
-            zi += 1
-          }
-          if zi >= zlen {
-            r = i + zlen
-            if consume {
-              currentIndex = r
-            }
-            break
+    let blen = bytes.count
+    let len = lineEndIndex - blen + 1
+    let fc = bytes[0]
+    let savei = i
+    AGAIN: while i < len {
+      if _bytes[i] == fc {
+        for bi in 1..<blen {
+          if _bytes[i + bi] != bytes[bi] {
+            i += 1
+            continue AGAIN
           }
         }
-        i += 1
+        i += blen
+        if consume {
+          currentIndex = i
+        }
+        return i - savei
       }
+      i += 1
     }
-    return r
+    return -1
   }
 
   public mutating func eatOneNotFromTable(firstCharTable: FirstCharTable)
@@ -1966,7 +1961,7 @@ public struct ByteStream {
           if i + blen <= len {
             for bi in 1..<blen {
               if _bytes[i + bi] != b[bi] {
-                break BYTES
+                continue BYTES
               }
             }
             if consume {
