@@ -1816,12 +1816,12 @@ public struct ByteStream {
     return r
   }
 
-  public mutating func eatUntilIncludingStringFromList(
+  public mutating func eatUntilIncludingBytesFromTable(
       firstCharTable: FirstCharTable) -> Bool {
-    return matchUntilIncludingStringFromList(firstCharTable, consume: true) >= 0
+    return matchUntilIncludingBytesFromTable(firstCharTable, consume: true) >= 0
   }
 
-  public mutating func matchUntilIncludingStringFromList(
+  public mutating func matchUntilIncludingBytesFromTable(
       firstCharTable: FirstCharTable, consume: Bool = false) -> Int {
     var r = -1
     var i = currentIndex
@@ -1829,8 +1829,7 @@ public struct ByteStream {
     if i < len {
       var zi = -1
       while i < len {
-        let c = _bytes[i]
-        if let zz = firstCharTable[Int(c)] {
+        if let zz = firstCharTable[Int(_bytes[i])] {
           let jlen = zz.count
           var j = 0
           var zlen = 0
@@ -1999,56 +1998,36 @@ public struct ByteStream {
     return r
   }
 
-  public mutating func eatWhileStringFromList(firstCharTable: FirstCharTable)
+  public mutating func eatWhileBytesFromTable(firstCharTable: FirstCharTable)
       -> Bool {
-    return matchWhileStringFromList(firstCharTable, consume: true) >= 0
+    return matchWhileBytesFromTable(firstCharTable, consume: true) >= 0
   }
 
-  public mutating func matchWhileStringFromList(firstCharTable: FirstCharTable,
+  public mutating func matchWhileBytesFromTable(firstCharTable: FirstCharTable,
       consume: Bool = false) -> Int {
-    var r = -1
     var i = currentIndex
     let len = lineEndIndex
     if i < len {
-      let savei = i
-      while i < len {
-        let c = _bytes[i]
-        if let zz = firstCharTable[Int(c)] {
-          let jlen = zz.count
-          var j = 0
-          while j < jlen {
-            let z = zz[j]
-            let zlen = z.count
-            if i + zlen <= len {
-              var zi = 1
-              while zi < zlen {
-                if _bytes[i + zi] != z[zi] {
-                  break
-                }
-                zi += 1
-              }
-              if zi >= zlen {
-                break
+      if let a = firstCharTable[Int(_bytes[i])] {
+        let savei = i
+        BYTES: for b in a {
+          let blen = b.count
+          if i + blen <= len {
+            for bi in 1..<blen {
+              if _bytes[i + bi] != b[bi] {
+                continue BYTES
               }
             }
-            j += 1
+            i += blen
+            if consume {
+              currentIndex = i
+            }
+            return i - savei
           }
-          if j >= jlen {
-            break
-          }
-        } else {
-          break
-        }
-        i += 1
-      }
-      if i > savei {
-        r = i - savei
-        if consume {
-          currentIndex = i
         }
       }
     }
-    return r
+    return -1
   }
 
   mutating func merge(buffer: [UInt8], maxBytes: Int) {

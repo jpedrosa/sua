@@ -15,6 +15,8 @@ enum ByteMatcherEntry {
   case EatBytesFromTable
   case EatOneFromTable
   case EatOneNotFromTable
+  case EatUntilIncludingBytesFromTable
+  case EatWhileBytesFromTable
 }
 
 
@@ -140,6 +142,12 @@ struct ByteMatcher {
         case .EatOneFromTable:
           let table = (data as! FirstCharTableParam).table
           b = stream.eatOneFromTable(table)
+        case .EatUntilIncludingBytesFromTable:
+          let table = (data as! FirstCharTableParam).table
+          b = stream.eatUntilIncludingBytesFromTable(table)
+        case .EatWhileBytesFromTable:
+          let table = (data as! FirstCharTableParam).table
+          b = stream.eatWhileBytesFromTable(table)
       }
       if !b && !data.optional { // No success and not optional.
         return false
@@ -245,6 +253,38 @@ struct ByteMatcher {
   mutating func eatOneFromBytes(list: [[UInt8]], optional: Bool = false) {
     let a = ByteStream.makeFirstCharTable(list)
     self.list.append(FirstCharTableParam(entry: .EatOneFromTable,
+        optional: optional, table: a))
+  }
+
+  mutating func eatUntilIncludingStringFromList(list: [String],
+      optional: Bool = false) {
+    let a = ByteStream.makeFirstCharTable(list)
+    self.list.append(FirstCharTableParam(
+        entry: .EatUntilIncludingBytesFromTable,
+        optional: optional, table: a))
+  }
+
+  mutating func eatUntilIncludingBytesFromList(list: [[UInt8]],
+      optional: Bool = false) {
+    let a = ByteStream.makeFirstCharTable(list)
+    self.list.append(FirstCharTableParam(
+        entry: .EatUntilIncludingBytesFromTable,
+        optional: optional, table: a))
+  }
+
+  mutating func eatWhileStringFromList(list: [String],
+      optional: Bool = false) {
+    let a = ByteStream.makeFirstCharTable(list)
+    self.list.append(FirstCharTableParam(
+        entry: .EatWhileBytesFromTable,
+        optional: optional, table: a))
+  }
+
+  mutating func eatWhileBytesFromList(list: [[UInt8]],
+      optional: Bool = false) {
+    let a = ByteStream.makeFirstCharTable(list)
+    self.list.append(FirstCharTableParam(
+        entry: .EatWhileBytesFromTable,
         optional: optional, table: a))
   }
 
