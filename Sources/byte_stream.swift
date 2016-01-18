@@ -1864,23 +1864,31 @@ public struct ByteStream {
   }
 
   public mutating func eatUntilIncludingString(string: String) -> Bool {
-    return matchUntilIncludingString(string, consume: true) >= 0
+    return matchUntilIncludingBytes(string.bytes, consume: true) >= 0
   }
 
   public mutating func matchUntilIncludingString(string: String,
       consume: Bool = false) -> Int {
+    return matchUntilIncludingBytes(string.bytes, consume: consume)
+  }
+
+  public mutating func eatUntilIncludingBytes(bytes: [UInt8]) -> Bool {
+    return matchUntilIncludingBytes(bytes, consume: true) >= 0
+  }
+
+  public mutating func matchUntilIncludingBytes(bytes: [UInt8],
+      consume: Bool = false) -> Int {
     var r = -1
     var i = currentIndex
-    var sa = [UInt8](string.utf8)
-    let zlen = sa.count
+    let zlen = bytes.count
     let len = lineEndIndex - zlen + 1
     if i < len {
-      let sfc = sa[0]
+      let fc = bytes[0]
       while i < len {
-        if _bytes[i] == sfc {
+        if _bytes[i] == fc {
           var zi = 1
           while zi < zlen {
-            if _bytes[i + zi] != sa[zi] {
+            if _bytes[i + zi] != bytes[zi] {
               break
             }
             zi += 1
