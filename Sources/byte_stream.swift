@@ -405,7 +405,7 @@ public struct ByteStream {
   }
 
   public mutating func eatString(string: String) -> Bool {
-    return matchString(string, consume: true) >= 0
+    return matchBytes(string.bytes, consume: true) >= 0
   }
 
   public mutating func matchString(string: String, consume: Bool = false)
@@ -474,24 +474,31 @@ public struct ByteStream {
   }
 
   public mutating func eatUntilString(string: String) -> Bool {
-    return matchUntilString(string, consume: true) >= 0
+    return matchUntilBytes(string.bytes, consume: true) >= 0
   }
 
   public mutating func matchUntilString(string: String, consume: Bool = false)
       -> Int {
+    return matchUntilBytes(string.bytes, consume: consume)
+  }
+
+  public mutating func eatUntilBytes(bytes: [UInt8]) -> Bool {
+    return matchUntilBytes(bytes, consume: true) >= 0
+  }
+
+  public mutating func matchUntilBytes(bytes: [UInt8], consume: Bool = false)
+      -> Int {
     var r = -1
     var i = currentIndex
     let savei = i
-    var sa = [UInt8](string.utf8)
-    let seqLen = sa.count
+    let seqLen = bytes.count
     let len = lineEndIndex - seqLen + 1
-    let sfc = sa[0]
+    let fc = bytes[0]
     while i < len {
-      let c = _bytes[i]
-      if c == sfc {
+      if _bytes[i] == fc {
         var j = 1
         while j < seqLen {
-          if _bytes[i + j] != sa[j] {
+          if _bytes[i + j] != bytes[j] {
             i += j - 1
             break
           }
