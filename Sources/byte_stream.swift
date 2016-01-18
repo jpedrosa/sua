@@ -410,15 +410,23 @@ public struct ByteStream {
 
   public mutating func matchString(string: String, consume: Bool = false)
       -> Int {
+    return matchBytes(string.bytes, consume: consume)
+  }
+
+  public mutating func eatBytes(bytes: [UInt8]) -> Bool {
+    return matchBytes(bytes, consume: true) >= 0
+  }
+
+  public mutating func matchBytes(bytes: [UInt8], consume: Bool = false)
+      -> Int {
     var r = -1
     let i = currentIndex
     let savei = i
-    var sa = [UInt8](string.utf8)
-    let len = sa.count
-    if i + len - 1 < lineEndIndex && _bytes[i] == sa[0] {
+    let len = bytes.count
+    if i + len - 1 < lineEndIndex && _bytes[i] == bytes[0] {
       var j = 1
       while j < len {
-        if _bytes[i + j] != sa[j] {
+        if _bytes[i + j] != bytes[j] {
           break
         }
         j += 1
