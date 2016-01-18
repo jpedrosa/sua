@@ -4,12 +4,13 @@ enum ByteMatcherEntry {
   case EatWhileDigit
   case Next
   case SkipToEnd
+  case MatchEos
   case EatOne
   case EatUntilOne
   case EatBytes
   case EatUntilBytes
   case EatUntilIncludingBytes
-  case MatchEos
+  case EatUntil
 }
 
 
@@ -39,6 +40,13 @@ struct ByteMatcher {
     var entry: ByteMatcherEntry
     var optional: Bool
     var bytes: [UInt8]
+  }
+
+
+  struct UInt8FnParam: ByteMatcherEntryData {
+    var entry: ByteMatcherEntry
+    var optional: Bool
+    var fn: (c: UInt8) -> Bool
   }
 
 
@@ -99,6 +107,9 @@ struct ByteMatcher {
         case .EatUntilIncludingBytes:
           let bytes = (data as! BytesParam).bytes
           b = stream.eatUntilIncludingBytes(bytes)
+        case .EatUntil:
+          let fn = (data as! UInt8FnParam).fn
+          b = stream.eatUntil(fn)
       }
       if !b && !data.optional { // No success and not optional.
         return false
@@ -160,6 +171,10 @@ struct ByteMatcher {
   mutating func eatUntilIncludingBytes(bytes: [UInt8], optional: Bool = false) {
     list.append(BytesParam(entry: .EatUntilIncludingBytes, optional: optional,
         bytes: bytes))
+  }
+
+  mutating func eatUntil(optional: Bool = false, fn: (c: UInt8) -> Bool) {
+    list.append(UInt8FnParam(entry: .EatUntil, optional: optional, fn: fn))
   }
 
 }
