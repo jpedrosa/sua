@@ -330,22 +330,21 @@ public struct ByteStream {
     return r
   }
 
-  public mutating func maybeEat(fn: (ctx: ByteStream) -> Bool) -> Bool {
+  public mutating func maybeEat(fn: (inout ctx: ByteStream) -> Bool) -> Bool {
     return maybeMatch(fn) >= 0
   }
 
-  public mutating func maybeMatch(fn: (ctx: ByteStream) -> Bool) -> Int {
-    var r = -1
+  public mutating func maybeMatch(fn: (inout ctx: ByteStream) -> Bool) -> Int {
     let savei = currentIndex
-    if fn(ctx: self) {
-      r = currentIndex - savei
+    if fn(ctx: &self) {
+      return currentIndex - savei
     } else if milestoneIndex > 0 {
       currentIndex = milestoneIndex
       milestoneIndex = 0
     } else {
       currentIndex = savei
     }
-    return r
+    return -1
   }
 
   public mutating func nestMatch(fn: (ctx: ByteStream) -> Bool) -> Int {
