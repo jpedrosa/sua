@@ -17,6 +17,7 @@ enum ByteMatcherEntry {
   case EatOneNotFromTable
   case EatUntilIncludingBytesFromTable
   case EatWhileBytesFromTable
+  case EatUntilBytesFromTable
 }
 
 
@@ -148,6 +149,9 @@ struct ByteMatcher {
         case .EatWhileBytesFromTable:
           let table = (data as! FirstCharTableParam).table
           b = stream.eatWhileBytesFromTable(table)
+        case .EatUntilBytesFromTable:
+          let table = (data as! FirstCharTableParam).table
+          b = stream.eatUntilBytesFromTable(table)
       }
       if !b && !data.optional { // No success and not optional.
         return false
@@ -275,16 +279,28 @@ struct ByteMatcher {
   mutating func eatWhileStringFromList(list: [String],
       optional: Bool = false) {
     let a = ByteStream.makeFirstCharTable(list)
-    self.list.append(FirstCharTableParam(
-        entry: .EatWhileBytesFromTable,
+    self.list.append(FirstCharTableParam(entry: .EatWhileBytesFromTable,
         optional: optional, table: a))
   }
 
   mutating func eatWhileBytesFromList(list: [[UInt8]],
       optional: Bool = false) {
     let a = ByteStream.makeFirstCharTable(list)
-    self.list.append(FirstCharTableParam(
-        entry: .EatWhileBytesFromTable,
+    self.list.append(FirstCharTableParam(entry: .EatWhileBytesFromTable,
+        optional: optional, table: a))
+  }
+
+  mutating func eatUntilStringFromList(list: [String],
+      optional: Bool = false) {
+    let a = ByteStream.makeFirstCharTable(list)
+    self.list.append(FirstCharTableParam(entry: .EatUntilBytesFromTable,
+        optional: optional, table: a))
+  }
+
+  mutating func eatUntilBytesFromList(list: [[UInt8]],
+      optional: Bool = false) {
+    let a = ByteStream.makeFirstCharTable(list)
+    self.list.append(FirstCharTableParam(entry: .EatUntilBytesFromTable,
         optional: optional, table: a))
   }
 

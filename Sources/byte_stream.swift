@@ -1948,52 +1948,38 @@ public struct ByteStream {
     return nil
   }
 
-  public mutating func eatWhileNotStringFromList(firstCharTable: FirstCharTable)
+  public mutating func eatUntilBytesFromTable(firstCharTable: FirstCharTable)
       -> Bool {
-    return matchWhileNotStringFromList(firstCharTable, consume: true) >= 0
+    return matchUntilBytesFromTable(firstCharTable, consume: true) >= 0
   }
 
-  public mutating func matchWhileNotStringFromList(
+  public mutating func matchUntilBytesFromTable(
       firstCharTable: FirstCharTable, consume: Bool = false) -> Int {
     var r = -1
     var i = currentIndex
     let len = lineEndIndex
-    if i < len {
-      let savei = i
-      while i < len {
-        let c = _bytes[i]
-        if let zz = firstCharTable[Int(c)] {
-          let jlen = zz.count
-          var j = 0
-          while j < jlen {
-            let z = zz[j]
-            let zlen = z.count
-            if i + zlen <= len {
-              var zi = 1
-              while zi < zlen {
-                if _bytes[i + zi] != z[zi] {
-                  break
-                }
-                zi += 1
-              }
-              if zi >= zlen {
-                break
+    let savei = i
+    OUT: while i < len {
+      if let a = firstCharTable[Int(_bytes[i])] {
+        BYTES: for b in a {
+          let blen = b.count
+          if i + blen <= len {
+            for bi in 1..<blen {
+              if _bytes[i + bi] != b[bi] {
+                break BYTES
               }
             }
-            j += 1
-          }
-          if j < jlen {
-            break
+            if consume {
+              currentIndex = i
+            }
+            break OUT
           }
         }
-        i += 1
       }
-      if i > savei {
-        r = i - savei
-        if consume {
-          currentIndex = i
-        }
-      }
+      i += 1
+    }
+    if i > savei {
+      r = i - savei
     }
     return r
   }
@@ -2009,9 +1995,9 @@ public struct ByteStream {
   // starts again. This is regardless of byte list length.
   public mutating func matchWhileBytesFromTable(firstCharTable: FirstCharTable,
       consume: Bool = false) -> Int {
+    var r = -1
     var i = currentIndex
     let len = lineEndIndex
-    var r = -1
     let savei = i
     AGAIN: while i < len {
       if let a = firstCharTable[Int(_bytes[i])] {
