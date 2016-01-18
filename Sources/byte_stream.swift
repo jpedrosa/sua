@@ -1779,41 +1779,29 @@ public struct ByteStream {
 
   public mutating func matchBytesFromTable(firstCharTable: FirstCharTable,
       consume: Bool = false) -> Int {
-    var r = -1
-    let i = currentIndex
+    var i = currentIndex
     let len = lineEndIndex
+    let savei = i
     if i < len {
-      if let zz = firstCharTable[Int(_bytes[i])] {
-        let jlen = zz.count
-        var j = 0
-        var zi = 0
-        var zlen = 0
-        while j < jlen {
-          let z = zz[j]
-          zlen = z.count
-          if i + zlen <= len {
-            zi = 1
-            while zi < zlen {
-              if _bytes[i + zi] != z[zi] {
-                break
+      if let a = firstCharTable[Int(_bytes[i])] {
+        BYTES: for b in a {
+          let blen = b.count
+          if i + blen <= len {
+            for bi in 1..<blen {
+              if _bytes[i + bi] != b[bi] {
+                continue BYTES
               }
-              zi += 1
             }
-            if zi >= zlen {
-              break
+            i += blen
+            if consume {
+              currentIndex = i
             }
-          }
-          j += 1
-        }
-        if j < jlen {
-          r = zi
-          if consume {
-            currentIndex = i + zlen
+            return i - savei
           }
         }
       }
     }
-    return r
+    return -1
   }
 
   public mutating func eatUntilIncludingBytesFromTable(
