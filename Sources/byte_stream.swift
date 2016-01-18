@@ -2003,11 +2003,16 @@ public struct ByteStream {
     return matchWhileBytesFromTable(firstCharTable, consume: true) >= 0
   }
 
+  // For byte lists of different sizes, the first byte list added to the table
+  // that is a match will result in a short-circuit so that other matching
+  // byte lists following it may not be considered until the next match loop
+  // starts again. This is regardless of byte list length.
   public mutating func matchWhileBytesFromTable(firstCharTable: FirstCharTable,
       consume: Bool = false) -> Int {
     var i = currentIndex
     let len = lineEndIndex
-    if i < len {
+    var r = -1
+    AGAIN: while i < len {
       if let a = firstCharTable[Int(_bytes[i])] {
         let savei = i
         BYTES: for b in a {
@@ -2022,12 +2027,14 @@ public struct ByteStream {
             if consume {
               currentIndex = i
             }
-            return i - savei
+            r = i - savei
+            continue AGAIN
           }
         }
       }
+      break
     }
-    return -1
+    return r
   }
 
   mutating func merge(buffer: [UInt8], maxBytes: Int) {
