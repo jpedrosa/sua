@@ -2012,9 +2012,9 @@ public struct ByteStream {
     var i = currentIndex
     let len = lineEndIndex
     var r = -1
+    let savei = i
     AGAIN: while i < len {
       if let a = firstCharTable[Int(_bytes[i])] {
-        let savei = i
         BYTES: for b in a {
           let blen = b.count
           if i + blen <= len {
