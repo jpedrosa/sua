@@ -1950,7 +1950,6 @@ public struct ByteStream {
 
   public mutating func matchUntilBytesFromTable(
       firstCharTable: FirstCharTable, consume: Bool = false) -> Int {
-    var r = -1
     var i = currentIndex
     let len = lineEndIndex
     let savei = i
@@ -1974,9 +1973,9 @@ public struct ByteStream {
       i += 1
     }
     if i > savei {
-      r = i - savei
+      return i - savei
     }
-    return r
+    return -1
   }
 
   public mutating func eatWhileBytesFromTable(firstCharTable: FirstCharTable)
