@@ -422,31 +422,37 @@ public struct ByteStream {
 
   public mutating func eatOnEitherString(string1: String, string2: String)
       -> Bool {
-    return matchOnEitherString(string1, string2: string2, consume: true) >= 0
+    return matchOnEitherBytes(string1.bytes, bytes2: string2.bytes,
+        consume: true) >= 0
   }
 
-  // Used for case insensitive matching
+  // Used for case insensitive matching.
   public mutating func matchOnEitherString(string1: String, string2: String,
       consume: Bool = false) -> Int {
-    var s1a = [UInt8](string1.utf8)
-    var s2a = [UInt8](string2.utf8)
-    let seqLen = s1a.count
+    return matchOnEitherBytes(string1.bytes, bytes2: string2.bytes)
+  }
+
+  public mutating func eatOnEitherBytes(bytes1: [UInt8], bytes2: [UInt8])
+      -> Bool {
+    return matchOnEitherBytes(bytes1, bytes2: bytes2, consume: true) >= 0
+  }
+
+  // Used for case insensitive matching.
+  public mutating func matchOnEitherBytes(bytes1: [UInt8], bytes2: [UInt8],
+      consume: Bool = false) -> Int {
+    let blen = bytes1.count
     let i = currentIndex
-    if i + seqLen - 1 < lineEndIndex {
-      var j = 0
-      while j < seqLen {
-        let c = _bytes[i + j]
-        if c != s1a[j] && c != s2a[j] {
-          break
+    if i + blen - 1 < lineEndIndex {
+      for bi in 0..<blen {
+        let c = _bytes[i + bi]
+        if c != bytes1[bi] && c != bytes2[bi] {
+          return -1
         }
-        j += 1
       }
-      if j >= seqLen {
-        if consume {
-          currentIndex += seqLen
-        }
-        return seqLen
+      if consume {
+        currentIndex += blen
       }
+      return blen
     }
     return -1
   }
@@ -496,7 +502,6 @@ public struct ByteStream {
 
   public mutating func matchUntilThree(c1: UInt8, c2: UInt8, c3: UInt8,
       consume: Bool = false) -> Int {
-    var r = -1
     var i = currentIndex
     let savei = i
     let len = lineEndIndex - 2
@@ -511,12 +516,12 @@ public struct ByteStream {
       i = lineEndIndex
     }
     if i > savei {
-      r = i - savei
       if consume {
         currentIndex = i
       }
+      return i - savei
     }
-    return r
+    return -1
   }
 
   public mutating func eatTwo(c1: UInt8, c2: UInt8) -> Bool {
@@ -582,7 +587,6 @@ public struct ByteStream {
 
   public mutating func matchWhileNeitherTwo(c1: UInt8, c2: UInt8,
       consume: Bool = false) -> Int {
-    var r = -1
     var i = currentIndex
     let savei = i
     let len = lineEndIndex
@@ -594,12 +598,12 @@ public struct ByteStream {
       i += 1
     }
     if i > savei {
-      r = i - savei
       if consume {
         currentIndex = i
       }
+      return i - savei
     }
-    return r
+    return -1
   }
 
   public mutating func eatWhileNeitherThree(c1: UInt8, c2: UInt8, c3: UInt8)
@@ -609,7 +613,6 @@ public struct ByteStream {
 
   public mutating func matchWhileNeitherThree(c1: UInt8, c2: UInt8, c3: UInt8,
       consume: Bool = false) -> Int {
-    var r = -1
     var i = currentIndex
     let savei = i
     let len = lineEndIndex
@@ -621,12 +624,12 @@ public struct ByteStream {
       i += 1
     }
     if i > savei {
-      r = i - savei
       if consume {
         currentIndex = i
       }
+      return i - savei
     }
-    return r
+    return -1
   }
 
   public mutating func eatWhileNeitherFour(c1: UInt8, c2: UInt8, c3: UInt8,
@@ -636,7 +639,6 @@ public struct ByteStream {
 
   public mutating func matchWhileNeitherFour(c1: UInt8, c2: UInt8, c3: UInt8,
       c4: UInt8, consume: Bool = false) -> Int {
-    var r = -1
     var i = currentIndex
     let savei = i
     let len = lineEndIndex
@@ -648,12 +650,12 @@ public struct ByteStream {
       i += 1
     }
     if i > savei {
-      r = i - savei
       if consume {
         currentIndex = i
       }
+      return i - savei
     }
-    return r
+    return -1
   }
 
   public mutating func eatWhileNeitherFive(c1: UInt8, c2: UInt8, c3: UInt8,
@@ -664,7 +666,6 @@ public struct ByteStream {
 
   public mutating func matchWhileNeitherFive(c1: UInt8, c2: UInt8, c3: UInt8,
       c4: UInt8, c5: UInt8, consume: Bool = false) -> Int {
-    var r = -1
     var i = currentIndex
     let savei = i
     let len = lineEndIndex
@@ -676,12 +677,12 @@ public struct ByteStream {
       i += 1
     }
     if i > savei {
-      r = i - savei
       if consume {
         currentIndex = i
       }
+      return i - savei
     }
-    return r
+    return -1
   }
 
   public mutating func eatWhileNeitherSix(c1: UInt8, c2: UInt8, c3: UInt8,
@@ -692,7 +693,6 @@ public struct ByteStream {
 
   public mutating func matchWhileNeitherSix(c1: UInt8, c2: UInt8, c3: UInt8,
       c4: UInt8, c5: UInt8, c6: UInt8, consume: Bool = false) -> Int {
-    var r = -1
     var i = currentIndex
     let savei = i
     let len = lineEndIndex
@@ -704,12 +704,12 @@ public struct ByteStream {
       i += 1
     }
     if i > savei {
-      r = i - savei
       if consume {
         currentIndex = i
       }
+      return i - savei
     }
-    return r
+    return -1
   }
 
   public mutating func eatWhileNeitherSeven(c1: UInt8, c2: UInt8, c3: UInt8,
@@ -721,7 +721,6 @@ public struct ByteStream {
   public mutating func matchWhileNeitherSeven(c1: UInt8, c2: UInt8, c3: UInt8,
       c4: UInt8, c5: UInt8, c6: UInt8, c7: UInt8, consume: Bool = false)
       -> Int {
-    var r = -1
     var i = currentIndex
     let savei = i
     let len = lineEndIndex
@@ -734,12 +733,12 @@ public struct ByteStream {
       i += 1
     }
     if i > savei {
-      r = i - savei
       if consume {
         currentIndex = i
       }
+      return i - savei
     }
-    return r
+    return -1
   }
 
   public var currentToken: [UInt8] {
@@ -747,8 +746,9 @@ public struct ByteStream {
   }
 
   public var currentTokenString: String? {
-    return String.fromCharCodes(_bytes, start: startIndex,
-        end: currentIndex - 1)
+    let ei = currentIndex - 1
+    return ei < startIndex ? nil :
+        String.fromCharCodes(_bytes, start: startIndex, end: ei)
   }
 
   // More specialization
