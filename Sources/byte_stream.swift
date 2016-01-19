@@ -792,27 +792,25 @@ public struct ByteStream {
     return matchDigit(true) != nil
   }
 
-  public mutating func eatWhileDigit() -> Bool {
-    return matchWhileDigit(true) >= 0
-  }
-
   public mutating func matchDigit(consume: Bool = false) -> UInt8? {
-    var r: UInt8?
     let i = currentIndex
     if i < lineEndIndex {
       let c = _bytes[i]
       if c >= 48 && c <= 57 {
-        r = c
         if consume {
           currentIndex = i + 1
         }
+        return c
       }
     }
-    return r
+    return nil
+  }
+
+  public mutating func eatWhileDigit() -> Bool {
+    return matchWhileDigit(true) >= 0
   }
 
   public mutating func matchWhileDigit(consume: Bool = false) -> Int {
-    var r = -1
     var i = currentIndex
     let savei = i
     let len = lineEndIndex
@@ -824,43 +822,41 @@ public struct ByteStream {
       i += 1
     }
     if i > savei {
-      r = i - savei
       if consume {
         currentIndex = i
       }
+      return i - savei
     }
-    return r
+    return -1
   }
 
   public mutating func eatLowerCase() -> Bool {
     return matchLowerCase(true) != nil
   }
 
-  public mutating func eatLowerCases() -> Bool {
-    return matchWhileLowerCase(true) >= 0
-  }
-
   // a-z
   public mutating func matchLowerCase(consume: Bool = false) -> UInt8? {
-    var r: UInt8?
     let i = currentIndex
     if i < lineEndIndex {
       let c = _bytes[i]
       if c >= 97 && c <= 122 { // a-z
-        r = c
         if consume {
           currentIndex = i + 1
         }
+        return c
       }
     }
-    return r
+    return nil
+  }
+
+  public mutating func eatWhileLowerCase() -> Bool {
+    return matchWhileLowerCase(true) >= 0
   }
 
   public mutating func matchWhileLowerCase(consume: Bool = false) -> Int {
-    var r = -1
     var i = currentIndex
-    let savei = i
     let len = lineEndIndex
+    let savei = i
     while i < len {
       let c = _bytes[i]
       if c < 97 || c > 122 {
@@ -869,43 +865,41 @@ public struct ByteStream {
       i += 1
     }
     if i > savei {
-      r = i - savei
       if consume {
         currentIndex = i
       }
+      return i - savei
     }
-    return r
+    return -1
   }
 
   public mutating func eatUpperCase() -> Bool {
     return matchUpperCase(true) != nil
   }
 
-  public mutating func eatWhileUpperCase() -> Bool {
-    return matchWhileUpperCase(true) >= 0
-  }
-
   // A-Z
   public mutating func matchUpperCase(consume: Bool = false) -> UInt8? {
-    var r: UInt8?
     let i = currentIndex
     if i < lineEndIndex {
       let c = _bytes[i]
       if c >= 65 && c <= 90 { // A-Z
-        r = c
         if consume {
           currentIndex = i + 1
         }
+        return c
       }
     }
-    return r
+    return nil
+  }
+
+  public mutating func eatWhileUpperCase() -> Bool {
+    return matchWhileUpperCase(true) >= 0
   }
 
   public mutating func matchWhileUpperCase(consume: Bool = false) -> Int {
-    var r = -1
     var i = currentIndex
-    let savei = i
     let len = lineEndIndex
+    let savei = i
     while i < len {
       let c = _bytes[i]
       if c < 65 || c > 90 {
@@ -914,20 +908,16 @@ public struct ByteStream {
       i += 1
     }
     if i > savei {
-      r = i - savei
       if consume {
         currentIndex = i
       }
+      return i - savei
     }
-    return r
+    return -1
   }
 
   public mutating func eatAlpha() -> Bool {
     return matchAlpha(true) != nil
-  }
-
-  public mutating func eatWhileAlpha() -> Bool {
-    return matchWhileAlpha(true) >= 0;
   }
 
   // A-Z a-z
@@ -943,6 +933,10 @@ public struct ByteStream {
       }
     }
     return nil
+  }
+
+  public mutating func eatWhileAlpha() -> Bool {
+    return matchWhileAlpha(true) >= 0;
   }
 
   public mutating func matchWhileAlpha(consume: Bool = false) -> Int {
@@ -971,10 +965,6 @@ public struct ByteStream {
     return matchAlphaUnderline(true) >= 0
   }
 
-  public mutating func eatWhileAlphaUnderline() -> Bool {
-    return matchWhileAlphaUnderline(true) >= 0
-  }
-
   // A-Z a-z _
   public mutating func matchAlphaUnderline(consume: Bool = false) -> UInt8? {
     let i = currentIndex
@@ -988,6 +978,10 @@ public struct ByteStream {
       }
     }
     return nil
+  }
+
+  public mutating func eatWhileAlphaUnderline() -> Bool {
+    return matchWhileAlphaUnderline(true) >= 0
   }
 
   public mutating func matchWhileAlphaUnderline(consume: Bool = false) -> Int {
@@ -1016,10 +1010,6 @@ public struct ByteStream {
     return matchAlphaUnderlineDigit(true) != nil
   }
 
-  public mutating func eatWhileAlphaUnderlineDigit() -> Bool {
-    return matchWhileAlphaUnderlineDigit(true) >= 0
-  }
-
   // A-Z a-z _ 0-9
   public mutating func matchAlphaUnderlineDigit(consume: Bool = false)
       -> UInt8? {
@@ -1035,6 +1025,10 @@ public struct ByteStream {
       }
     }
     return nil
+  }
+
+  public mutating func eatWhileAlphaUnderlineDigit() -> Bool {
+    return matchWhileAlphaUnderlineDigit(true) >= 0
   }
 
   public mutating func matchWhileAlphaUnderlineDigit(consume: Bool = false)
@@ -1065,31 +1059,29 @@ public struct ByteStream {
     return matchAlphaUnderlineDigitMinus(true) != nil
   }
 
-  public mutating func eatWhileAlphaUnderlineDigitMinus() -> Bool {
-    return matchWhileAlphaUnderlineDigitMinus(true) >= 0
-  }
-
   // A-Z a-z _ 0-9
   public mutating func matchAlphaUnderlineDigitMinus(consume: Bool = false)
       -> UInt8? {
-    var r: UInt8?
     let i = currentIndex
     if i < lineEndIndex {
       let c = _bytes[i] // A-Z a-z _ 0-9 -
       if (c >= 65 && c <= 90) || (c >= 97 && c <= 122) || c == 95 ||
           (c >= 48 && c <= 57) || c == 45 {
-        r = c
         if consume {
           currentIndex = i + 1
         }
+        return c
       }
     }
-    return r
+    return nil
+  }
+
+  public mutating func eatWhileAlphaUnderlineDigitMinus() -> Bool {
+    return matchWhileAlphaUnderlineDigitMinus(true) >= 0
   }
 
   public mutating func matchWhileAlphaUnderlineDigitMinus(consume: Bool = false)
       -> Int {
-    var r = -1
     var i = currentIndex
     let savei = i
     let len = lineEndIndex
@@ -1104,44 +1096,42 @@ public struct ByteStream {
       i += 1
     }
     if i > savei {
-      r = i - savei
       if consume {
         currentIndex = i
       }
+      return i - savei
     }
-    return r
+    return -1
   }
 
   public mutating func eatAlphaDigit() -> Bool {
     return matchAlphaDigit(true) != nil
   }
 
-  public mutating func eatWhileAlphaDigit() -> Bool {
-    return matchWhileAlphaDigit(true) >= 0
-  }
-
   // A-Z a-z 0-9
   public mutating func matchAlphaDigit(consume: Bool = false) -> UInt8? {
-    var r: UInt8?
     let i = currentIndex
     if i < lineEndIndex {
       let c = _bytes[i] // A-Z a-z 0-9
       if (c >= 65 && c <= 90) || (c >= 97 && c <= 122) ||
           (c >= 48 && c <= 57) {
-        r = c
         if consume {
           currentIndex = i + 1
         }
+        return c
       }
     }
-    return r
+    return nil
+  }
+
+  public mutating func eatWhileAlphaDigit() -> Bool {
+    return matchWhileAlphaDigit(true) >= 0
   }
 
   public mutating func matchWhileAlphaDigit(consume: Bool = false) -> Int {
-    var r = -1
     var i = currentIndex
-    let savei = i
     let len = lineEndIndex
+    let savei = i
     while i < len {
       let c = _bytes[i]
       if (c >= 65 && c <= 90) || (c >= 97 && c <= 122) ||
@@ -1153,44 +1143,42 @@ public struct ByteStream {
       i += 1
     }
     if i > savei {
-      r = i - savei
       if consume {
         currentIndex = i
       }
+      return i - savei
     }
-    return r
+    return -1
   }
 
   public mutating func eatHexa() -> Bool {
     return matchHexa(true) != nil
   }
 
-  public mutating func eatWhileHexa() -> Bool {
-    return matchWhileHexa(true) >= 0
-  }
-
   // A-F a-f 0-9
   public mutating func matchHexa(consume: Bool = false) -> UInt8? {
-    var r: UInt8?
     let i = currentIndex
     if i < lineEndIndex {
       let c = _bytes[i] // A-F a-f 0-9
       if (c >= 65 && c <= 70) || (c >= 97 && c <= 102) ||
           (c >= 48 && c <= 57) {
-        r = c
         if consume {
           currentIndex = i + 1
         }
+        return c
       }
     }
-    return r
+    return nil
+  }
+
+  public mutating func eatWhileHexa() -> Bool {
+    return matchWhileHexa(true) >= 0
   }
 
   public mutating func matchWhileHexa(consume: Bool = false) -> Int {
-    var r = -1
     var i = currentIndex
-    let savei = i
     let len = lineEndIndex
+    let savei = i
     while i < len {
       let c = _bytes[i]
       if (c >= 65 && c <= 70) || (c >= 97 && c <= 102) ||
@@ -1202,12 +1190,12 @@ public struct ByteStream {
       i += 1
     }
     if i > savei {
-      r = i - savei
       if consume {
         currentIndex = i
       }
+      return i - savei
     }
-    return r
+    return -1
   }
 
   // One-off symbols
