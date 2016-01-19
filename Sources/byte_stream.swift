@@ -932,25 +932,23 @@ public struct ByteStream {
 
   // A-Z a-z
   public mutating func matchAlpha(consume: Bool = false) -> UInt8? {
-    var r: UInt8?
     let i = currentIndex
     if i < lineEndIndex {
       let c = _bytes[i]
       if (c >= 65 && c <= 90) || (c >= 97 && c <= 122) { // A-Z a-z
-        r = c
         if consume {
           currentIndex = i + 1
         }
+        return c
       }
     }
-    return r
+    return nil
   }
 
   public mutating func matchWhileAlpha(consume: Bool = false) -> Int {
-    var r = -1
     var i = currentIndex
-    let savei = i
     let len = lineEndIndex
+    let savei = i
     while i < len {
       let c = _bytes[i]
       if (c >= 65 && c <= 90) || (c >= 97 && c <= 122) {
@@ -961,12 +959,12 @@ public struct ByteStream {
       i += 1
     }
     if i > savei {
-      r = i - savei
       if consume {
         currentIndex = i
       }
+      return i - savei
     }
-    return r
+    return -1
   }
 
   public mutating func eatAlphaUnderline() -> Bool {
@@ -979,25 +977,23 @@ public struct ByteStream {
 
   // A-Z a-z _
   public mutating func matchAlphaUnderline(consume: Bool = false) -> UInt8? {
-    var r: UInt8?
     let i = currentIndex
     if i < lineEndIndex {
       let c = _bytes[i] // A-Z a-z _
       if (c >= 65 && c <= 90) || (c >= 97 && c <= 122) || c == 95 {
-        r = c
         if consume {
           currentIndex = i + 1
         }
+        return c
       }
     }
-    return r
+    return nil
   }
 
   public mutating func matchWhileAlphaUnderline(consume: Bool = false) -> Int {
-    var r = -1
     var i = currentIndex
-    let savei = i
     let len = lineEndIndex
+    let savei = i
     while i < len {
       let c = _bytes[i]
       if (c >= 65 && c <= 90) || (c >= 97 && c <= 122) || c == 95 {
@@ -1008,12 +1004,12 @@ public struct ByteStream {
       i += 1
     }
     if i > savei {
-      r = i - savei
       if consume {
         currentIndex = i
       }
+      return i - savei
     }
-    return r
+    return -1
   }
 
   public mutating func eatAlphaUnderlineDigit() -> Bool {
@@ -1027,27 +1023,25 @@ public struct ByteStream {
   // A-Z a-z _ 0-9
   public mutating func matchAlphaUnderlineDigit(consume: Bool = false)
       -> UInt8? {
-    var r: UInt8?
     let i = currentIndex
     if i < lineEndIndex {
       let c = _bytes[i] // A-Z a-z _ 0-9
       if (c >= 65 && c <= 90) || (c >= 97 && c <= 122) || c == 95 ||
           (c >= 48 && c <= 57) {
-        r = c
         if consume {
           currentIndex = i + 1
         }
+        return c
       }
     }
-    return r
+    return nil
   }
 
   public mutating func matchWhileAlphaUnderlineDigit(consume: Bool = false)
       -> Int {
-    var r = -1
     var i = currentIndex
-    let savei = i
     let len = lineEndIndex
+    let savei = i
     while i < len {
       let c = _bytes[i]
       if (c >= 65 && c <= 90) || (c >= 97 && c <= 122) || c == 95 ||
@@ -1059,12 +1053,12 @@ public struct ByteStream {
       i += 1
     }
     if i > savei {
-      r = i - savei
       if consume {
         currentIndex = i
       }
+      return i - savei
     }
-    return r
+    return -1
   }
 
   public mutating func eatAlphaUnderlineDigitMinus() -> Bool {
