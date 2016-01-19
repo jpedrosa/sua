@@ -408,22 +408,17 @@ public struct ByteStream {
   public mutating func matchBytes(bytes: [UInt8], consume: Bool = false)
       -> Int {
     let i = currentIndex
-    let savei = i
-    let len = bytes.count
-    if i + len - 1 < lineEndIndex && _bytes[i] == bytes[0] {
-      var j = 1
-      while j < len {
-        if _bytes[i + j] != bytes[j] {
-          break
+    let blen = bytes.count
+    if i + blen - 1 < lineEndIndex && _bytes[i] == bytes[0] {
+      for bi in 1..<blen {
+        if _bytes[i + bi] != bytes[bi] {
+          return -1
         }
-        j += 1
       }
-      if j >= len {
-        if consume {
-          currentIndex += len
-        }
-        return savei
+      if consume {
+        currentIndex += blen
       }
+      return blen
     }
     return -1
   }
@@ -474,38 +469,27 @@ public struct ByteStream {
 
   public mutating func matchUntilBytes(bytes: [UInt8], consume: Bool = false)
       -> Int {
-    var r = -1
     var i = currentIndex
     let savei = i
-    let seqLen = bytes.count
-    let len = lineEndIndex - seqLen + 1
+    let blen = bytes.count
+    let len = lineEndIndex - blen + 1
     let fc = bytes[0]
-    while i < len {
+    AGAIN: while i < len {
       if _bytes[i] == fc {
-        var j = 1
-        while j < seqLen {
-          if _bytes[i + j] != bytes[j] {
-            i += j - 1
-            break
+        for bi in 1..<blen {
+          if _bytes[i + bi] != bytes[bi] {
+            i += 1
+            continue AGAIN
           }
-          j += 1
         }
-        if j >= seqLen {
-          break
+        if consume {
+          currentIndex = i
         }
+        return i - savei
       }
       i += 1
     }
-    if i >= len {
-      i = lineEndIndex
-    }
-    if i > savei {
-      r = i - savei
-      if consume {
-        currentIndex = i
-      }
-    }
-    return r
+    return -1
   }
 
   // Triple quotes sequence
