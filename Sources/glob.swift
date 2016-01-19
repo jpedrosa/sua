@@ -17,7 +17,6 @@ public enum GlobTokenizer: Tokenizer {
 enum GlobTokenType: TokenType {
   case Text
   case Name
-  case Symbol
   case SymAsterisk           // *
   case SymQuestionMark       // ?
   case SymCircumflex         // ^ for negation of a set.
@@ -25,9 +24,6 @@ enum GlobTokenType: TokenType {
   case SetLowerCaseRange     // a-b
   case SetUpperCaseRange     // A-Z
   case SetDigitRange         // 0-9
-  case SetLowerChar
-  case SetUpperChar
-  case SetDigitChar
   case SymOBSet              // [
   case SymCBSet              // ]
   case OptionalName
