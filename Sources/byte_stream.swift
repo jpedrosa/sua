@@ -61,18 +61,17 @@ public struct ByteStream {
 
   public mutating func match(consume: Bool = false, fn: (c: UInt8) -> Bool)
       -> Bool {
-    var r = false
     let i = currentIndex
     if i < lineEndIndex {
       let c = _bytes[i]
       if fn(c: c) {
-        r = true
         if consume {
           currentIndex = i + 1
         }
+        return true
       }
     }
-    return r
+    return false
   }
 
   public mutating func eatOne(c: UInt8) -> Bool {
@@ -80,15 +79,14 @@ public struct ByteStream {
   }
 
   public mutating func matchOne(c: UInt8, consume: Bool = false) -> Bool {
-    var r = false
     let i = currentIndex
     if i < lineEndIndex && c == _bytes[i] {
-      r = true
       if consume {
         currentIndex = i + 1
       }
+      return true
     }
-    return r
+    return false
   }
 
   public mutating func eatWhileOne(c: UInt8) -> Bool {
@@ -96,7 +94,6 @@ public struct ByteStream {
   }
 
   public mutating func matchWhileOne(c: UInt8, consume: Bool = false) -> Int {
-    var r = -1
     var i = currentIndex
     let savei = i
     let len = lineEndIndex
@@ -107,12 +104,12 @@ public struct ByteStream {
       i += 1
     }
     if i > savei {
-      r = i - savei
       if consume {
         currentIndex = i
       }
+      return i - savei
     }
-    return r
+    return -1
   }
 
   public mutating func eatSpace() -> Bool {
@@ -528,16 +525,15 @@ public struct ByteStream {
 
   public mutating func matchTwo(c1: UInt8, c2: UInt8, consume: Bool = false)
       -> Bool {
-    var r = false
     let i = currentIndex
     if i < lineEndIndex - 1 && _bytes[i] == c1 &&
         _bytes[i + 1] == c2 {
-      r = true
       if consume {
         currentIndex = i + 2
       }
+      return true
     }
-    return r
+    return false
   }
 
   public mutating func eatThree(c1: UInt8, c2: UInt8, c3: UInt8) -> Bool {
@@ -546,40 +542,38 @@ public struct ByteStream {
 
   public mutating func matchThree(c1: UInt8, c2: UInt8, c3: UInt8,
       consume: Bool = false) -> Bool {
-    var r = false
     let i = currentIndex
     if i < lineEndIndex - 2 && _bytes[i] == c1 &&
         _bytes[i + 1] == c2 && _bytes[i + 2] == c3 {
-      r = true
       if consume {
         currentIndex = i + 3
       }
+      return true
     }
-    return r
+    return false
   }
 
   public mutating func eatUntilOne(c: UInt8) -> Bool {
     return matchUntilOne(c, consume: true) >= 0
   }
 
-  public mutating func matchUntilOne(mc: UInt8, consume: Bool = false) -> Int {
-    var r = -1
+  public mutating func matchUntilOne(c: UInt8, consume: Bool = false) -> Int {
     var i = currentIndex
     let savei = i
     let len = lineEndIndex
     while i < len {
-      if _bytes[i] == mc {
+      if _bytes[i] == c {
         break
       }
       i += 1
     }
     if i > savei {
-      r = i - savei
       if consume {
         currentIndex = i
       }
+      return i - savei
     }
-    return r
+    return -1
   }
 
   public mutating func eatWhileNeitherTwo(c1: UInt8, c2: UInt8) -> Bool {
@@ -1457,7 +1451,6 @@ public struct ByteStream {
   }
 
   public mutating func matchInQuotes(qc: UInt8, consume: Bool = false) -> Int {
-    var r = -1
     var i = currentIndex
     if qc == _bytes[i] {
       let savei = i
@@ -1466,16 +1459,15 @@ public struct ByteStream {
       while i < len {
         if _bytes[i] == qc {
           i += 1
-          r = i - savei
           if consume {
             currentIndex = i
           }
-          break
+          return i - savei
         }
         i += 1
       }
     }
-    return r
+    return -1
   }
 
   public mutating func eatInEscapedQuotes(qc: UInt8) -> Bool {
@@ -1484,7 +1476,6 @@ public struct ByteStream {
 
   public mutating func matchInEscapedQuotes(qc: UInt8, consume: Bool = false)
       -> Int {
-    var r = -1
     var i = currentIndex
     if qc == _bytes[i] {
       let savei = i
@@ -1501,13 +1492,13 @@ public struct ByteStream {
       }
       if i < len {
         i += 1
-        r = i - savei
         if consume {
           currentIndex = i
         }
+        return i - savei
       }
     }
-    return r
+    return -1
   }
 
   public mutating func eatUntilEscapedString(string: String) -> Bool {
@@ -1567,7 +1558,6 @@ public struct ByteStream {
 
   public mutating func matchEscapingUntil(consume: Bool = false,
       fn: (c: UInt8) -> Bool) -> Int {
-    var r = -1
     var i = currentIndex
     let len = lineEndIndex
     let savei = i
@@ -1581,12 +1571,12 @@ public struct ByteStream {
       i += 1
     }
     if i > savei {
-      r = i - savei
       if consume {
         currentIndex = i
       }
+      return i - savei
     }
-    return r
+    return -1
   }
 
   public mutating func eatKeyword(string: String) -> Bool {
@@ -1674,7 +1664,6 @@ public struct ByteStream {
 
   public mutating func matchEscapingUntilThree(c1: UInt8, c2: UInt8, c3: UInt8,
       consume: Bool = false) -> Int {
-    var r = -1
     var i = currentIndex
     let savei = i
     let len = lineEndIndex - 2
@@ -1695,12 +1684,12 @@ public struct ByteStream {
       i = lineEndIndex
     }
     if i > savei {
-      r = i - savei
       if consume {
         currentIndex = i
       }
+      return i - savei
     }
-    return r
+    return -1
   }
 
   // String list matching
