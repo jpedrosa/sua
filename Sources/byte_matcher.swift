@@ -92,7 +92,7 @@ struct ByteMatcher {
     stream.currentIndex = startIndex
     if _retryAware {
       _retryAtPartialSuccess = false
-      // b = doMatchWithRetry()
+      b = doMatchWithRetry()
     } else {
       b = doMatch()
     }
@@ -102,61 +102,103 @@ struct ByteMatcher {
     return -1
   }
 
+  mutating func doDataMatch(data: ByteMatcherEntryData) -> Bool {
+    switch data.entry {
+      case .EatWhileDigit:
+        return stream.eatWhileDigit()
+      case .SkipToEnd:
+        return stream.skipToEnd()
+      case .MatchEos:
+        return stream.currentIndex >= stream.bytes.count
+      case .Next:
+        return stream.next() != nil
+      case .EatOne:
+        let c = (data as! UInt8Param).c
+        return stream.eatOne(c)
+      case .EatUntilOne:
+        let c = (data as! UInt8Param).c
+        return stream.eatUntilOne(c)
+      case .EatBytes:
+        let bytes = (data as! BytesParam).bytes
+        return stream.eatBytes(bytes)
+      case .EatUntilBytes:
+        let bytes = (data as! BytesParam).bytes
+        return stream.eatUntilBytes(bytes)
+      case .EatUntilIncludingBytes:
+        let bytes = (data as! BytesParam).bytes
+        return stream.eatUntilIncludingBytes(bytes)
+      case .EatUntil:
+        let fn = (data as! UInt8FnParam).fn
+        return stream.eatUntil(fn)
+      case .EatOn:
+        let fn = (data as! CtxFnParam).fn
+        return stream.maybeEat(fn)
+      case .EatBytesFromTable:
+        let table = (data as! FirstCharTableParam).table
+        return stream.eatBytesFromTable(table)
+      case .EatOneNotFromTable:
+        let table = (data as! FirstCharTableParam).table
+        return stream.eatOneNotFromTable(table)
+      case .EatOneFromTable:
+        let table = (data as! FirstCharTableParam).table
+        return stream.eatOneFromTable(table)
+      case .EatUntilIncludingBytesFromTable:
+        let table = (data as! FirstCharTableParam).table
+        return stream.eatUntilIncludingBytesFromTable(table)
+      case .EatWhileBytesFromTable:
+        let table = (data as! FirstCharTableParam).table
+        return stream.eatWhileBytesFromTable(table)
+      case .EatUntilBytesFromTable:
+        let table = (data as! FirstCharTableParam).table
+        return stream.eatUntilBytesFromTable(table)
+      case .RetryAtPartialSuccess:
+        _retryAtPartialSuccess = true
+        return true
+    }
+  }
+
+  mutating func doMatchWithRetry() -> Bool {
+    var i = 0
+    let len = list.count
+    while i < len {
+      var data = list[i]
+      var b = doDataMatch(data)
+      if !b && !data.optional { // No success and not optional.
+        return false
+      } else if _retryAtPartialSuccess {
+        i += 1
+        let savei = i
+        var ci = -1
+        while true {
+          while i < len {
+            data = list[i]
+            b = doDataMatch(data)
+            if !b { // No success.
+              if !data.optional { // Not optional.
+                break
+              }
+            } else if ci < 0 {
+              ci = stream.currentIndex
+            }
+            i += 1
+          }
+          if i < len && ci >= 0 {
+            i = savei
+            stream.currentIndex = ci
+            ci = -1
+          } else {
+            break
+          }
+        }
+        break
+      }
+    }
+    return i >= len
+  }
+
   mutating func doMatch() -> Bool {
     for data in list {
-      var b = false
-      switch data.entry {
-        case .EatWhileDigit:
-          b = stream.eatWhileDigit()
-        case .SkipToEnd:
-          b = stream.skipToEnd()
-        case .MatchEos:
-          b = stream.currentIndex >= stream.bytes.count
-        case .Next:
-          b = stream.next() != nil
-        case .EatOne:
-          let c = (data as! UInt8Param).c
-          b = stream.eatOne(c)
-        case .EatUntilOne:
-          let c = (data as! UInt8Param).c
-          b = stream.eatUntilOne(c)
-        case .EatBytes:
-          let bytes = (data as! BytesParam).bytes
-          b = stream.eatBytes(bytes)
-        case .EatUntilBytes:
-          let bytes = (data as! BytesParam).bytes
-          b = stream.eatUntilBytes(bytes)
-        case .EatUntilIncludingBytes:
-          let bytes = (data as! BytesParam).bytes
-          b = stream.eatUntilIncludingBytes(bytes)
-        case .EatUntil:
-          let fn = (data as! UInt8FnParam).fn
-          b = stream.eatUntil(fn)
-        case .EatOn:
-          let fn = (data as! CtxFnParam).fn
-          b = stream.maybeEat(fn)
-        case .EatBytesFromTable:
-          let table = (data as! FirstCharTableParam).table
-          b = stream.eatBytesFromTable(table)
-        case .EatOneNotFromTable:
-          let table = (data as! FirstCharTableParam).table
-          b = stream.eatOneNotFromTable(table)
-        case .EatOneFromTable:
-          let table = (data as! FirstCharTableParam).table
-          b = stream.eatOneFromTable(table)
-        case .EatUntilIncludingBytesFromTable:
-          let table = (data as! FirstCharTableParam).table
-          b = stream.eatUntilIncludingBytesFromTable(table)
-        case .EatWhileBytesFromTable:
-          let table = (data as! FirstCharTableParam).table
-          b = stream.eatWhileBytesFromTable(table)
-        case .EatUntilBytesFromTable:
-          let table = (data as! FirstCharTableParam).table
-          b = stream.eatUntilBytesFromTable(table)
-        case .RetryAtPartialSuccess:
-          _retryAtPartialSuccess = true
-          b = true
-      }
+      let b = doDataMatch(data)
       if !b && !data.optional { // No success and not optional.
         return false
       }
