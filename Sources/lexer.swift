@@ -109,7 +109,9 @@ public class CommonLexer: Lexer, CustomStringConvertible {
       //p([stream.currentTokenString, status.tokenizer]);
       //p(status.stored);
       if let t = tt {
-        try fn(type: t)
+        if stream.startIndex != stream.currentIndex {
+          try fn(type: t)
+        }
       } else {
         throw CommonLexerError.TokenType
       }
