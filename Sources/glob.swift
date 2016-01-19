@@ -3,7 +3,6 @@
 public enum GlobTokenizer: Tokenizer {
   case OptionalNameComma
   case OptionalName
-  case OptionalNameMaybeEmpty
   case Set
   case SetCharMaybeEmpty
   case SetNegation
@@ -52,8 +51,6 @@ class GlobLexer: CommonLexer {
         return inOptionalNameComma()
       case .OptionalName:
         return inOptionalName()
-      case .OptionalNameMaybeEmpty:
-        return inOptionalNameMaybeEmpty()
       case .Set:
         return inSet()
       case .SetCharMaybeEmpty:
@@ -104,14 +101,6 @@ class GlobLexer: CommonLexer {
       return .OptionalName
     }
     return inText() // Unexpected comma.
-  }
-
-  func inOptionalNameMaybeEmpty() -> GlobTokenType {
-    if stream.eatCloseBrace() {
-      status.tokenizer = T.Body
-      return .SymCBOptionalName
-    }
-    return inOptionalName()
   }
 
   func inSet() -> GlobTokenType {
@@ -203,7 +192,7 @@ class GlobLexer: CommonLexer {
     } else if stream.eatQuestionMark() {
       return .SymQuestionMark
     } else if stream.eatOpenBrace() {
-      status.tokenizer = T.OptionalNameMaybeEmpty
+      status.tokenizer = T.OptionalName
       return .SymOBOptionalName
     } else if stream.eatOpenBracket() {
       status.tokenizer = T.SetMaybeEmpty
