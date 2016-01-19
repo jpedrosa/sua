@@ -18,6 +18,7 @@ enum ByteMatcherEntry {
   case EatUntilIncludingBytesFromTable
   case EatWhileBytesFromTable
   case EatUntilBytesFromTable
+  case RetryAtPartialSuccess
 }
 
 
@@ -152,6 +153,9 @@ struct ByteMatcher {
         case .EatUntilBytesFromTable:
           let table = (data as! FirstCharTableParam).table
           b = stream.eatUntilBytesFromTable(table)
+        case .RetryAtPartialSuccess:
+          _retryAtPartialSuccess = true
+          b = true
       }
       if !b && !data.optional { // No success and not optional.
         return false
@@ -302,6 +306,11 @@ struct ByteMatcher {
     let a = ByteStream.makeFirstCharTable(list)
     self.list.append(FirstCharTableParam(entry: .EatUntilBytesFromTable,
         optional: optional, table: a))
+  }
+
+  mutating func retryAtPartialSuccess() {
+    add(.RetryAtPartialSuccess, optional: false)
+    _retryAware = true
   }
 
 }
