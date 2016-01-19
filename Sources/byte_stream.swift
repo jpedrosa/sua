@@ -124,25 +124,23 @@ public struct ByteStream {
   }
 
   public mutating func matchSpace(consume: Bool = false) -> UInt8? {
-    var r: UInt8?
     let i = currentIndex
     if i < lineEndIndex {
       let c = _bytes[i]
       if c == 32 || c == 160 { // space or \u00a0
-        r = c
         if consume {
           currentIndex = i + 1
         }
+        return c
       }
     }
-    return r
+    return nil
   }
 
   public mutating func matchWhileSpace(consume: Bool = false) -> Int {
-    var r = -1
     var i = currentIndex
-    let savei = i
     let len = lineEndIndex
+    let savei = i
     while i < len {
       let c = _bytes[i]
       if c != 32 && c != 160 {
@@ -151,12 +149,12 @@ public struct ByteStream {
       i += 1
     }
     if i > savei {
-      r = i - savei
       if consume {
         currentIndex = i
       }
+      return i - savei
     }
-    return r
+    return -1
   }
 
   public mutating func eatSpaceTab() -> Bool {
@@ -168,22 +166,20 @@ public struct ByteStream {
   }
 
   public mutating func matchSpaceTab(consume: Bool = false) -> UInt8? {
-    var r: UInt8?
     let i = currentIndex
     if i < lineEndIndex {
       let c = _bytes[i]
       if c == 32 || c == 160 || c == 9 { // space or \u00a0 or tab
-        r = c
         if consume {
           currentIndex = i + 1
         }
+        return c
       }
     }
-    return r
+    return nil
   }
 
   public mutating func matchWhileSpaceTab(consume: Bool = false) -> Int {
-    var r = -1
     var i = currentIndex
     let savei = i
     let len = lineEndIndex
@@ -195,12 +191,12 @@ public struct ByteStream {
       i += 1
     }
     if i > savei {
-      r = i - savei
       if consume {
         currentIndex = i
       }
+      return i - savei
     }
-    return r
+    return -1
   }
 
   public mutating func skipToEnd() -> Bool {
@@ -209,7 +205,6 @@ public struct ByteStream {
   }
 
   public func findIndex(c: UInt8, startAt: Int = 0) -> Int {
-    var r = -1
     let len = _bytes.count
     let lim = len - 2
     var i = startAt
@@ -222,12 +217,11 @@ public struct ByteStream {
     }
     while i < len {
       if _bytes[i] == c {
-        r = i
-        break
+        return i
       }
       i += 1
     }
-    return r
+    return -1
   }
 
   public mutating func skipTo(c: UInt8) -> Int {
@@ -263,10 +257,9 @@ public struct ByteStream {
 
   public mutating func matchUntil(consume: Bool = false, fn: (c: UInt8) -> Bool)
       -> Int {
-    var r = -1
     var i = currentIndex
-    let savei = i
     let len = lineEndIndex
+    let savei = i
     while i < len {
       if fn(c: _bytes[i]) {
         break
@@ -274,12 +267,12 @@ public struct ByteStream {
       i += 1
     }
     if i > savei {
-      r = i - savei
       if consume {
         currentIndex = i
       }
+      return i - savei
     }
-    return r
+    return -1
   }
 
   public mutating func eatWhile(fn: (c: UInt8) -> Bool) -> Bool {
@@ -288,7 +281,6 @@ public struct ByteStream {
 
   public mutating func matchWhile(consume: Bool = false, fn: (c: UInt8) -> Bool)
       -> Int {
-    var r = -1
     var i = currentIndex
     let savei = i
     let len = lineEndIndex
@@ -299,12 +291,12 @@ public struct ByteStream {
       i += 1
     }
     if i > savei {
-      r = i - savei
       if consume {
         currentIndex = i
       }
+      return i - savei
     }
-    return r
+    return -1
   }
 
   public mutating func seekContext(fn: (c: UInt8) -> Bool) -> Bool {
@@ -313,21 +305,19 @@ public struct ByteStream {
 
   public mutating func matchContext(consume: Bool = false,
       fn: (c: UInt8) -> Bool) -> Int {
-    var r = -1
     var i = currentIndex
     let len = lineEndIndex
     while i < len {
       if fn(c: _bytes[i]) {
-        r = i
         if consume {
           currentIndex = i
           startIndex = i
         }
-        break
+        return i
       }
       i += 1
     }
-    return r
+    return -1
   }
 
   public mutating func maybeEat(fn: (inout ctx: ByteStream) -> Bool) -> Bool {
@@ -349,17 +339,16 @@ public struct ByteStream {
 
   public mutating func nestMatch(fn: (ctx: ByteStream) -> Bool) -> Int {
     var ctx = ByteStream._cloneFromPool(self)
-    var r = -1
     let savei = currentIndex
     if fn(ctx: ctx) {
       currentIndex = ctx.currentIndex
-      r = currentIndex - savei
+      return currentIndex - savei
     } else if ctx.milestoneIndex > 0 {
       currentIndex = ctx.milestoneIndex
       ctx.milestoneIndex = 0
     }
     ByteStream._returnToPool(ctx)
-    return r
+    return -1
   }
 
   public mutating func collectTokenString() -> String? {
@@ -418,7 +407,6 @@ public struct ByteStream {
 
   public mutating func matchBytes(bytes: [UInt8], consume: Bool = false)
       -> Int {
-    var r = -1
     let i = currentIndex
     let savei = i
     let len = bytes.count
@@ -431,13 +419,13 @@ public struct ByteStream {
         j += 1
       }
       if j >= len {
-        r = savei
         if consume {
           currentIndex += len
         }
+        return savei
       }
     }
-    return r
+    return -1
   }
 
   public mutating func eatOnEitherString(string1: String, string2: String)
@@ -448,7 +436,6 @@ public struct ByteStream {
   // Used for case insensitive matching
   public mutating func matchOnEitherString(string1: String, string2: String,
       consume: Bool = false) -> Int {
-    var r = -1
     var s1a = [UInt8](string1.utf8)
     var s2a = [UInt8](string2.utf8)
     let seqLen = s1a.count
@@ -463,13 +450,13 @@ public struct ByteStream {
         j += 1
       }
       if j >= seqLen {
-        r = seqLen
         if consume {
           currentIndex += seqLen
         }
+        return seqLen
       }
     }
-    return r
+    return -1
   }
 
   public mutating func eatUntilString(string: String) -> Bool {
