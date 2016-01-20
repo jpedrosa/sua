@@ -360,6 +360,33 @@ public struct GlobMatcherAlternativePart: GlobMatcherPart {
 }
 
 
+// GlobMatcher will parse a ByteMatcher that can be used for matching from the
+// start of a string. In order to allow for some flexibility, it will not match
+// to the very end of a string by default, but it can be configured to do so by
+// calling ByteMatcher#matchEos().
+//
+// E.g.
+//     var bm = try GlobMatcher.parse("hello*.txt").assembleMatcher()
+//     p(bm.match("hello_world.txta")) // Prints 15.
+//
+//     // If instead we call the matchEos on the ByteMatcher:
+//     var bm2 = try GlobMatcher.parse("hello*.txt").assembleMatcher()
+//     bm2.matchEos()
+//     p(bm2.match("hello_world.txta")) // Prints -1. Not found. Since it didn't
+//                                     // match it to the very end.
+//
+// The glob features that are understood are these:
+//
+//     * The ? wildcard - It will match a single character of any kind.
+//
+//     * The * wildcard - It will match any character until the next pattern is
+//                        found.
+//     * The [a-z] [abc] [A-Za-z0-9_] character set - It will match a character
+//                        included in its ranges or sets.
+//     * The {jpg,png} optional names - It will match one of the names included
+//                        in its list.
+// The special characters could be escaped with the \ backslash character in
+// order to allow them to work like any other character.
 public struct GlobMatcher {
 
   var parts = [GlobMatcherPart]()
