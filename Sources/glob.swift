@@ -39,9 +39,7 @@ class GlobLexer: CommonLexer {
   var escapeTokenType = GlobTokenType.Name
 
   init(bytes: [UInt8]) {
-    var st = CommonLexerStatus(tokenizer: T.Body)
-    st.defaultTokenizer = T.Text
-    super.init(bytes: bytes, status: st)
+    super.init(bytes: bytes, status: CommonLexerStatus(tokenizer: T.Body))
   }
 
   override func next(tokenizer: Tokenizer) -> TokenType {

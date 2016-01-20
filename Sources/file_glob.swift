@@ -47,9 +47,7 @@ class FileGlobLexer: CommonLexer {
   typealias T = FileGlobTokenizer
 
   init(bytes: [UInt8]) {
-    var st = CommonLexerStatus(tokenizer: T.Root)
-    st.defaultTokenizer = T.Text
-    super.init(bytes: bytes, status: st)
+    super.init(bytes: bytes, status: CommonLexerStatus(tokenizer: T.Root))
   }
 
   override func next(tokenizer: Tokenizer) -> TokenType {

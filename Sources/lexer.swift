@@ -31,7 +31,6 @@ protocol Lexer {
 
 public struct CommonLexerStatus {
 
-  public var defaultTokenizer: Tokenizer?
   public var lineCount = 0
   public var newLineKeyword: TokenType?
   public var lineStartIndex = 0
@@ -39,7 +38,6 @@ public struct CommonLexerStatus {
   public var spaceTokenizer: Tokenizer?
 
   init(tokenizer: Tokenizer?) {
-    defaultTokenizer = nil
     lineCount = 0
     newLineKeyword = nil
     lineStartIndex = 0
@@ -98,12 +96,6 @@ public class CommonLexer: Lexer, CustomStringConvertible {
       if tt == nil {
         if let t = status.tokenizer {
           tt = next(t)
-          if tt == nil {
-            if let dt = status.defaultTokenizer {
-              status.tokenizer = dt
-              tt = next(dt)
-            }
-          }
         }
       }
       //p([stream.currentTokenString, status.tokenizer]);
