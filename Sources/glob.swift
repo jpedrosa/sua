@@ -17,7 +17,7 @@ enum GlobTokenType: TokenType {
   case Name
   case SymAsterisk           // *
   case SymQuestionMark       // ?
-  case SymCircumflex         // ^ for negation of a set.
+  case SymExclamation        // ! for negation of a set.
   case SetChar               // Non-range elements of a set.
   case SetLowerCaseRange     // a-b
   case SetUpperCaseRange     // A-Z
@@ -137,9 +137,9 @@ class GlobLexer: CommonLexer {
   }
 
   func inSetNegation() -> GlobTokenType {
-    if stream.eatCircumflex() {
+    if stream.eatExclamation() {
       status.tokenizer = T.Set
-      return .SymCircumflex
+      return .SymExclamation
     }
     return inSet()
   }
