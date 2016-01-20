@@ -4,7 +4,6 @@ public enum GlobTokenizer: Tokenizer {
   case OptionalNameComma
   case OptionalName
   case Set
-  case SetCharMaybeEmpty
   case SetNegation
   case SetMaybeEmpty
   case Body
@@ -53,8 +52,6 @@ class GlobLexer: CommonLexer {
         return inOptionalName()
       case .Set:
         return inSet()
-      case .SetCharMaybeEmpty:
-        return inSetCharMaybeEmpty()
       case .SetNegation:
         return inSetNegation()
       case .SetMaybeEmpty:
@@ -141,19 +138,12 @@ class GlobLexer: CommonLexer {
     return .SetChar
   }
 
-  func inSetCharMaybeEmpty() -> GlobTokenType {
-    if stream.eatCloseBracket() {
-      return inText()
-    }
-    return inSet()
-  }
-
   func inSetNegation() -> GlobTokenType {
     if stream.eatCircumflex() {
       status.tokenizer = T.Set
       return .SymCircumflex
     }
-    return inSetCharMaybeEmpty()
+    return inSet()
   }
 
   func inSetMaybeEmpty() -> GlobTokenType {
