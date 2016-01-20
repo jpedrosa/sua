@@ -197,3 +197,235 @@ class GlobLexer: CommonLexer {
   }
 
 }
+
+
+public class Ascii {
+
+  public static func toLowerCase(c: UInt8) -> UInt8 {
+    if c >= 97 && c <= 122 {
+      return c - 32
+    }
+    return c
+  }
+
+  public static func toLowerCase(bytes: [UInt8]) -> [UInt8] {
+    var a = bytes
+    let len = a.count
+    for i in 0..<len {
+      let c = a[i]
+      if c >= 97 && c <= 122 {
+        a[i] = c - 32
+      }
+    }
+    return a
+  }
+
+}
+
+
+enum GlobMatcherType {
+  case Name
+  case Any
+  case One
+  case Set
+  case Alternative
+}
+
+
+protocol GlobMatcherPart {
+  var type: GlobMatcherType { get }
+}
+
+
+struct GlobMatcherNamePart: GlobMatcherPart {
+
+  var type: GlobMatcherType
+  var bytes: [UInt8]
+
+  init(bytes: [UInt8]) {
+    type = .Name
+    self.bytes = bytes
+  }
+
+}
+
+
+struct GlobMatcherAnyPart: GlobMatcherPart {
+
+  var type = GlobMatcherType.Any
+
+}
+
+
+struct GlobMatcherOnePart: GlobMatcherPart {
+
+  var type = GlobMatcherType.One
+
+}
+
+
+struct GlobMatcherSetPart: GlobMatcherPart {
+
+  var type: GlobMatcherType
+  var chars: [UInt8]
+  var ranges: [UInt8]
+  var negated: Bool
+
+  init() {
+    type = .Set
+    chars = []
+    ranges = []
+    negated = false
+  }
+
+  mutating func addChar(c: UInt8) {
+    chars.append(c)
+  }
+
+  mutating func addRange(c1: UInt8, c2: UInt8) {
+    if c1 < c2 {
+      ranges.append(c1)
+      ranges.append(c2)
+    } else {
+      ranges.append(c2)
+      ranges.append(c1)
+    }
+  }
+
+  mutating func negate() {
+    negated = true
+  }
+
+  func makeComparisonTable() -> FirstCharTable {
+    var table = FirstCharTable(count: 256, repeatedValue: nil)
+    for c in chars {
+      table[Int(c)] = FirstCharTableValue
+    }
+    var i = 0
+    let len = ranges.count
+    while i < len {
+      var n = ranges[i]
+      let n2 = ranges[i + 1]
+      while n <= n2 {
+        table[Int(n)] = FirstCharTableValue
+        n += 1
+      }
+      i += 2
+    }
+    return table
+  }
+
+  var isNegated: Bool {
+    return negated
+  }
+
+}
+
+
+struct GlobMatcherAlternativePart: GlobMatcherPart {
+
+  var type: GlobMatcherType
+  var bytes: [[UInt8]]
+
+  init() {
+    type = .Alternative
+    bytes = []
+  }
+
+  mutating func addBytes(bytes: [UInt8]) {
+    self.bytes.append(bytes)
+  }
+
+}
+
+
+struct GlobMatcher {
+
+  var parts = [GlobMatcherPart]()
+  var currentSet: GlobMatcherSetPart?
+  var currentAlternative: GlobMatcherAlternativePart?
+
+  mutating func addName(bytes: [UInt8]) {
+    parts.append(GlobMatcherNamePart(bytes: bytes))
+  }
+
+  mutating func addAny() {
+    parts.append(GlobMatcherAnyPart())
+  }
+
+  mutating func addOne() {
+    parts.append(GlobMatcherOnePart())
+  }
+
+  mutating func startSet() {
+    currentSet = GlobMatcherSetPart()
+  }
+
+  mutating func addSetChar(c: UInt8) {
+    currentSet!.addChar(c)
+  }
+
+  mutating func addSetRange(c1: UInt8, c2: UInt8) {
+    currentSet!.addRange(c1, c2: c2)
+  }
+
+  mutating func negateSet() {
+    currentSet!.negate()
+  }
+
+  mutating func saveSet() {
+    parts.append(currentSet!)
+  }
+
+  mutating func startAlternative() {
+    currentAlternative = GlobMatcherAlternativePart()
+  }
+
+  mutating func addAlternativeName(bytes: [UInt8]) {
+    currentAlternative!.addBytes(bytes)
+  }
+
+  mutating func saveAlternative() {
+    parts.append(currentAlternative!)
+  }
+
+  func assembleMatcher() -> ByteMatcher {
+    var m = ByteMatcher()
+    var lastType: GlobMatcherType?
+    for part in parts {
+      switch part.type {
+        case .Name:
+          let namePart = part as! GlobMatcherNamePart
+          if lastType == .Any {
+            m.eatUntilIncludingBytes(namePart.bytes)
+          } else {
+            m.eatBytes(namePart.bytes)
+          }
+        case .Any: () // Ignore.
+        case .One:
+          m.next()
+        case .Set: ()
+          let setPart = part as! GlobMatcherSetPart
+          let table = setPart.makeComparisonTable()
+          if setPart.isNegated {
+            m.eatOneNotFromTable(table)
+          } else {
+            m.eatBytesFromTable(table)
+          }
+        case .Alternative:
+          let altPart = part as! GlobMatcherAlternativePart
+          if lastType == .Any {
+            m.eatUntilIncludingBytesFromList(altPart.bytes)
+          } else {
+            m.eatBytesFromList(altPart.bytes)
+          }
+      }
+      lastType = part.type
+    }
+    if lastType == .Any {
+      m.skipToEnd()
+    }
+    return m
+  }
+
+}
