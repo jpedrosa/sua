@@ -12,6 +12,7 @@ public protocol LexerToken {
   var endIndex: Int { get }
   var type: TokenType { get }
   var string: String { get }
+  func collect() -> [UInt8]
 }
 
 
@@ -48,12 +49,7 @@ public struct CommonLexerStatus {
 }
 
 
-public struct CommonToken: LexerToken, CustomStringConvertible {
-
-  public var bytes: [UInt8]
-  public var startIndex: Int
-  public var endIndex: Int
-  public var type: TokenType
+extension LexerToken {
 
   public var string: String {
     if let s = String.fromCharCodes(bytes, start: startIndex,
@@ -63,10 +59,24 @@ public struct CommonToken: LexerToken, CustomStringConvertible {
     return ""
   }
 
+  public func collect() -> [UInt8] {
+    return Array(bytes[startIndex..<endIndex])
+  }
+
   public var description: String {
     return "CommonToken(startIndex: \(startIndex), endIndex: \(endIndex), " +
         "type: \(type), string: \(inspect(string)))"
   }
+
+}
+
+
+public struct CommonToken: LexerToken, CustomStringConvertible {
+
+  public var bytes: [UInt8]
+  public var startIndex: Int
+  public var endIndex: Int
+  public var type: TokenType
 
 }
 

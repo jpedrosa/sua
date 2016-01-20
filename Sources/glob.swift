@@ -12,16 +12,14 @@ public enum GlobTokenizer: Tokenizer {
 }
 
 
-enum GlobTokenType: TokenType {
+public enum GlobTokenType: TokenType {
   case Text
   case Name
   case SymAsterisk           // *
   case SymQuestionMark       // ?
   case SymExclamation        // ! for negation of a set.
   case SetChar               // Non-range elements of a set.
-  case SetLowerCaseRange     // a-b
-  case SetUpperCaseRange     // A-Z
-  case SetDigitRange         // 0-9
+  case SetRange              // a-z A-Z 0-9
   case SymOBSet              // [
   case SymCBSet              // ]
   case OptionalName
@@ -31,7 +29,18 @@ enum GlobTokenType: TokenType {
 }
 
 
-class GlobLexer: CommonLexer {
+public struct GlobToken: LexerToken, CustomStringConvertible {
+
+  public var bytes: [UInt8]
+  public var startIndex: Int
+  public var endIndex: Int
+  public var type: TokenType
+  public var globType: GlobTokenType
+
+}
+
+
+public class GlobLexer: CommonLexer {
 
   typealias T = GlobTokenizer
 
@@ -110,7 +119,7 @@ class GlobLexer: CommonLexer {
     } else if stream.eatLowerCase() {
       if stream.eatMinus() {
         if stream.eatLowerCase() {
-          return .SetLowerCaseRange
+          return .SetRange
         }
         stream.currentIndex -= 1
       }
@@ -118,7 +127,7 @@ class GlobLexer: CommonLexer {
     } else if stream.eatUpperCase() {
       if stream.eatMinus() {
         if stream.eatUpperCase() {
-          return .SetUpperCaseRange
+          return .SetRange
         }
         stream.currentIndex -= 1
       }
@@ -126,7 +135,7 @@ class GlobLexer: CommonLexer {
     } else if stream.eatDigit() {
       if stream.eatMinus() {
         if stream.eatDigit() {
-          return .SetDigitRange
+          return .SetRange
         }
         stream.currentIndex -= 1
       }
@@ -196,6 +205,18 @@ class GlobLexer: CommonLexer {
     return .Text
   }
 
+  func parseAllGlobTokens() throws -> [GlobToken] {
+    var a = [GlobToken]()
+    try parse() { tt in
+      a.append(GlobToken(bytes: self.stream.bytes,
+            startIndex: self.stream.startIndex,
+            endIndex: self.stream.currentIndex,
+            type: tt,
+            globType: tt as! GlobTokenType))
+    }
+    return a
+  }
+
 }
 
 
@@ -223,7 +244,7 @@ public class Ascii {
 }
 
 
-enum GlobMatcherType {
+public enum GlobMatcherType {
   case Name
   case Any
   case One
@@ -232,17 +253,17 @@ enum GlobMatcherType {
 }
 
 
-protocol GlobMatcherPart {
+public protocol GlobMatcherPart {
   var type: GlobMatcherType { get }
 }
 
 
-struct GlobMatcherNamePart: GlobMatcherPart {
+public struct GlobMatcherNamePart: GlobMatcherPart {
 
-  var type: GlobMatcherType
-  var bytes: [UInt8]
+  public var type: GlobMatcherType
+  public var bytes: [UInt8]
 
-  init(bytes: [UInt8]) {
+  public init(bytes: [UInt8]) {
     type = .Name
     self.bytes = bytes
   }
@@ -250,39 +271,39 @@ struct GlobMatcherNamePart: GlobMatcherPart {
 }
 
 
-struct GlobMatcherAnyPart: GlobMatcherPart {
+public struct GlobMatcherAnyPart: GlobMatcherPart {
 
-  var type = GlobMatcherType.Any
-
-}
-
-
-struct GlobMatcherOnePart: GlobMatcherPart {
-
-  var type = GlobMatcherType.One
+  public var type = GlobMatcherType.Any
 
 }
 
 
-struct GlobMatcherSetPart: GlobMatcherPart {
+public struct GlobMatcherOnePart: GlobMatcherPart {
 
-  var type: GlobMatcherType
-  var chars: [UInt8]
-  var ranges: [UInt8]
-  var negated: Bool
+  public var type = GlobMatcherType.One
 
-  init() {
+}
+
+
+public struct GlobMatcherSetPart: GlobMatcherPart {
+
+  public var type: GlobMatcherType
+  public var chars: [UInt8]
+  public var ranges: [UInt8]
+  public var negated: Bool
+
+  public init() {
     type = .Set
     chars = []
     ranges = []
     negated = false
   }
 
-  mutating func addChar(c: UInt8) {
+  public mutating func addChar(c: UInt8) {
     chars.append(c)
   }
 
-  mutating func addRange(c1: UInt8, c2: UInt8) {
+  public mutating func addRange(c1: UInt8, c2: UInt8) {
     if c1 < c2 {
       ranges.append(c1)
       ranges.append(c2)
@@ -292,11 +313,11 @@ struct GlobMatcherSetPart: GlobMatcherPart {
     }
   }
 
-  mutating func negate() {
+  public mutating func negate() {
     negated = true
   }
 
-  func makeComparisonTable() -> FirstCharTable {
+  public func makeComparisonTable() -> FirstCharTable {
     var table = FirstCharTable(count: 256, repeatedValue: nil)
     for c in chars {
       table[Int(c)] = FirstCharTableValue
@@ -315,81 +336,89 @@ struct GlobMatcherSetPart: GlobMatcherPart {
     return table
   }
 
-  var isNegated: Bool {
+  public var isNegated: Bool {
     return negated
   }
 
 }
 
 
-struct GlobMatcherAlternativePart: GlobMatcherPart {
+public struct GlobMatcherAlternativePart: GlobMatcherPart {
 
-  var type: GlobMatcherType
-  var bytes: [[UInt8]]
+  public var type: GlobMatcherType
+  public var bytes: [[UInt8]]
 
-  init() {
+  public init() {
     type = .Alternative
     bytes = []
   }
 
-  mutating func addBytes(bytes: [UInt8]) {
+  public mutating func addBytes(bytes: [UInt8]) {
     self.bytes.append(bytes)
   }
 
 }
 
 
-struct GlobMatcher {
+public struct GlobMatcher {
 
   var parts = [GlobMatcherPart]()
   var currentSet: GlobMatcherSetPart?
   var currentAlternative: GlobMatcherAlternativePart?
 
-  mutating func addName(bytes: [UInt8]) {
+  public init() { }
+
+  public mutating func addName(bytes: [UInt8]) {
     parts.append(GlobMatcherNamePart(bytes: bytes))
   }
 
-  mutating func addAny() {
+  public mutating func addAny() {
     parts.append(GlobMatcherAnyPart())
   }
 
-  mutating func addOne() {
+  public mutating func addOne() {
     parts.append(GlobMatcherOnePart())
   }
 
-  mutating func startSet() {
+  public mutating func startSet() {
     currentSet = GlobMatcherSetPart()
   }
 
-  mutating func addSetChar(c: UInt8) {
+  public mutating func addSetChar(c: UInt8) {
     currentSet!.addChar(c)
   }
 
-  mutating func addSetRange(c1: UInt8, c2: UInt8) {
+  public mutating func addSetRange(c1: UInt8, c2: UInt8) {
     currentSet!.addRange(c1, c2: c2)
   }
 
-  mutating func negateSet() {
+  public mutating func negateSet() {
     currentSet!.negate()
   }
 
-  mutating func saveSet() {
-    parts.append(currentSet!)
+  public mutating func saveSet() {
+    if let cs = currentSet {
+      if cs.ranges.count > 0 || cs.chars.count > 0 {
+        parts.append(cs)
+      }
+    }
   }
 
-  mutating func startAlternative() {
+  public mutating func startAlternative() {
     currentAlternative = GlobMatcherAlternativePart()
   }
 
-  mutating func addAlternativeName(bytes: [UInt8]) {
+  public mutating func addAlternativeName(bytes: [UInt8]) {
     currentAlternative!.addBytes(bytes)
   }
 
-  mutating func saveAlternative() {
-    parts.append(currentAlternative!)
+  public mutating func saveAlternative() {
+    if currentAlternative!.bytes.count > 0 {
+      parts.append(currentAlternative!)
+    }
   }
 
-  func assembleMatcher() -> ByteMatcher {
+  public func assembleMatcher() -> ByteMatcher {
     var m = ByteMatcher()
     var lastType: GlobMatcherType?
     for part in parts {
@@ -428,4 +457,61 @@ struct GlobMatcher {
     return m
   }
 
+  public static func parse(string: String) throws -> GlobMatcher {
+    let tokens = try GlobLexer(bytes: string.bytes).parseAllGlobTokens()
+    let len = tokens.count
+    var m = GlobMatcher()
+    if len > 0 {
+      if tokens[len - 1].globType == .Text {
+        throw GlobMatcherError.Parse
+      }
+      var i = 0
+      while i < len {
+        let token = tokens[i]
+        switch token.globType {
+          case .Name:
+            m.addName(token.collect())
+          case .SymAsterisk:
+            m.addAny()
+          case .SymQuestionMark:
+            m.addOne()
+          //case .SymOBSet:
+          case .SymOBOptionalName:
+            m.startAlternative()
+            i += 1
+            while i < len {
+              let t = tokens[i]
+              if t.globType == .OptionalName {
+                m.addAlternativeName(t.collect())
+                i += 1
+                if i < len {
+                  let gt = tokens[i].globType
+                  if gt == .SymCBOptionalName {
+                    break
+                  } else if gt == .SymCommaOptionalName {
+                    i += 1
+                    continue
+                  }
+                }
+                throw GlobMatcherError.Parse
+              } else {
+                throw GlobMatcherError.Parse
+              }
+            }
+            m.saveAlternative()
+          default:
+            GlobMatcherError.Unreachable
+        }
+        i += 1
+      }
+    }
+    return m
+  }
+
+}
+
+
+public enum GlobMatcherError: ErrorType {
+  case Parse
+  case Unreachable
 }

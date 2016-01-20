@@ -1,6 +1,6 @@
 
 
-enum ByteMatcherEntry {
+public enum ByteMatcherEntry {
   case EatWhileDigit
   case Next
   case SkipToEnd
@@ -21,12 +21,12 @@ enum ByteMatcherEntry {
 }
 
 
-protocol ByteMatcherEntryData {
+public protocol ByteMatcherEntryData {
   var entry: ByteMatcherEntry { get }
 }
 
 
-struct ByteMatcher {
+public struct ByteMatcher {
 
 
   struct EmptyParams: ByteMatcherEntryData {
@@ -67,7 +67,7 @@ struct ByteMatcher {
   var stream = ByteStream()
   var list = [ByteMatcherEntryData]()
 
-  mutating func match(string: String) -> Int {
+  public mutating func match(string: String) -> Int {
     return matchAt(string, startIndex: 0)
   }
 
@@ -75,7 +75,7 @@ struct ByteMatcher {
   // index + 1 and the startIndex.
   //
   // Returns -1 in case the matching was unsuccessful.
-  mutating func matchAt(string: String, startIndex: Int) -> Int {
+  public mutating func matchAt(string: String, startIndex: Int) -> Int {
     stream.bytes = string.bytes
     stream.startIndex = startIndex
     stream.currentIndex = startIndex
@@ -85,7 +85,7 @@ struct ByteMatcher {
     return -1
   }
 
-  mutating func doDataMatch(data: ByteMatcherEntryData) -> Bool {
+  public mutating func doDataMatch(data: ByteMatcherEntryData) -> Bool {
     switch data.entry {
       case .EatWhileDigit:
         return stream.eatWhileDigit()
@@ -137,7 +137,7 @@ struct ByteMatcher {
     }
   }
 
-  mutating func doMatch() -> Bool {
+  public mutating func doMatch() -> Bool {
     for data in list {
       if !doDataMatch(data) { // No success.
         return false
@@ -146,137 +146,137 @@ struct ByteMatcher {
     return true
   }
 
-  mutating func add(entry: ByteMatcherEntry) {
+  public mutating func add(entry: ByteMatcherEntry) {
     list.append(EmptyParams(entry: entry))
   }
 
-  mutating func eatWhileDigit() {
+  public mutating func eatWhileDigit() {
     add(.EatWhileDigit)
   }
 
-  mutating func next() {
+  public mutating func next() {
     add(.Next)
   }
 
-  mutating func skipToEnd() {
+  public mutating func skipToEnd() {
     add(.SkipToEnd)
   }
 
-  mutating func matchEos() {
+  public mutating func matchEos() {
     add(.MatchEos)
   }
 
-  mutating func eatOne(c: UInt8) {
+  public mutating func eatOne(c: UInt8) {
     list.append(UInt8Param(entry: .EatOne, c: c))
   }
 
-  mutating func eatUntilOne(c: UInt8) {
+  public mutating func eatUntilOne(c: UInt8) {
     list.append(UInt8Param(entry: .EatUntilOne, c: c))
   }
 
-  mutating func eatString(string: String) {
+  public mutating func eatString(string: String) {
     eatBytes(string.bytes)
   }
 
-  mutating func eatBytes(bytes: [UInt8]) {
+  public mutating func eatBytes(bytes: [UInt8]) {
     list.append(BytesParam(entry: .EatBytes, bytes: bytes))
   }
 
-  mutating func eatUntilString(string: String) {
+  public mutating func eatUntilString(string: String) {
     eatUntilBytes(string.bytes)
   }
 
-  mutating func eatUntilBytes(bytes: [UInt8]) {
+  public mutating func eatUntilBytes(bytes: [UInt8]) {
     list.append(BytesParam(entry: .EatUntilBytes, bytes: bytes))
   }
 
-  mutating func eatUntilIncludingString(string: String) {
+  public mutating func eatUntilIncludingString(string: String) {
     eatUntilIncludingBytes(string.bytes)
   }
 
-  mutating func eatUntilIncludingBytes(bytes: [UInt8]) {
+  public mutating func eatUntilIncludingBytes(bytes: [UInt8]) {
     list.append(BytesParam(entry: .EatUntilIncludingBytes, bytes: bytes))
   }
 
-  mutating func eatUntil(fn: (c: UInt8) -> Bool) {
+  public mutating func eatUntil(fn: (c: UInt8) -> Bool) {
     list.append(UInt8FnParam(entry: .EatUntil, fn: fn))
   }
 
-  mutating func eatOn(fn: (inout ctx: ByteStream) -> Bool) {
+  public mutating func eatOn(fn: (inout ctx: ByteStream) -> Bool) {
     list.append(CtxFnParam(entry: .EatOn, fn: fn))
   }
 
-  mutating func eatStringFromList(list: [String]) {
+  public mutating func eatStringFromList(list: [String]) {
     eatBytesFromTable(ByteStream.makeFirstCharTable(list))
   }
 
-  mutating func eatBytesFromList(list: [[UInt8]]) {
+  public mutating func eatBytesFromList(list: [[UInt8]]) {
     eatBytesFromTable(ByteStream.makeFirstCharTable(list))
   }
 
-  mutating func eatBytesFromTable(table: FirstCharTable) {
+  public mutating func eatBytesFromTable(table: FirstCharTable) {
     list.append(FirstCharTableParam(entry: .EatBytesFromTable, table: table))
   }
 
-  mutating func eatOneNotFromStrings(list: [String]) {
+  public mutating func eatOneNotFromStrings(list: [String]) {
     eatOneNotFromTable(ByteStream.makeFirstCharTable(list))
   }
 
-  mutating func eatOneNotFromBytes(list: [[UInt8]]) {
+  public mutating func eatOneNotFromBytes(list: [[UInt8]]) {
     eatOneNotFromTable(ByteStream.makeFirstCharTable(list))
   }
 
-  mutating func eatOneNotFromTable(table: FirstCharTable) {
+  public mutating func eatOneNotFromTable(table: FirstCharTable) {
     list.append(FirstCharTableParam(entry: .EatOneNotFromTable, table: table))
   }
 
-  mutating func eatOneFromStrings(list: [String]) {
+  public mutating func eatOneFromStrings(list: [String]) {
     eatOneFromTable(ByteStream.makeFirstCharTable(list))
   }
 
-  mutating func eatOneFromBytes(list: [[UInt8]]) {
+  public mutating func eatOneFromBytes(list: [[UInt8]]) {
     eatOneFromTable(ByteStream.makeFirstCharTable(list))
   }
 
-  mutating func eatOneFromTable(table: FirstCharTable) {
+  public mutating func eatOneFromTable(table: FirstCharTable) {
     list.append(FirstCharTableParam(entry: .EatOneFromTable, table: table))
   }
 
-  mutating func eatUntilIncludingStringFromList(list: [String]) {
+  public mutating func eatUntilIncludingStringFromList(list: [String]) {
     eatUntilIncludingBytesFromTable(ByteStream.makeFirstCharTable(list))
   }
 
-  mutating func eatUntilIncludingBytesFromList(list: [[UInt8]]) {
+  public mutating func eatUntilIncludingBytesFromList(list: [[UInt8]]) {
     eatUntilIncludingBytesFromTable(ByteStream.makeFirstCharTable(list))
   }
 
-  mutating func eatUntilIncludingBytesFromTable(table: FirstCharTable) {
+  public mutating func eatUntilIncludingBytesFromTable(table: FirstCharTable) {
     list.append(FirstCharTableParam(
         entry: .EatUntilIncludingBytesFromTable, table: table))
   }
 
-  mutating func eatWhileStringFromList(list: [String]) {
+  public mutating func eatWhileStringFromList(list: [String]) {
     eatWhileBytesFromTable(ByteStream.makeFirstCharTable(list))
   }
 
-  mutating func eatWhileBytesFromList(list: [[UInt8]]) {
+  public mutating func eatWhileBytesFromList(list: [[UInt8]]) {
     eatWhileBytesFromTable(ByteStream.makeFirstCharTable(list))
   }
 
-  mutating func eatWhileBytesFromTable(table: FirstCharTable) {
+  public mutating func eatWhileBytesFromTable(table: FirstCharTable) {
     list.append(FirstCharTableParam(entry: .EatWhileBytesFromTable,
         table: table))
   }
 
-  mutating func eatUntilStringFromList(list: [String]) {
+  public mutating func eatUntilStringFromList(list: [String]) {
     eatUntilBytesFromTable(ByteStream.makeFirstCharTable(list))
   }
 
-  mutating func eatUntilBytesFromList(list: [[UInt8]]) {
+  public mutating func eatUntilBytesFromList(list: [[UInt8]]) {
     eatUntilBytesFromTable(ByteStream.makeFirstCharTable(list))
   }
 
-  mutating func eatUntilBytesFromTable(table: FirstCharTable) {
+  public mutating func eatUntilBytesFromTable(table: FirstCharTable) {
     list.append(FirstCharTableParam(entry: .EatUntilBytesFromTable,
         table: table))
   }
