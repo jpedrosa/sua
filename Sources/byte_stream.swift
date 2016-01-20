@@ -1758,13 +1758,12 @@ public struct ByteStream {
     let savei = i
     AGAIN: while i < len {
       if let a = firstCharTable[Int(_bytes[i])] {
-        for b in a {
+        BYTES: for b in a {
           let blen = b.count
           if i + blen <= len {
             for bi in 1..<blen {
               if _bytes[i + bi] != b[bi] {
-                i += 1
-                continue AGAIN
+                continue BYTES
               }
             }
           }

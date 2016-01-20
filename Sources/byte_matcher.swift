@@ -18,7 +18,6 @@ enum ByteMatcherEntry {
   case EatUntilIncludingBytesFromTable
   case EatWhileBytesFromTable
   case EatUntilBytesFromTable
-  case RetryAtPartialSuccess
 }
 
 
@@ -74,8 +73,6 @@ struct ByteMatcher {
 
   var stream = ByteStream()
   var list = [ByteMatcherEntryData]()
-  var _retryAware = false
-  var _retryAtPartialSuccess = false
 
   mutating func match(string: String) -> Int {
     return matchAt(string, startIndex: 0)
@@ -86,17 +83,10 @@ struct ByteMatcher {
   //
   // Returns -1 in case the matching was unsuccessful.
   mutating func matchAt(string: String, startIndex: Int) -> Int {
-    var b = false
     stream.bytes = string.bytes
     stream.startIndex = startIndex
     stream.currentIndex = startIndex
-    if _retryAware {
-      _retryAtPartialSuccess = false
-      b = doMatchWithRetry()
-    } else {
-      b = doMatch()
-    }
-    if b {
+    if doMatch() {
       return stream.currentIndex - startIndex
     }
     return -1
@@ -151,49 +141,7 @@ struct ByteMatcher {
       case .EatUntilBytesFromTable:
         let table = (data as! FirstCharTableParam).table
         return stream.eatUntilBytesFromTable(table)
-      case .RetryAtPartialSuccess:
-        _retryAtPartialSuccess = true
-        return true
     }
-  }
-
-  mutating func doMatchWithRetry() -> Bool {
-    var i = 0
-    let len = list.count
-    while i < len {
-      var data = list[i]
-      var b = doDataMatch(data)
-      if !b && !data.optional { // No success and not optional.
-        return false
-      } else if _retryAtPartialSuccess {
-        i += 1
-        let savei = i
-        var ci = -1
-        while true {
-          while i < len {
-            data = list[i]
-            b = doDataMatch(data)
-            if !b { // No success.
-              if !data.optional { // Not optional.
-                break
-              }
-            } else if ci < 0 {
-              ci = stream.currentIndex
-            }
-            i += 1
-          }
-          if i < len && ci >= 0 {
-            i = savei
-            stream.currentIndex = ci
-            ci = -1
-          } else {
-            break
-          }
-        }
-        break
-      }
-    }
-    return i >= len
   }
 
   mutating func doMatch() -> Bool {
@@ -348,11 +296,6 @@ struct ByteMatcher {
     let a = ByteStream.makeFirstCharTable(list)
     self.list.append(FirstCharTableParam(entry: .EatUntilBytesFromTable,
         optional: optional, table: a))
-  }
-
-  mutating func retryAtPartialSuccess() {
-    add(.RetryAtPartialSuccess, optional: false)
-    _retryAware = true
   }
 
 }
