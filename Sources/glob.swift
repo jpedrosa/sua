@@ -475,8 +475,30 @@ public struct GlobMatcher {
             m.addAny()
           case .SymQuestionMark:
             m.addOne()
-          //case .SymOBSet:
+          case .SymOBSet:
+            m.startSet()
+            i += 1
+            SET: while i < len {
+              let t = tokens[i]
+              switch t.globType {
+                case .SetChar:
+                  m.addSetChar(t.bytes[t.startIndex])
+                case .SetRange:
+                  m.addSetRange(t.bytes[t.startIndex],
+                      c2: t.bytes[t.startIndex + 2])
+                case .SymCBSet:
+                  break SET
+                default:
+                  throw GlobMatcherError.Parse
+              }
+              i += 1
+            }
+            m.saveSet()
           case .SymOBOptionalName:
+            if i + 1 < len && tokens[i + 1].globType == .SymCBOptionalName {
+              i += 1
+              continue
+            }
             m.startAlternative()
             i += 1
             while i < len {
