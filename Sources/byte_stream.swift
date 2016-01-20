@@ -2,6 +2,8 @@
 
 public typealias FirstCharTable = [[[UInt8]]?]
 
+public let FirstCharTableValue = [[UInt8]]()
+
 
 public struct ByteStream {
 
@@ -1726,6 +1728,12 @@ public struct ByteStream {
     let savei = i
     if i < len {
       if let a = firstCharTable[Int(_bytes[i])] {
+        if a.count == 0 {
+          if consume {
+            currentIndex = i + 1
+          }
+          return 1
+        }
         BYTES: for b in a {
           let blen = b.count
           if i + blen <= len {
@@ -1758,6 +1766,13 @@ public struct ByteStream {
     let savei = i
     AGAIN: while i < len {
       if let a = firstCharTable[Int(_bytes[i])] {
+        if a.count == 0 {
+          i += 1
+          if consume {
+            currentIndex = i
+          }
+          return i - savei
+        }
         BYTES: for b in a {
           let blen = b.count
           if i + blen <= len {
@@ -1870,6 +1885,12 @@ public struct ByteStream {
     let savei = i
     OUT: while i < len {
       if let a = firstCharTable[Int(_bytes[i])] {
+        if a.count == 0 {
+          if consume {
+            currentIndex = i
+          }
+          return i - savei
+        }
         BYTES: for b in a {
           let blen = b.count
           if i + blen <= len {
@@ -1910,6 +1931,13 @@ public struct ByteStream {
     let savei = i
     AGAIN: while i < len {
       if let a = firstCharTable[Int(_bytes[i])] {
+        if a.count == 0 {
+          i += 1
+          if consume {
+            currentIndex = i
+          }
+          return i - savei
+        }
         BYTES: for b in a {
           let blen = b.count
           if i + blen <= len {
