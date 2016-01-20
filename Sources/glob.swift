@@ -372,6 +372,11 @@ public struct GlobMatcherAlternativePart: GlobMatcherPart {
 //                        in its list.
 // The special characters could be escaped with the \ backslash character in
 // order to allow them to work like any other character.
+//
+// Ignore case is supported by way of lowering the case of the ASCII characters
+// of the patterns, which is done during the call to the assembleMatcher method.
+// Then the matching string should also be set to lower case before trying to
+// match against it.
 public struct GlobMatcher {
 
   var parts = [GlobMatcherPart]()
