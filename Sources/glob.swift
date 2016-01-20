@@ -223,8 +223,8 @@ public class GlobLexer: CommonLexer {
 public class Ascii {
 
   public static func toLowerCase(c: UInt8) -> UInt8 {
-    if c >= 97 && c <= 122 {
-      return c - 32
+    if c >= 65 && c <= 90 {
+      return c + 32
     }
     return c
   }
@@ -234,8 +234,24 @@ public class Ascii {
     let len = a.count
     for i in 0..<len {
       let c = a[i]
-      if c >= 97 && c <= 122 {
-        a[i] = c - 32
+      if c >= 65 && c <= 90 {
+        a[i] = c + 32
+      }
+    }
+    return a
+  }
+
+  public static func toLowerCase(bytes: [[UInt8]]) -> [[UInt8]] {
+    var a = bytes
+    let len = a.count
+    for i in 0..<len {
+      let b = a[i]
+      let blen = b.count
+      for bi in 0..<blen {
+        let c = b[bi]
+        if c >= 65 && c <= 90 {
+          a[i][bi] = c + 32
+        }
       }
     }
     return a
@@ -291,12 +307,14 @@ public struct GlobMatcherSetPart: GlobMatcherPart {
   public var chars: [UInt8]
   public var ranges: [UInt8]
   public var negated: Bool
+  public var ignoreCase: Bool
 
   public init() {
     type = .Set
     chars = []
     ranges = []
     negated = false
+    ignoreCase = false
   }
 
   public mutating func addChar(c: UInt8) {
@@ -320,13 +338,18 @@ public struct GlobMatcherSetPart: GlobMatcherPart {
   public func makeComparisonTable() -> FirstCharTable {
     var table = FirstCharTable(count: 256, repeatedValue: nil)
     for c in chars {
-      table[Int(c)] = FirstCharTableValue
+      let n = Int(ignoreCase ? Ascii.toLowerCase(c) : c)
+      table[n] = FirstCharTableValue
     }
     var i = 0
     let len = ranges.count
     while i < len {
       var n = ranges[i]
-      let n2 = ranges[i + 1]
+      var n2 = ranges[i + 1]
+      if ignoreCase {
+        n = Ascii.toLowerCase(n)
+        n2 = Ascii.toLowerCase(n2)
+      }
       while n <= n2 {
         table[Int(n)] = FirstCharTableValue
         n += 1
@@ -394,6 +417,7 @@ public struct GlobMatcher {
   var parts = [GlobMatcherPart]()
   var currentSet: GlobMatcherSetPart?
   var currentAlternative: GlobMatcherAlternativePart?
+  public var ignoreCase = false
 
   public init() { }
 
@@ -454,16 +478,19 @@ public struct GlobMatcher {
       switch part.type {
         case .Name:
           let namePart = part as! GlobMatcherNamePart
+          let bytes = ignoreCase ? Ascii.toLowerCase(namePart.bytes) :
+              namePart.bytes
           if lastType == .Any {
-            m.eatUntilIncludingBytes(namePart.bytes)
+            m.eatUntilIncludingBytes(bytes)
           } else {
-            m.eatBytes(namePart.bytes)
+            m.eatBytes(bytes)
           }
         case .Any: () // Ignore.
         case .One:
           m.next()
         case .Set: ()
-          let setPart = part as! GlobMatcherSetPart
+          var setPart = part as! GlobMatcherSetPart
+          setPart.ignoreCase = ignoreCase
           let table = setPart.makeComparisonTable()
           if setPart.isNegated {
             m.eatOneNotFromTable(table)
@@ -472,10 +499,12 @@ public struct GlobMatcher {
           }
         case .Alternative:
           let altPart = part as! GlobMatcherAlternativePart
+          let bytes = ignoreCase ? Ascii.toLowerCase(altPart.bytes) :
+              altPart.bytes
           if lastType == .Any {
-            m.eatUntilIncludingBytesFromList(altPart.bytes)
+            m.eatUntilIncludingBytesFromList(bytes)
           } else {
-            m.eatBytesFromList(altPart.bytes)
+            m.eatBytesFromList(bytes)
           }
       }
       lastType = part.type
