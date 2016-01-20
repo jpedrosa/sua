@@ -373,7 +373,7 @@ public struct GlobMatcherAlternativePart: GlobMatcherPart {
 //     var bm2 = try GlobMatcher.parse("hello*.txt").assembleMatcher()
 //     bm2.matchEos()
 //     p(bm2.match("hello_world.txta")) // Prints -1. Not found. Since it didn't
-//                                     // match it to the very end.
+//                                      // match it to the very end.
 //
 // The glob features that are understood are these:
 //
@@ -383,6 +383,8 @@ public struct GlobMatcherAlternativePart: GlobMatcherPart {
 //                        found.
 //     * The [a-z] [abc] [A-Za-z0-9_] character set - It will match a character
 //                        included in its ranges or sets.
+//     * The [!a-z] [!def] character set negation. It will match a character
+//                        that is not included in the set.
 //     * The {jpg,png} optional names - It will match one of the names included
 //                        in its list.
 // The special characters could be escaped with the \ backslash character in
