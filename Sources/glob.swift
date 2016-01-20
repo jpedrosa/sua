@@ -24,7 +24,7 @@ public enum GlobTokenType: TokenType {
   case SymCBSet              // ]
   case OptionalName
   case SymOBOptionalName     // {
-  case SymCommaOptionalName  // ,
+  case SymComma  // ,
   case SymCBOptionalName     // }
 }
 
@@ -83,7 +83,7 @@ public class GlobLexer: CommonLexer {
       return .OptionalName
     } else if stream.eatComma() {
       status.tokenizer = T.OptionalName
-      return .SymCommaOptionalName
+      return .SymComma
     } else if stream.eatCloseBrace() {
       status.tokenizer = T.Body
       return .SymCBOptionalName
@@ -539,7 +539,7 @@ public struct GlobMatcher {
                   let gt = tokens[i].globType
                   if gt == .SymCBOptionalName {
                     break
-                  } else if gt == .SymCommaOptionalName {
+                  } else if gt == .SymComma {
                     i += 1
                     continue
                   }
