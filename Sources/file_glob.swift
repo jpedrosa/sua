@@ -141,8 +141,11 @@ public struct FileGlob {
         stream.startIndex = stream.currentIndex
       } else if stream.eatAsterisk() {
         if stream.eatAsterisk() {
-          if stream.matchSlash() {
+          if stream.matchSlash(){
             fg.addRecurse()
+            stream.startIndex = stream.currentIndex
+          } else if stream.isEol {
+            fg.addAll()
             stream.startIndex = stream.currentIndex
           } else {
             stream.eatUntilOne(47) // /
@@ -236,7 +239,7 @@ public struct FileGlobList {
         }
         lastIndex = parts.count - 1
       }
-      if lastIndex > 0 {
+      if lastIndex >= 0 {
         try doList(baseDir, partIndex: 0)
       }
     }
@@ -263,6 +266,7 @@ public struct FileGlobList {
           try recurseAndMultiLevelMatch(path, partIndex: partIndex,
               indexList: &indexList)
         } else {
+          p("DEMO")
           // subRecurse(path, partIndex: partIndex)
         }
       }
@@ -310,6 +314,7 @@ public struct FileGlobList {
     return false
   }
 
+  // This gets used on patterns like this: "/home/dewd/**/*.txt"
   public func recurseAndMatch(path: String, partIndex: Int) throws {
     try FileBrowser.scanDir(path) { name, type in
       if self.matchFileName(name, partIndex: partIndex) {
@@ -336,6 +341,7 @@ public struct FileGlobList {
     }
   }
 
+  // This is used on patterns like this: "/home/dewd/**/d*/*.txt"
   public func recurseAndMultiLevelMatch(path: String, partIndex: Int,
       inout indexList: [Int]) throws {
     var indexListLen = indexList.count
