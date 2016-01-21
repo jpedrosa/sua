@@ -348,29 +348,6 @@ public struct GlobMatcherAlternativePart: GlobMatcherPart {
 }
 
 
-// E.g.
-//     var bm2 = try GlobMatcher.parse("hello*.txt").assembleMatcher()
-//     p(bm2.match("hello_world.txt")) // Prints true.
-//
-// The glob features that are understood are these:
-//
-//     * The ? wildcard - It will match a single character of any kind.
-//
-//     * The * wildcard - It will match any character until the next pattern is
-//                        found.
-//     * The [a-z] [abc] [A-Za-z0-9_] character set - It will match a character
-//                        included in its ranges or sets.
-//     * The [!a-z] [!def] character set negation. It will match a character
-//                        that is not included in the set.
-//     * The {jpg,png} optional names - It will match one of the names included
-//                        in its list.
-// The special characters could be escaped with the \ backslash character in
-// order to allow them to work like any other character.
-//
-// Ignore case is supported by way of lowering the case of the ASCII characters
-// of the patterns, which is done during the call to the assembleMatcher method.
-// Then the matching string should also be set to lower case before trying to
-// match against it.
 public struct GlobMatcher {
 
   var parts = [GlobMatcherPart]()
@@ -584,6 +561,29 @@ public struct GlobMatcher {
 }
 
 
+// E.g.
+//     var g = try Glob.parse("hello*.txt")
+//     print(g.match("hello_world.txt")) // Prints true.
+//
+// The glob features that are understood are these:
+//
+//     * The ? wildcard - It will match a single character of any kind.
+//
+//     * The * wildcard - It will match any character until the next pattern is
+//                        found.
+//     * The [a-z] [abc] [A-Za-z0-9_] character set - It will match a character
+//                        included in its ranges or sets.
+//     * The [!a-z] [!def] character set negation. It will match a character
+//                        that is not included in the set.
+//     * The {jpg,png} optional names - It will match one of the names included
+//                        in its list.
+// The special characters could be escaped with the \ backslash character in
+// order to allow them to work like any other character.
+//
+// Ignore case is supported by way of lowering the case of the ASCII characters
+// of the patterns, which is done during the call to the assembleMatcher method.
+// Then the matching string should also be set to lower case before trying to
+// match against it, which is also covered by the Glob#match method.
 public struct Glob {
 
   var matcher: ByteMatcher
