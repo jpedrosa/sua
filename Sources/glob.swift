@@ -509,27 +509,7 @@ public struct GlobMatcher {
     return m
   }
 
-}
-
-
-public struct Glob {
-
-  var matcher: ByteMatcher
-  var ignoreCase: Bool
-
-  public init(matcher: ByteMatcher, ignoreCase: Bool) {
-    self.matcher = matcher
-    self.ignoreCase = ignoreCase
-  }
-
-  public mutating func match(string: String) -> Bool {
-    let z = ignoreCase ? Ascii.toLowerCase(string) ?? "" : string
-    return matcher.match(z) > 0
-  }
-
-  public static func parse(string: String, ignoreCase: Bool = false) throws
-      -> Glob {
-    let tokens = try GlobLexer(bytes: string.bytes).parseAllGlobTokens()
+  public static func doParse(tokens: [GlobToken]) throws -> GlobMatcher {
     let len = tokens.count
     var m = GlobMatcher()
     if len > 0 {
@@ -598,6 +578,31 @@ public struct Glob {
         i += 1
       }
     }
+    return m
+  }
+
+}
+
+
+public struct Glob {
+
+  var matcher: ByteMatcher
+  var ignoreCase: Bool
+
+  public init(matcher: ByteMatcher, ignoreCase: Bool) {
+    self.matcher = matcher
+    self.ignoreCase = ignoreCase
+  }
+
+  public mutating func match(string: String) -> Bool {
+    let z = ignoreCase ? Ascii.toLowerCase(string) ?? "" : string
+    return matcher.match(z) > 0
+  }
+
+  public static func parse(string: String, ignoreCase: Bool = false) throws
+      -> Glob {
+    let tokens = try GlobLexer(bytes: string.bytes).parseAllGlobTokens()
+    var m = try GlobMatcher.doParse(tokens)
     m.ignoreCase = ignoreCase
     return Glob(matcher: m.assembleMatcher(), ignoreCase: ignoreCase)
   }
