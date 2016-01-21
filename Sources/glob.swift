@@ -343,20 +343,9 @@ public struct GlobMatcherAlternativePart: GlobMatcherPart {
 }
 
 
-// GlobMatcher will parse a ByteMatcher that can be used for matching from the
-// start of a string. In order to allow for some flexibility, it will not match
-// to the very end of a string by default, but it can be configured to do so by
-// calling ByteMatcher#matchEos().
-//
 // E.g.
-//     var bm = try GlobMatcher.parse("hello*.txt").assembleMatcher()
-//     p(bm.match("hello_world.txta")) // Prints 15.
-//
-//     // If instead we call the matchEos on the ByteMatcher:
 //     var bm2 = try GlobMatcher.parse("hello*.txt").assembleMatcher()
-//     bm2.matchEos()
-//     p(bm2.match("hello_world.txta")) // Prints -1. Not found. Since it didn't
-//                                      // match it to the very end.
+//     p(bm2.match("hello_world.txt")) // Prints true.
 //
 // The glob features that are understood are these:
 //
@@ -480,7 +469,23 @@ public struct GlobMatcher {
     return m
   }
 
-  public static func parse(string: String) throws -> GlobMatcher {
+}
+
+
+public struct Glob {
+
+  var matcher: ByteMatcher
+
+  public init(matcher: ByteMatcher) {
+    self.matcher = matcher
+  }
+
+  public mutating func match(string: String) -> Bool {
+    return matcher.match(string) > 0
+  }
+
+  public static func parse(string: String, ignoreCase: Bool = false) throws
+      -> Glob {
     let tokens = try GlobLexer(bytes: string.bytes).parseAllGlobTokens()
     let len = tokens.count
     var m = GlobMatcher()
@@ -550,7 +555,9 @@ public struct GlobMatcher {
         i += 1
       }
     }
-    return m
+    m.ignoreCase = ignoreCase
+    let bm = m.assembleMatcher()
+    return Glob(matcher: bm)
   }
 
 }
