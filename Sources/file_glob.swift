@@ -174,6 +174,8 @@ public enum FileGlobError: ErrorType {
 }
 
 
+// This has been tested against the output of the globbing features of Ruby,
+// and where possible we have tried to match it.
 public struct FileGlobList {
 
   var fileGlob: FileGlob
@@ -249,7 +251,8 @@ public struct FileGlobList {
     let part = parts[partIndex]
     if part.type == .Recurse {
       if partIndex >= lastIndex {
-        try handler(name: File.baseName(path), type: .D, path: path)
+        try handler(name: File.baseName(path), type: .D,
+            path: "\(File.dirName(path))/")
         try recurseAndAddDirectories(path)
       } else if partIndex + 1 >= lastIndex {
         try recurseAndMatch(path, partIndex: partIndex + 1)
@@ -314,7 +317,7 @@ public struct FileGlobList {
     return false
   }
 
-  // This gets used on patterns like this: "/home/dewd/**/*.txt"
+  // This gets used on patterns like this: "/home/user/**/*.txt"
   public func recurseAndMatch(path: String, partIndex: Int) throws {
     try FileBrowser.scanDir(path) { name, type in
       if self.matchFileName(name, partIndex: partIndex) {
@@ -329,6 +332,8 @@ public struct FileGlobList {
     }
   }
 
+  // This is used for patterns like this: "/home/user/t_/**/"
+  // It lists only the directories, recursively.
   public func recurseAndAddDirectories(path: String) throws {
     try FileBrowser.scanDir(path) { name, type in
       if type == .D {
@@ -341,7 +346,7 @@ public struct FileGlobList {
     }
   }
 
-  // This is used on patterns like this: "/home/dewd/**/d*/*.txt"
+  // This is used on patterns like this: "/home/user/**/d*/*.txt"
   public func recurseAndMultiLevelMatch(path: String, partIndex: Int,
       inout indexList: [Int]) throws {
     var indexListLen = indexList.count
