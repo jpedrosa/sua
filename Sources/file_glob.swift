@@ -55,6 +55,11 @@ public struct FileGlobMatcherPart: FileGlobPart {
 public struct FileGlob {
 
   var parts = [FileGlobPart]()
+  var ignoreCase = false
+
+  public init(ignoreCase: Bool = false) {
+    self.ignoreCase = ignoreCase
+  }
 
   mutating func addLiteral(value: String) {
     parts.append(FileGlobStringPart(type: .Literal, value: value))
@@ -76,9 +81,10 @@ public struct FileGlob {
     parts.append(FileGlobMatcherPart(glob: glob))
   }
 
-  public static func parse(string: String) throws -> FileGlob {
+  public static func parse(string: String, ignoreCase: Bool = false) throws
+      -> FileGlob {
     var stream = ByteStream(bytes: string.bytes)
-    var fg = FileGlob()
+    var fg = FileGlob(ignoreCase: ignoreCase)
     while !stream.isEol {
       if stream.eatWhileNeitherTwo(47, c2: 42) { // / *
         if stream.matchSlash() {
@@ -90,7 +96,7 @@ public struct FileGlob {
         } else {
           stream.eatUntilOne(47) // /
           if let s = stream.collectTokenString() {
-            fg.addMatcher(try Glob.parse(s))
+            fg.addMatcher(try Glob.parse(s, ignoreCase: ignoreCase))
           } else {
             throw FileGlobError.Parse
           }
@@ -106,7 +112,7 @@ public struct FileGlob {
           } else {
             stream.eatUntilOne(47) // /
             if let s = stream.collectTokenString() {
-              fg.addMatcher(try Glob.parse(s))
+              fg.addMatcher(try Glob.parse(s, ignoreCase: ignoreCase))
             } else {
               throw FileGlobError.Parse
             }
@@ -116,7 +122,7 @@ public struct FileGlob {
         } else { // Ends with.
           stream.eatUntilOne(47) // /
           if let s = stream.collectTokenString() {
-            fg.addMatcher(try Glob.parse(s))
+            fg.addMatcher(try Glob.parse(s, ignoreCase: ignoreCase))
           } else {
             throw FileGlobError.Parse
           }
