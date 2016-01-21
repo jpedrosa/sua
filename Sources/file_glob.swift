@@ -259,7 +259,9 @@ public struct FileGlobList {
           j += 1
         }
         if j >= lastIndex {
-          // recurseAndMultiLevelMatch(path, partIndex: partIndex)
+          var indexList = [Int]()
+          try recurseAndMultiLevelMatch(path, partIndex: partIndex,
+              indexList: &indexList)
         } else {
           // subRecurse(path, partIndex: partIndex)
         }
@@ -330,6 +332,57 @@ public struct FileGlobList {
         }
         try self.handler(name: name, type: type, path: path)
         try self.recurseAndAddDirectories("\(path)\(name)/")
+      }
+    }
+  }
+
+  public func recurseAndMultiLevelMatch(path: String, partIndex: Int,
+      inout indexList: [Int]) throws {
+    var indexListLen = indexList.count
+    var haveIndexList = indexListLen != 0
+    var finalMatcherIndex = partIndex + 1
+    var haveFinalMatcher = false
+    if haveIndexList {
+      for mi in 0..<indexListLen {
+        let n = indexList[mi]
+        if n == lastIndex {
+          finalMatcherIndex = n
+          haveFinalMatcher = true
+          break
+        }
+      }
+      if haveFinalMatcher {
+        if indexListLen == 1 {
+          haveIndexList = false
+        } else {
+          indexList.removeAtIndex(partIndex)
+          indexListLen -= 1
+        }
+      }
+    }
+    try FileBrowser.scanDir(path) { name, type in
+      if haveFinalMatcher &&
+          self.matchFileName(name, partIndex: finalMatcherIndex) {
+        try self.handler(name: name, type: type, path: path)
+      }
+      if type == .D && (!self.skipDotFiles || name.utf16.codeUnitAt(0) != 46) {
+        let haveMatch = self.matchFileName(name, partIndex: partIndex + 1)
+        var freshIndexList = [Int]()
+        if haveIndexList {
+          for mi in 0..<indexListLen {
+            let n = indexList[mi]
+            if self.matchFileName(name, partIndex: n) {
+              freshIndexList.append(n + 1)
+            }
+          }
+          if haveMatch {
+            freshIndexList.append(partIndex + 2)
+          }
+        } else if haveMatch {
+          freshIndexList.append(partIndex + 2)
+        }
+        try self.recurseAndMultiLevelMatch("\(path)\(name)/",
+            partIndex: partIndex, indexList: &freshIndexList)
       }
     }
   }
