@@ -515,13 +515,16 @@ public struct GlobMatcher {
 public struct Glob {
 
   var matcher: ByteMatcher
+  var ignoreCase: Bool
 
-  public init(matcher: ByteMatcher) {
+  public init(matcher: ByteMatcher, ignoreCase: Bool) {
     self.matcher = matcher
+    self.ignoreCase = ignoreCase
   }
 
   public mutating func match(string: String) -> Bool {
-    return matcher.match(string) > 0
+    let z = ignoreCase ? Ascii.toLowerCase(string) ?? "" : string
+    return matcher.match(z) > 0
   }
 
   public static func parse(string: String, ignoreCase: Bool = false) throws
@@ -596,7 +599,7 @@ public struct Glob {
       }
     }
     m.ignoreCase = ignoreCase
-    return Glob(matcher: m.assembleMatcher())
+    return Glob(matcher: m.assembleMatcher(), ignoreCase: ignoreCase)
   }
 
 }
