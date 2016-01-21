@@ -18,6 +18,7 @@ public enum ByteMatcherEntry {
   case EatUntilIncludingBytesFromTable
   case EatWhileBytesFromTable
   case EatUntilBytesFromTable
+  case SearchAtEnd
 }
 
 
@@ -66,6 +67,8 @@ public struct ByteMatcher {
 
   var stream = ByteStream()
   var list = [ByteMatcherEntryData]()
+  var searchAtEnd = -1
+  var startSearchingAtEnd = false
 
   public mutating func match(string: String) -> Int {
     return matchAt(string, startIndex: 0)
@@ -79,7 +82,12 @@ public struct ByteMatcher {
     stream.bytes = string.bytes
     stream.startIndex = startIndex
     stream.currentIndex = startIndex
-    if doMatch() {
+    if searchAtEnd > 0 {
+      startSearchingAtEnd = false
+      if doMatchWithSearchAtEnd() {
+        return stream.currentIndex - startIndex
+      }
+    } else if doMatch() {
       return stream.currentIndex - startIndex
     }
     return -1
@@ -134,7 +142,43 @@ public struct ByteMatcher {
       case .EatUntilBytesFromTable:
         let table = (data as! FirstCharTableParam).table
         return stream.eatUntilBytesFromTable(table)
+      case .SearchAtEnd:
+        startSearchingAtEnd = true
+        return true
     }
+  }
+
+  public mutating func doMatchWithSearchAtEnd() -> Bool {
+    var i = 0
+    let len = list.count
+    while i < len {
+      if !doDataMatch(list[i]) { // No success.
+        return false
+      } else if startSearchingAtEnd {
+        let slen = stream.lineEndIndex
+        var n = slen - stream.currentIndex
+        if n > searchAtEnd {
+          n = searchAtEnd
+          stream.currentIndex = slen - n
+        }
+        let savei = i + 1
+        SEARCH: while n > 0 {
+          i = savei
+          while i < len {
+            if !doDataMatch(list[i]) { // No success.
+              n -= 1
+              stream.currentIndex = slen - n
+              continue SEARCH
+            }
+            i += 1
+          }
+          return true
+        }
+        return false
+      }
+      i += 1
+    }
+    return true
   }
 
   public mutating func doMatch() -> Bool {
@@ -279,6 +323,11 @@ public struct ByteMatcher {
   public mutating func eatUntilBytesFromTable(table: FirstCharTable) {
     list.append(FirstCharTableParam(entry: .EatUntilBytesFromTable,
         table: table))
+  }
+
+  public mutating func searchAtEnd(length: Int) {
+    add(.SearchAtEnd)
+    searchAtEnd = length
   }
 
 }

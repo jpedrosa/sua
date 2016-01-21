@@ -1781,6 +1781,8 @@ public struct ByteStream {
                 continue BYTES
               }
             }
+          } else {
+            continue BYTES
           }
           i += blen
           if consume {

@@ -330,14 +330,19 @@ public struct GlobMatcherAlternativePart: GlobMatcherPart {
 
   public var type: GlobMatcherType
   public var bytes: [[UInt8]]
+  public var maximumLength: Int
 
   public init() {
     type = .Alternative
     bytes = []
+    maximumLength = 0
   }
 
   public mutating func addBytes(bytes: [UInt8]) {
     self.bytes.append(bytes)
+    if bytes.count > maximumLength {
+      maximumLength = bytes.count
+    }
   }
 
 }
@@ -428,6 +433,35 @@ public struct GlobMatcher {
   public func assembleMatcher() -> ByteMatcher {
     var m = ByteMatcher()
     var lastType: GlobMatcherType?
+    var anyCount = 0
+    for part in parts {
+      if part.type == .Any {
+        anyCount += 1
+      }
+    }
+    var endLength = 0
+    if anyCount > 0 {
+      var n = anyCount
+      for part in parts {
+        if part.type == .Any && n > 0 {
+          n -= 1
+        } else if n == 0 {
+          switch part.type {
+            case .Name:
+              let namePart = part as! GlobMatcherNamePart
+              endLength += namePart.bytes.count
+            case .Any: () // Ignore.
+            case .One:
+              endLength += 1
+            case .Set: ()
+              endLength += 1
+            case .Alternative:
+              let altPart = part as! GlobMatcherAlternativePart
+              endLength += altPart.maximumLength
+          }
+        }
+      }
+    }
     for part in parts {
       switch part.type {
         case .Name:
@@ -439,7 +473,12 @@ public struct GlobMatcher {
           } else {
             m.eatBytes(bytes)
           }
-        case .Any: () // Ignore.
+        case .Any: // Ignore.
+          if anyCount > 1 {
+            anyCount -= 1
+          } else if endLength > 0 {
+            m.searchAtEnd(endLength)
+          }
         case .One:
           m.next()
         case .Set: ()
@@ -466,6 +505,7 @@ public struct GlobMatcher {
     if lastType == .Any {
       m.skipToEnd()
     }
+    m.matchEos()
     return m
   }
 
@@ -556,8 +596,7 @@ public struct Glob {
       }
     }
     m.ignoreCase = ignoreCase
-    let bm = m.assembleMatcher()
-    return Glob(matcher: bm)
+    return Glob(matcher: m.assembleMatcher())
   }
 
 }
