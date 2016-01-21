@@ -54,34 +54,34 @@ public struct FileGlobMatcherPart: FileGlobPart {
 
 public struct FileGlob {
 
-  var parts = [FileGlobPart]()
+  public var parts = [FileGlobPart]()
   var ignoreCase = false
 
   public init(ignoreCase: Bool = false) {
     self.ignoreCase = ignoreCase
   }
 
-  mutating func addLiteral(value: String) {
+  public mutating func addLiteral(value: String) {
     parts.append(FileGlobStringPart(type: .Literal, value: value))
   }
 
-  mutating func addSeparator() {
+  public mutating func addSeparator() {
     parts.append(FileGlobTypePart(type: .Separator))
   }
 
-  mutating func addAll() {
+  public mutating func addAll() {
     parts.append(FileGlobTypePart(type: .All))
   }
 
-  mutating func addRecurse() {
+  public mutating func addRecurse() {
     parts.append(FileGlobTypePart(type: .Recurse))
   }
 
-  mutating func addMatcher(glob: Glob) {
+  public mutating func addMatcher(glob: Glob) {
     parts.append(FileGlobMatcherPart(glob: glob))
   }
 
-  mutating func addEndsWith(value: String) {
+  public mutating func addEndsWith(value: String) {
     parts.append(FileGlobStringPart(type: .EndsWith, value: value))
   }
 
@@ -165,7 +165,7 @@ public struct FileGlob {
 }
 
 
-enum FileGlobError: ErrorType {
+public enum FileGlobError: ErrorType {
   case Parse
   case Unreachable
 }

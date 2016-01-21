@@ -129,4 +129,20 @@ public extension String.UTF16View {
     return self[startIndex.advancedBy(index)]
   }
 
+  public func endsWith(string: String) -> Bool {
+    let a = string.utf16
+    let alen = a.count
+    let len = self.count
+    if len >= alen && alen > 0 {
+      let j = len - alen
+      for i in 0..<alen {
+        if a.codeUnitAt(i) != self.codeUnitAt(j + i) {
+          return false
+        }
+      }
+      return true
+    }
+    return false
+  }
+
 }
