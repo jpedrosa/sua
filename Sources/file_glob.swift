@@ -81,25 +81,60 @@ public struct FileGlob {
     parts.append(FileGlobMatcherPart(glob: glob))
   }
 
+  mutating func addEndsWith(value: String) {
+    parts.append(FileGlobStringPart(type: .EndsWith, value: value))
+  }
+
   public static func parse(string: String, ignoreCase: Bool = false) throws
       -> FileGlob {
     var stream = ByteStream(bytes: string.bytes)
     var fg = FileGlob(ignoreCase: ignoreCase)
+    func collectGlob() throws {
+      let tb = stream.collectToken()
+      let tokens = try GlobLexer(bytes: tb).parseAllGlobTokens()
+      if tokens.count == 1 && tokens[0].globType == .Name {
+        if let z = tokens[0].collectString() {
+          if ignoreCase {
+            if let ds = Ascii.toLowerCase(z) {
+              fg.addLiteral(ds)
+            } else {
+              throw FileGlobError.Parse
+            }
+          } else {
+            fg.addLiteral(z)
+          }
+        } else {
+          throw FileGlobError.Parse
+        }
+      } else if tokens.count == 2 && tokens[0].globType == .SymAsterisk &&
+          tokens[1].globType == .Name {
+        if let z = tokens[1].collectString() {
+          if ignoreCase {
+            if let ds = Ascii.toLowerCase(z) {
+              fg.addLiteral(ds)
+            } else {
+              throw FileGlobError.Parse
+            }
+          } else {
+            fg.addLiteral(z)
+          }
+        } else {
+          throw FileGlobError.Parse
+        }
+      } else {
+        var m = try GlobMatcher.doParse(tokens)
+        m.ignoreCase = ignoreCase
+        fg.addMatcher(Glob(matcher: m.assembleMatcher(),
+              ignoreCase: ignoreCase))
+      }
+    }
     while !stream.isEol {
       if stream.eatWhileNeitherTwo(47, c2: 42) { // / *
         if stream.matchSlash() {
-          if let s = stream.collectTokenString() {
-            fg.addLiteral(s)
-          } else {
-            throw FileGlobError.Parse
-          }
+          try collectGlob()
         } else {
           stream.eatUntilOne(47) // /
-          if let s = stream.collectTokenString() {
-            fg.addMatcher(try Glob.parse(s, ignoreCase: ignoreCase))
-          } else {
-            throw FileGlobError.Parse
-          }
+          try collectGlob()
         }
       } else if stream.eatSlash() {
         fg.addSeparator()
@@ -111,21 +146,13 @@ public struct FileGlob {
             stream.startIndex = stream.currentIndex
           } else {
             stream.eatUntilOne(47) // /
-            if let s = stream.collectTokenString() {
-              fg.addMatcher(try Glob.parse(s, ignoreCase: ignoreCase))
-            } else {
-              throw FileGlobError.Parse
-            }
+            try collectGlob()
           }
         } else if stream.matchSlash() || stream.isEol {
           fg.addAll()
         } else { // Ends with.
           stream.eatUntilOne(47) // /
-          if let s = stream.collectTokenString() {
-            fg.addMatcher(try Glob.parse(s, ignoreCase: ignoreCase))
-          } else {
-            throw FileGlobError.Parse
-          }
+          try collectGlob()
         }
       } else {
         throw FileGlobError.Unreachable

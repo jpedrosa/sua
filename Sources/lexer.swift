@@ -63,6 +63,10 @@ extension LexerToken {
     return Array(bytes[startIndex..<endIndex])
   }
 
+  public func collectString() -> String? {
+    return String.fromCharCodes(bytes, start: startIndex, end: endIndex - 1)
+  }
+
   public var description: String {
     return "CommonToken(startIndex: \(startIndex), endIndex: \(endIndex), " +
         "type: \(type), string: \(inspect(string)))"
