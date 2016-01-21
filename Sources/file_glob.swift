@@ -169,3 +169,169 @@ public enum FileGlobError: ErrorType {
   case Parse
   case Unreachable
 }
+
+
+public struct FileGlobList {
+
+  var fileGlob: FileGlob
+  var ignoreCase = false
+  var skipDotFiles = true
+  var handler: FileBrowserHandler
+  var lastIndex: Int
+  var parts: [FileGlobPart]
+
+  public init(fileGlob: FileGlob, skipDotFiles: Bool = true,
+        fn: FileBrowserHandler) {
+    self.fileGlob = fileGlob
+    self.skipDotFiles = skipDotFiles
+    ignoreCase = fileGlob.ignoreCase
+    handler = fn
+    lastIndex = 0
+    parts = []
+  }
+
+  public init(pattern: String, skipDotFiles: Bool = true,
+      fn: FileBrowserHandler) throws {
+    self.init(fileGlob: try FileGlob.parse(pattern), skipDotFiles: skipDotFiles,
+        fn: fn)
+  }
+
+  public mutating func list() throws {
+    let len = fileGlob.parts.count
+    if len > 0 {
+      var i = 0
+      var baseDir = ""
+      while i < len {
+        let part = fileGlob.parts[i]
+        if part.type == .Separator {
+          baseDir += "/"
+        } else if part.type == .Literal {
+          baseDir += (part as! FileGlobStringPart).value
+        } else {
+          break
+        }
+        i += 1
+      }
+      if baseDir.isEmpty {
+        baseDir = Dir.cwd ?? ""
+      }
+      if baseDir.utf16.codeUnitAt(baseDir.utf16.count - 1) != 47 { // /
+        baseDir += "/"
+      }
+      if parts.count == 0 {
+        var lastWasRecurse = false
+        while i < len {
+          let part = fileGlob.parts[i]
+          if part.type != .Separator {
+            if !lastWasRecurse {
+              parts.append(part)
+            }
+            if part.type == .Recurse {
+              lastWasRecurse = true
+            }
+          } else {
+            lastWasRecurse = false
+          }
+          i += 1
+        }
+        lastIndex = parts.count - 1
+      }
+      if lastIndex > 0 {
+        try doList(baseDir, partIndex: 0)
+      }
+    }
+  }
+
+  public mutating func doList(path: String, partIndex: Int) throws {
+    let part = parts[partIndex]
+    if part.type == .Recurse {
+      if partIndex >= lastIndex {
+        try handler(name: File.baseName(path), type: .D, path: path)
+        try recurseAndAddDirectories(path)
+      } else if partIndex + 1 >= lastIndex {
+        try recurseAndMatch(path, partIndex: partIndex + 1)
+      } else {
+        var j = partIndex + 2
+        while j <= lastIndex {
+          if parts[j].type == .Recurse {
+            break
+          }
+          j += 1
+        }
+        if j >= lastIndex {
+          // recurseAndMultiLevelMatch(path, partIndex: partIndex)
+        } else {
+          // subRecurse(path, partIndex: partIndex)
+        }
+      }
+    } else { // .Matcher .EndsWith .Literal .All
+      if partIndex < lastIndex {
+        try FileBrowser.scanDir(path) { name, type in
+          if type == .D {
+            if self.matchFileName(name, partIndex: partIndex) {
+              try self.doList("\(path)\(name)/", partIndex: partIndex + 1)
+            }
+          }
+        }
+      } else {
+        try FileBrowser.scanDir(path) { name, type in
+          if self.matchFileName(name, partIndex: partIndex) {
+            try self.handler(name: name, type: type, path: path)
+          }
+        }
+      }
+    }
+  }
+
+  public func matchFileName(name: String, partIndex: Int) -> Bool {
+    if self.skipDotFiles && name.utf16.codeUnitAt(0) == 46 { // .
+      return false
+    } else {
+      let part = parts[partIndex]
+      switch part.type {
+        case .All:
+          return true
+        case .Matcher:
+          var matcherPart = part as! FileGlobMatcherPart
+          return matcherPart.glob.match(name)
+        case .Literal:
+          let stringPart = part as! FileGlobStringPart
+          let s = ignoreCase ? Ascii.toLowerCase(name) ?? "" : name
+          return s == stringPart.value
+        case .EndsWith:
+          let stringPart = part as! FileGlobStringPart
+          let s = ignoreCase ? Ascii.toLowerCase(name) ?? "" : name
+          return s.utf16.endsWith(stringPart.value)
+        default: ()
+      }
+    }
+    return false
+  }
+
+  public func recurseAndMatch(path: String, partIndex: Int) throws {
+    try FileBrowser.scanDir(path) { name, type in
+      if self.matchFileName(name, partIndex: partIndex) {
+        try self.handler(name: name, type: type, path: path)
+      }
+      if type == .D {
+        if self.skipDotFiles && name.utf16.codeUnitAt(0) == 46 { // .
+          return
+        }
+        try self.recurseAndMatch("\(path)\(name)/", partIndex: partIndex)
+      }
+    }
+  }
+
+  public func recurseAndAddDirectories(path: String) throws {
+    try FileBrowser.scanDir(path) { name, type in
+      if type == .D {
+        if self.skipDotFiles && name.utf16.codeUnitAt(0) == 46 { // .
+          return
+        }
+        try self.handler(name: name, type: type, path: path)
+        try self.recurseAndAddDirectories("\(path)\(name)/")
+      }
+    }
+  }
+
+}
