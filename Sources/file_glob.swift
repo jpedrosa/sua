@@ -111,12 +111,12 @@ public struct FileGlob {
         if let z = tokens[1].collectString() {
           if ignoreCase {
             if let ds = Ascii.toLowerCase(z) {
-              fg.addLiteral(ds)
+              fg.addEndsWith(ds)
             } else {
               throw FileGlobError.Parse
             }
           } else {
-            fg.addLiteral(z)
+            fg.addEndsWith(z)
           }
         } else {
           throw FileGlobError.Parse

@@ -6,6 +6,10 @@ public enum FileType {
 }
 
 
+public typealias FileBrowserHandler =
+    (name: String, type: FileType, path: String) throws -> Void
+
+
 final public class FileBrowser {
 
   var dirp: COpaquePointer?
@@ -84,15 +88,14 @@ final public class FileBrowser {
   }
 
   public static func scanDir(path: String,
-      fn: (name: String, type: FileType) -> Void) throws {
+      fn: (name: String, type: FileType) throws -> Void) throws {
     let fb = try FileBrowser(path: path)
     while fb.next() {
-      fn(name: fb.name ?? "", type: fb.type)
+      try fn(name: fb.name ?? "", type: fb.type)
     }
   }
 
-  public static func recurseDir(path: String,
-      fn: (name: String, type: FileType, path: String) -> Void) {
+  public static func recurseDir(path: String, fn: FileBrowserHandler) {
     let lasti = path.utf16.count - 1
     if lasti >= 0 {
       if path.utf16.codeUnitAt(lasti) != 47 { // /
@@ -103,12 +106,11 @@ final public class FileBrowser {
     }
   }
 
-  public static func doRecurseDir(path: String,
-      fn: (name: String, type: FileType, path: String) -> Void) {
+  public static func doRecurseDir(path: String, fn: FileBrowserHandler) {
     do {
       try scanDir(path) { (name, type) in
         if name != ".." && name != "." {
-          fn(name: name, type: type, path: path)
+          try fn(name: name, type: type, path: path)
           if type == .D {
             doRecurseDir("\(path)\(name)/", fn: fn)
           }
