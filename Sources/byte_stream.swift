@@ -1962,6 +1962,44 @@ public struct ByteStream {
     return r
   }
 
+  public mutating func eatStringFromListAtEnd(strings: [String]) -> Bool {
+    let bytes = strings.map { $0.bytes }
+    return matchBytesFromListAtEnd(bytes, consume: true) >= 0
+  }
+
+  public mutating func matchStringFromListAtEnd(strings: [String],
+      consume: Bool = false) -> Int {
+    let bytes = strings.map { $0.bytes }
+    return matchBytesFromListAtEnd(bytes, consume: false)
+  }
+
+  public mutating func eatBytesFromListAtEnd(bytes: [[UInt8]]) -> Bool {
+    return matchBytesFromListAtEnd(bytes, consume: true) >= 0
+  }
+
+  public mutating func matchBytesFromListAtEnd(bytes: [[UInt8]],
+      consume: Bool = false) -> Int {
+    let len = lineEndIndex
+    let hostLen = len - currentIndex
+    BYTES: for i in 0..<bytes.count {
+      let a = bytes[i]
+      let alen = a.count
+      if alen <= hostLen {
+        let si = len - alen
+        for j in 0..<alen {
+          if a[j] != _bytes[si + j] {
+            continue BYTES
+          }
+        }
+        if consume {
+          currentIndex = len
+        }
+        return i
+      }
+    }
+    return -1
+  }
+
   mutating func merge(buffer: [UInt8], maxBytes: Int) {
     let len = _bytes.count
     let si = startIndex
