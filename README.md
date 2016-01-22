@@ -17,6 +17,15 @@ sweeter.
 
 ----------
 
+**News - January 22, 2016**
+
+Added a ton of [Glob and file path](docs/Glob.md) related tools. Also added some
+more parsing related classes in [ByteMatcher](Sources/byte_matcher.swift),
+[Lexer](Sources/lexer.swift), [GlobLexer](Sources/glob.swift),
+[String#utf16#endsWith](Sources/string.swift#200) and so on.
+
+----------
+
 **News - January 13, 2016**
 
 Great news! With the [Momentum](docs/Momentum.md) web server, and a handful of
@@ -94,6 +103,7 @@ Progress Notes
 --------------
 *LATEST*
 
+* [Glob and File Path](docs/Glob.md)
 * [Environment](docs/Environment.md)
 * [Momentum](docs/Momentum.md)
 * [ServerSocket](docs/ServerSocket.md)
