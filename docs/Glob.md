@@ -149,4 +149,7 @@ for (name, type, path) in Dir["/home/dewd/**/*{.png,.jpg}"] {
 The example above would search for the files ending in either .png or .jpg
 extension in the given directories, recursively.
 
+**Edit:** Added an actual example to the repository:
+[GlobList.](../examples/glob_list/Sources/main.swift)
+
 Cheers!
