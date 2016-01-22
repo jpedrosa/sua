@@ -455,13 +455,15 @@ public class FilePath {
     }
     if maxBytes > 0 {
       let lasti = maxBytes - 1
-      var c = bytes[0]
-      if c == 47 { // /
+      while i < maxBytes && bytes[i] == 47 { //
         sb += "/"
-        i = skipSlashes(bytes, startIndex: 1, maxBytes: maxBytes)
+        i += 1
+      }
+      if i >= maxBytes {
+        return sb
       }
       while i < maxBytes {
-        c = bytes[i]
+        var c = bytes[i]
         if c == 46 { // .
           if i < lasti {
             c = bytes[i + 1]
