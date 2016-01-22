@@ -269,8 +269,9 @@ public struct FileGlobList {
           try recurseAndMultiLevelMatch(path, partIndex: partIndex,
               indexList: &indexList)
         } else {
-          p("DEMO")
-          // subRecurse(path, partIndex: partIndex)
+          var indexList = [Int]()
+          try subRecurse(path, partIndex: partIndex, indexList: &indexList,
+              lastMatchIndex: j - 1)
         }
       }
     } else { // .Matcher .EndsWith .Literal .All
@@ -350,23 +351,25 @@ public struct FileGlobList {
   public func recurseAndMultiLevelMatch(path: String, partIndex: Int,
       inout indexList: [Int]) throws {
     var indexListLen = indexList.count
-    var haveIndexList = indexListLen != 0
+    var haveIndexList = indexListLen > 0
     var finalMatcherIndex = partIndex + 1
     var haveFinalMatcher = false
     if haveIndexList {
-      for mi in 0..<indexListLen {
+      var mi = 0
+      while mi < indexListLen {
         let n = indexList[mi]
         if n == lastIndex {
           finalMatcherIndex = n
           haveFinalMatcher = true
           break
         }
+        mi += 1
       }
       if haveFinalMatcher {
         if indexListLen == 1 {
           haveIndexList = false
         } else {
-          indexList.removeAtIndex(partIndex)
+          indexList.removeAtIndex(mi)
           indexListLen -= 1
         }
       }
@@ -394,6 +397,62 @@ public struct FileGlobList {
         }
         try self.recurseAndMultiLevelMatch("\(path)\(name)/",
             partIndex: partIndex, indexList: &freshIndexList)
+      }
+    }
+  }
+
+  // This gets used for pattern like this "/home/**/user/**/t_"
+  mutating public func subRecurse(path: String, partIndex: Int,
+      inout indexList: [Int], lastMatchIndex: Int) throws {
+    var indexListLen = indexList.count
+    var haveIndexList = indexListLen > 0
+    var finalMatcherIndex = partIndex + 1
+    var haveFinalMatcher = false
+    if haveIndexList {
+      var mi = 0
+      while mi < indexListLen {
+        let n = indexList[mi]
+        if n == lastMatchIndex {
+          finalMatcherIndex = n
+          haveFinalMatcher = true
+          break
+        }
+        mi += 1
+      }
+      if haveFinalMatcher {
+        if indexListLen == 1 {
+          haveIndexList = false
+        } else {
+          indexList.removeAtIndex(mi)
+          indexListLen -= 1
+        }
+      }
+    }
+    try FileBrowser.scanDir(path) { name, type in
+      if type == .D && (!self.skipDotFiles || name.utf16.codeUnitAt(0) != 46) {
+        let haveMatch = self.matchFileName(name, partIndex: partIndex + 1)
+        if (haveMatch && (partIndex + 1 == lastMatchIndex)) ||
+            (haveFinalMatcher && self.matchFileName(name,
+                partIndex: finalMatcherIndex)) {
+          try self.doList("\(path)\(name)/", partIndex: lastMatchIndex + 1)
+        } else {
+          var freshIndexList = [Int]()
+          if haveIndexList {
+            for mi in 0..<indexListLen {
+              let n = indexList[mi]
+              if self.matchFileName(name, partIndex: n) {
+                freshIndexList.append(n + 1)
+              }
+            }
+            if haveMatch {
+              freshIndexList.append(partIndex + 2)
+            }
+          } else if haveMatch {
+            freshIndexList.append(partIndex + 2)
+          }
+          try self.subRecurse("\(path)\(name)/", partIndex: partIndex,
+              indexList: &freshIndexList, lastMatchIndex: lastMatchIndex)
+        }
       }
     }
   }
