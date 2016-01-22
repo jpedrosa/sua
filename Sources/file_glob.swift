@@ -312,26 +312,25 @@ public struct FileGlobList {
   public func matchFileName(name: String, partIndex: Int) -> Bool {
     if self.skipDotFiles && name.utf16.codeUnitAt(0) == 46 { // .
       return false
-    } else {
-      let part = parts[partIndex]
-      switch part.type {
-        case .All:
-          return true
-        case .Matcher:
-          var matcherPart = part as! FileGlobMatcherPart
-          return matcherPart.glob.match(name)
-        case .Literal:
-          let stringPart = part as! FileGlobStringPart
-          let s = ignoreCase ? Ascii.toLowerCase(name) ?? "" : name
-          return s == stringPart.value
-        case .EndsWith:
-          let stringPart = part as! FileGlobStringPart
-          let s = ignoreCase ? Ascii.toLowerCase(name) ?? "" : name
-          return s.utf16.endsWith(stringPart.value)
-        default: ()
-      }
     }
-    return false
+    let part = parts[partIndex]
+    switch part.type {
+      case .All:
+        return true
+      case .Matcher:
+        var matcherPart = part as! FileGlobMatcherPart
+        return matcherPart.glob.match(name)
+      case .Literal:
+        let stringPart = part as! FileGlobStringPart
+        let s = ignoreCase ? Ascii.toLowerCase(name) ?? "" : name
+        return s == stringPart.value
+      case .EndsWith:
+        let stringPart = part as! FileGlobStringPart
+        let s = ignoreCase ? Ascii.toLowerCase(name) ?? "" : name
+        return s.utf16.endsWith(stringPart.value)
+      default:
+        return false
+    }
   }
 
   // This gets used on patterns like this: "/home/user/**/*.txt"
