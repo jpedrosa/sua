@@ -7,7 +7,9 @@ func printUsage() {
   print("GlobList: GlobList <pattern>\n" +
       "Where the pattern follows a Glob pattern, including a directory path\n" +
       "that may include a recursion command.\n" +
-      "E.g. GlobList ~/**/*.txt\n\n" +
+      "E.g. GlobList \"~/**/*.txt\"\n\n" +
+      "**Note** It's best to enclose the pattern within quotes, so that the\n" +
+      "         shell does not try to interpret it itself.\n\n" +
       "Table of supported Glob features:\n" +
       "    * The ? wildcard - It will match a single character of any kind.\n" +
       "\n" +
@@ -33,7 +35,7 @@ if let s = parseOpt() {
   if s.utf16.codeUnitAt(0) == 126 { // ~
     z = try File.expandPath(s)
   }
-  Dir.glob(z) { name, type, path in
+  try Dir.glob(z) { name, type, path in
     print("\(type): \(path)\(name)")
   }
 } else {
