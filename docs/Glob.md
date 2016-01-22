@@ -140,4 +140,13 @@ And a table of the Glob features that are supported:
 **Note** The special characters could be escaped with the \ backslash character
 in order to allow them to work like any other character.
 
+```swift
+for (name, type, path) in Dir["/home/dewd/**/*{.png,.jpg}"] {
+  print("\(type):\(path)\(name)")
+}
+```
+
+The example above would search for the files ending in either .png or .jpg
+extension in the given directories, recursively.
+
 Cheers!
