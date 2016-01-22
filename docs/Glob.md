@@ -118,7 +118,7 @@ variable names instead. :-)
 In truth, Swift is not always concise. In dealing with types, we can create a
 ton structs and protocols and stuff that in other languages would not be needed
 as they would reuse more of their standard data structures instead. That's the
-bitter-sweet side of Swift. Still, I was thinking that perhaps Swift is the
+bittersweet side of Swift. Still, I was thinking that perhaps Swift is the
 closest to the bare-metal that most programmers will ever get. A lot of the
 stuff that we learned for Assembly, C, and so on, can be put to good use with
 Swift. And yet, many of us would never be as productive in a lower-level
