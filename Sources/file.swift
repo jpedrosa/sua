@@ -178,7 +178,7 @@ public class File: CustomStringConvertible {
 
   // Aliases for handy FilePath methods.
   public static func join(firstPath: String, secondPath: String) -> String {
-    return FilePath.join(firstPath, secondPath: secondPath)
+    return FilePath.join(firstPath, s: secondPath)
   }
 
   public static func baseName(path: String, suffix: String? = nil) -> String {
@@ -264,7 +264,7 @@ public enum TempFileError: ErrorType {
 
 public class FilePath {
 
-  public static func join(firstPath: String, secondPath: String) -> String {
+  public static func join(firstPath: String, s secondPath: String) -> String {
     let fpa = firstPath.bytes
     let i = skipTrailingSlashes(fpa, lastIndex: fpa.count - 1)
     let fps = String.fromCharCodes(fpa, start: 0, end: i) ?? ""
@@ -410,16 +410,15 @@ public class FilePath {
         if i >= len {
           return homeDir
         }
-        return join(homeDir, secondPath: doExpandPath(bytes, startIndex: i,
+        return join(homeDir, s: doExpandPath(bytes, startIndex: i,
             maxBytes: len))
       } else if fc != 47 { // /
         if let cd = Dir.cwd {
           if fc == 46 { // .
-            let za = join(cd, secondPath: path).bytes
+            let za = join(cd, s: path).bytes
             return doExpandPath(za, startIndex: 0, maxBytes: za.count)
           }
-          return join(cd, secondPath: doExpandPath(bytes, startIndex: 0,
-              maxBytes: len))
+          return join(cd, s: doExpandPath(bytes, startIndex: 0, maxBytes: len))
         } else {
           throw FilePathError.ExpandPath(message: "Invalid current directory.")
         }
