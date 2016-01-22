@@ -244,6 +244,21 @@ public struct FileGlobList {
       }
       if lastIndex >= 0 {
         try doList(baseDir, partIndex: 0)
+      } else {
+        // Perhaps a literal file or directory was given, so return it instead:
+        var z = ""
+        for part in fileGlob.parts {
+          if part.type == .Separator {
+            z += "/"
+          } else if part.type == .Literal {
+            z += (part as! FileGlobStringPart).value
+          }
+        }
+        if let st = File.stat(z) {
+          let t: FileType = st.isRegularFile ? .F : (st.isDirectory ? .D : .U)
+          try handler(name: File.baseName(z), type: t,
+              path: "\(File.dirName(z))/")
+        }
       }
     }
   }
