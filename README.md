@@ -22,7 +22,7 @@ sweeter.
 Added a ton of [Glob and file path](docs/Glob.md) related tools. Also added some
 more parsing related classes in [ByteMatcher](Sources/byte_matcher.swift),
 [Lexer](Sources/lexer.swift), [GlobLexer](Sources/glob.swift),
-[String#utf16#endsWith](Sources/string.swift#200) and so on.
+[String#utf16#endsWith](Sources/string.swift#L130) and so on.
 
 ----------
 

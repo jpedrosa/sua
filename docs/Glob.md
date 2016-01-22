@@ -75,8 +75,8 @@ finally got it done!
 I had to come up with other supporting classes in the interim, such as the
 common [Lexer](../Sources/lexer.swift) features that were also first an idea in
 Dart. I also brought over to Swift some of the [File.join, File.baseName and
-even File.expandName](../Sources/file.swift#400) that were originally ideas from
-Ruby.
+even File.expandName](../Sources/file.swift#L400) that were originally ideas
+from Ruby.
 
 ```swift
 print(try File.expandPath("~/t_"))          // Prints /home/dewd/t_
