@@ -177,7 +177,7 @@ public class File: CustomStringConvertible {
   }
 
   // Aliases for handy FilePath methods.
-  public static func join(firstPath: String, secondPath: String) -> String {
+  public static func join(firstPath: String, s secondPath: String) -> String {
     return FilePath.join(firstPath, s: secondPath)
   }
 

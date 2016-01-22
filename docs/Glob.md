@@ -81,7 +81,7 @@ from Ruby.
 ```swift
 print(try File.expandPath("~/t_"))          // Prints /home/dewd/t_
 // The following prints: /home/dewd/t_/swift
-print(try File.expandPath(File.join("~/t_", secondPath: "swift")))
+print(try File.expandPath(File.join("~/t_", s: "swift")))
 print(File.extName("some.png"))            // Prints .png
 print(File.baseName("../t_/some.png"))     // Prints some.png
 ```
