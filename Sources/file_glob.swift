@@ -196,9 +196,10 @@ public struct FileGlobList {
   }
 
   public init(pattern: String, skipDotFiles: Bool = true,
+      ignoreCase: Bool = false,
       fn: FileBrowserHandler) throws {
-    self.init(fileGlob: try FileGlob.parse(pattern), skipDotFiles: skipDotFiles,
-        fn: fn)
+    self.init(fileGlob: try FileGlob.parse(pattern, ignoreCase: ignoreCase),
+        skipDotFiles: skipDotFiles, fn: fn)
   }
 
   public mutating func list() throws {
