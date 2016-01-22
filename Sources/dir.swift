@@ -37,4 +37,4 @@ public struct DirImpl {
 }
 
 
-let Dir = DirImpl()
+public let Dir = DirImpl()

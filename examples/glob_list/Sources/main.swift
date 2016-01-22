@@ -19,19 +19,19 @@ func printUsage() {
       "                       character that is not included in the set.\n" +
       "    * The {jpg,png} optional names - It will match one of the names\n" +
       "                       included in its list.\n\n" +
-      "The special characters could be escaped with the \ backslash\n" +
+      "The special characters could be escaped with the \\ backslash\n" +
       "character in order to allow them to work like any other character.")
 }
 
 func parseOpt() -> String? {
-  return Process.arguments.count > 1 Process.arguments[1] : nil
+  return Process.arguments.count > 1 ? Process.arguments[1] : nil
 }
 
 
 if let s = parseOpt() {
   var z = s
   if s.utf16.codeUnitAt(0) == 126 { // ~
-    z = File.expandPath(s)
+    z = try File.expandPath(s)
   }
   Dir.glob(z) { name, type, path in
     print("\(type): \(path)\(name)")
