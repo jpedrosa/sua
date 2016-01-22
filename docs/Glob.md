@@ -58,9 +58,9 @@ since full support for Unicode is kind of complicated and can slow down the
 algorithms even further and we'd have to depend on other libraries in order to
 get it going. (Excuses!) :-)
 
-While matching glob against both file and directory names is the most important
-use-case of glob matching, one could also reuse the library for their other
-needs, like this:
+While matching glob against file and directory names is the most important
+use-case of glob, one could also reuse the library for other needs, by calling
+the basic comparison API like this:
 
 ```swift
 var g = try Glob.parse("hello*.txt")
