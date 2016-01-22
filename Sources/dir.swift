@@ -21,10 +21,9 @@ public struct DirImpl {
   public func globList(pattern: String, skipDotFiles: Bool = true,
       ignoreCase: Bool = false) throws -> [(String, FileType, String)] {
     var r = [(String, FileType, String)]()
-    var list = try FileGlobList(pattern: pattern) { name, type, path in
+    try glob(pattern) { name, type, path in
       r.append((name, type, path))
     }
-    try list.list()
     return r
   }
 
