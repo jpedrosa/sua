@@ -18,6 +18,7 @@ public struct DirImpl {
       // directly if they want to try to catch the errors.
       // These errors could also be caused by trying to open directories that
       // are inaccessible.
+      return [] // Return it empty to be on the safe side.
     }
     return r
   }
