@@ -496,6 +496,9 @@ public class FilePath {
         sb += a[i]
         slash = true
       }
+      if bytes[lasti] == 47 { // /
+        sb += "/"
+      }
     }
     return sb
   }
