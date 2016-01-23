@@ -127,6 +127,17 @@ func timeUtf8Cache(label: String = "ut8c") {
   print("timeUtf8Cache (\(label)) count: \(count)")
 }
 
+func timeEndsWith(label: String = "endw") {
+  var count = 0
+  for _ in 0..<ITERATIONS {
+    let s = genSample(label)
+    if s.utf16.endsWith("2") {
+      count += 1
+    }
+  }
+  print("timeEndsWith (\(label)) count: \(count)")
+}
+
 var sw = Stopwatch()
 sw.start()
 timeCharacter()
@@ -155,4 +166,8 @@ print("Elapsed: \(sw.millis)ms")
 prepareUtf8Cache()
 sw.start()
 timeUtf8Cache()
+print("Elapsed: \(sw.millis)ms")
+
+sw.start()
+timeEndsWith()
 print("Elapsed: \(sw.millis)ms")
