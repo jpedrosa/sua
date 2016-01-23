@@ -24,7 +24,7 @@ public enum GlobTokenType: TokenType {
   case SymCBSet              // ]
   case OptionalName
   case SymOBOptionalName     // {
-  case SymComma  // ,
+  case SymComma              // ,
   case SymCBOptionalName     // }
 }
 
@@ -424,7 +424,7 @@ public struct GlobMatcher {
         case .Any: ()
         case .One:
           m.next()
-        case .Set: ()
+        case .Set:
           var setPart = part as! GlobMatcherSetPart
           setPart.ignoreCase = ignoreCase
           let table = setPart.makeComparisonTable()
