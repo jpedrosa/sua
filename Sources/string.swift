@@ -146,3 +146,15 @@ public extension String.UTF16View {
   }
 
 }
+
+
+public extension String.CharacterView {
+
+  // Handy method for obtaining a string out of character indices.
+  public func substring(startIndex: Int, endIndex: Int)
+      -> String {
+    return String(self[self.startIndex.advancedBy(
+        startIndex)..<self.startIndex.advancedBy(endIndex)])
+  }
+
+}
