@@ -103,6 +103,7 @@ Progress Notes
 --------------
 *LATEST*
 
+* [Hexastyle](docs/Hexastyle.md)
 * [Glob and File Path](docs/Glob.md)
 * [Environment](docs/Environment.md)
 * [Momentum](docs/Momentum.md)

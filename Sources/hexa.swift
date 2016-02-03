@@ -53,4 +53,35 @@ public class HexaUtils {
     return a
   }
 
+  // Make sure it is a value between 0 and 15 before calling it.
+  public static func toLiteral(f: UInt8) -> String {
+    switch f {
+      case 10:
+        return "A"
+      case 11:
+        return "B"
+      case 12:
+        return "C"
+      case 13:
+        return "D"
+      case 14:
+        return "E"
+      case 15:
+        return "F"
+      default:
+        return "\(f)"
+    }
+  }
+
+  public static func hexaToString(c: UInt8, pad: Bool = false) -> String {
+    if c >= 16 {
+      let n = c % 16
+      let rest = c - (n * 16)
+      return "\(toLiteral(n))\(toLiteral(rest))"
+    } else if pad {
+      return "0\(toLiteral(c))"
+    }
+    return toLiteral(c)
+  }
+
 }
