@@ -1,10 +1,10 @@
 
 
 public struct RGBAColor {
-  var r: UInt8
-  var g: UInt8
-  var b: UInt8
-  var a: UInt8?
+  public var r: UInt8
+  public var g: UInt8
+  public var b: UInt8
+  public var a: UInt8?
 }
 
 
@@ -224,6 +224,7 @@ public struct Hexastyle {
   }
 
 }
+
 
 public enum HexastyleError: ErrorType {
   case Parse
