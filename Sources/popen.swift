@@ -25,21 +25,21 @@ public class Popen {
   public static func readAllCChar(command: String) throws -> [CChar] {
     let fs = try doPopen(command)
     defer { doClose(fs) }
-    return try fs.readAllCChar(command)
+    return try fs.readAllCChar()
   }
 
   public static func readLines(command: String, fn: (string: String?)
       -> Void) throws {
     let fs = try doPopen(command)
     defer { doClose(fs) }
-    try fs.readLines(command, fn: fn)
+    try fs.readLines(fn)
   }
 
   public static func readByteLines(command: String, maxBytes: Int = 80,
       fn: (bytes: [UInt8], length: Int) -> Void) throws {
     let fs = try doPopen(command)
     defer { doClose(fs) }
-    try fs.readByteLines(command, maxBytes: maxBytes, fn: fn)
+    try fs.readByteLines(maxBytes, fn: fn)
   }
 
 }

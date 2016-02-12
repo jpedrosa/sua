@@ -530,7 +530,7 @@ public class FileStream {
     fp = nil
   }
 
-  public func readAllCChar(command: String) throws -> [CChar] {
+  public func readAllCChar() throws -> [CChar] {
     guard let afp = fp else { return [CChar]() }
     var a = [CChar](count: SIZE, repeatedValue: 0)
     var buffer = [CChar](count: SIZE, repeatedValue: 0)
@@ -557,8 +557,7 @@ public class FileStream {
     return a
   }
 
-  public func readLines(command: String, fn: (string: String?)
-      -> Void) throws {
+  public func readLines(fn: (string: String?) -> Void) throws {
     guard let afp = fp else { return }
     var a = [CChar](count: SIZE, repeatedValue: 0)
     var buffer = [CChar](count: SIZE, repeatedValue: 0)
@@ -594,7 +593,7 @@ public class FileStream {
     }
   }
 
-  public func readByteLines(command: String, maxBytes: Int = 80,
+  public func readByteLines(maxBytes: Int = 80,
       fn: (bytes: [UInt8], length: Int) -> Void) throws {
     guard let afp = fp else { return }
     var buffer = [UInt8](count: Int(maxBytes), repeatedValue: 0)
