@@ -134,6 +134,26 @@ Which prints this:
 
 Hexastyle is already being useful on the SuaSDL sister project. Since it is a
 core functionality that could be useful beyond just the SuaSDL project, I
-decided to bring it over to the main Sua project now.
+decided to bring it over to the main Sua project now. See a screenshot of it
+in action:
+
+![Hello World screenshot](../../../../sua_sdl/blob/master/docs/images/hello_world.png)
+
+And a snippet of the 
+[code](../../../../sua_sdl/blob/master/examples/colors_hexastyle/Sources/main.swift) 
+if you want to browse it too:
+
+```swift
+try S.start() { div in
+  S.mainDiv.borderTop = true
+  S.mainDiv.borderRight = true
+  S.mainDiv.borderBottom = true
+  S.mainDiv.borderLeft = true
+  try div.span("%u#F00=Hexa%u#0F0=st%u#00F=yle")
+  try div.span("%#0F0,000=S%#8ef,000=u%#EE0,000=a")
+```
+
+The [SuaSDL](../../../../sua_sdl/) project is still coming along, though. The SDL is
+proving to be a great library if you ever wondered.
 
 Cheers!
