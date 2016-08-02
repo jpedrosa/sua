@@ -1,13 +1,13 @@
 
 public func escapeString(s: String) -> String {
   var z = ""
-  debugPrint(s, terminator: "", toStream: &z)
+  debugPrint(s, terminator: "", to: &z)
   return z
 }
 
 public func inspect(o: Any) -> String {
   var z = ""
-  debugPrint(o, terminator: "", toStream: &z)
+  debugPrint(o, terminator: "", to: &z)
   return z
 }
 
@@ -25,9 +25,10 @@ public func p(a: Any...) {
 // would conflict with this command, we've given it a unique name instead.
 public func printList(string: String) {
   // 10 - new line
-  if string.isEmpty || string.utf16.codeUnitAt(string.utf16.count - 1) != 10 {
+  if string.isEmpty ||
+      string.utf16.codeUnitAt(index: string.utf16.count - 1) != 10 {
     print(string)
   } else {
-    Stdout.write(string)
+    Stdout.write(s: string)
   }
 }

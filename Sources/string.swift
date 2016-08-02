@@ -37,7 +37,7 @@ public extension String {
           a.append(0)
         }
       }
-      return String.fromCString(&a)
+      return String(cString: &a)
     }
   }
 
@@ -59,7 +59,7 @@ public extension String {
         }
       }
       let ap = UnsafePointer<CChar>(a)
-      return String.fromCString(ap)
+      return String(cString: ap)
     }
   }
 
@@ -81,25 +81,26 @@ public extension String {
     var left: String?
     var right: String?
     if !string.isEmpty {
-      let sfc = string.utf16.codeUnitAt(0)
+      let sfc = string.utf16.codeUnitAt(index: 0)
       let jlen = string.utf16.count
       let len = utf16.count
       let validLen = len - jlen + 1
       for i in 0..<validLen {
-        if utf16.codeUnitAt(i) == sfc {
+        if utf16.codeUnitAt(index: i) == sfc {
           var ok = true
           var j = 1
           while j < jlen {
-            if utf16.codeUnitAt(i + j) != string.utf16.codeUnitAt(j) {
+            if utf16.codeUnitAt(index: i + j) !=
+                string.utf16.codeUnitAt(index: j) {
               ok = false
               break
             }
             j += 1
           }
           if ok {
-            left = utf16.substring(0, endIndex: i)
+            left = utf16.substring(startIndex: 0, endIndex: i)
             if i + j < len {
-              right = utf16.substring(i + j, endIndex: len)
+              right = utf16.substring(startIndex: i + j, endIndex: len)
             }
             break
           }
@@ -120,13 +121,14 @@ public extension String.UTF16View {
   // Handy method for obtaining a string out of UTF16 indices.
   public func substring(startIndex: Int, endIndex: Int)
       -> String? {
-    return String(self[self.startIndex.advancedBy(
-        startIndex)..<self.startIndex.advancedBy(endIndex)])
+    return String(self[
+        self.index(self.startIndex, offsetBy: startIndex
+          )..<self.index(self.startIndex, offsetBy: endIndex)])
   }
 
   // Handy method for obtaining a UTF16 code unit to compare with.
   public func codeUnitAt(index: Int) -> UInt16 {
-    return self[startIndex.advancedBy(index)]
+    return self[self.index(startIndex, offsetBy: index)]
   }
 
   public func endsWith(string: String) -> Bool {
@@ -136,7 +138,7 @@ public extension String.UTF16View {
     if len >= alen && alen > 0 {
       let j = len - alen
       for i in 0..<alen {
-        if a.codeUnitAt(i) != self.codeUnitAt(j + i) {
+        if a.codeUnitAt(index: i) != self.codeUnitAt(index: j + i) {
           return false
         }
       }
@@ -153,8 +155,9 @@ public extension String.CharacterView {
   // Handy method for obtaining a string out of character indices.
   public func substring(startIndex: Int, endIndex: Int)
       -> String {
-    return String(self[self.startIndex.advancedBy(
-        startIndex)..<self.startIndex.advancedBy(endIndex)])
+    return String(self[
+        self.index(self.startIndex, offsetBy: startIndex
+        )..<self.index(self.startIndex, offsetBy: endIndex)])
   }
 
 }

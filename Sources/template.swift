@@ -17,8 +17,9 @@ public class Template {
     var s = ""
     let vlen = len - 7
     let clen = len - 2
-    func collect(startIndex: Int, endIndex: Int) -> String? {
-      return template.utf16.substring(startIndex, endIndex: endIndex)
+    func collect(_ startIndex: Int, endIndex: Int) -> String? {
+      return template.utf16.substring(startIndex: startIndex,
+          endIndex: endIndex)
     }
     var si = 0
     while i < vlen {

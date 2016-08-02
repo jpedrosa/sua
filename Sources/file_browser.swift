@@ -12,11 +12,11 @@ public typealias FileBrowserHandler =
 
 final public class FileBrowser {
 
-  var dirp: COpaquePointer?
+  var dirp: OpaquePointer?
   var entry: CDirentPointer?
 
   public init(path: String) throws {
-    dirp = Sys.opendir(path)
+    dirp = Sys.opendir(path: path)
     if dirp == nil {
       throw FileBrowserError.InvalidDirectory(message:
           "Failed to open directory.")
@@ -25,7 +25,7 @@ final public class FileBrowser {
 
   // The array needs to include a null value (0) at the end.
   public init(pathBytes: [UInt8]) throws {
-    dirp = Sys.opendir(pathBytes)
+    dirp = Sys.opendir(pathBytes: pathBytes)
     if dirp == nil {
       throw FileBrowserError.InvalidDirectory(message:
           "Failed to open directory.")
@@ -41,29 +41,29 @@ final public class FileBrowser {
     // Funny stuff. If the code was entry = Sys.readdir(dp), at the end of the
     // listing the entry would still not be set to nil. By storing it into The
     // temp variable "e" first, we get it to behave correctly.
-    let e = Sys.readdir(dp)
+    let e = Sys.readdir(dirp: dp)
     entry = e
     return e != nil
   }
 
   public func close() {
     if let dp = dirp {
-      Sys.closedir(dp)
+      let _ = Sys.closedir(dirp: dp)
       dirp = nil
     }
   }
 
   public var name: String? {
-    var dirName = entry!.memory.d_name
+    var dirName = entry!.pointee.d_name
     return withUnsafePointer(&dirName) { (ptr) -> String? in
-      return String.fromCString(UnsafePointer<CChar>(ptr))
+      return String(cString: UnsafePointer<CChar>(ptr))
     }
   }
 
   public var nameBytes: [UInt8] {
-    var dirName = entry!.memory.d_name
+    var dirName = entry!.pointee.d_name
     return withUnsafePointer(&dirName) { (ptr) -> [UInt8] in
-      let len = Int(Sys.strlen(UnsafePointer<CChar>(ptr)))
+      let len = Int(Sys.strlen(sp: UnsafePointer<CChar>(ptr)))
       let b = UnsafeBufferPointer<UInt8>(start: UnsafePointer<UInt8>(ptr),
           count: len)
       return [UInt8](b)
@@ -75,16 +75,16 @@ final public class FileBrowser {
   }
 
   public var type: FileType {
-    let t = entry!.memory.d_type
+    let t = entry!.pointee.d_type
     return t == 8 ? .F : (t == 4 ? .D : .U)
   }
 
   public var rawType: UInt8 {
-    return entry!.memory.d_type
+    return entry!.pointee.d_type
   }
 
   public var ino: UInt {
-    return entry!.memory.d_ino
+    return entry!.pointee.d_ino
   }
 
   public static func scanDir(path: String,
@@ -98,21 +98,21 @@ final public class FileBrowser {
   public static func recurseDir(path: String, fn: FileBrowserHandler) {
     let lasti = path.utf16.count - 1
     if lasti >= 0 {
-      if path.utf16.codeUnitAt(lasti) != 47 { // /
-        doRecurseDir("\(path)/", fn: fn)
+      if path.utf16.codeUnitAt(index: lasti) != 47 { // /
+        doRecurseDir(path: "\(path)/", fn: fn)
       } else {
-        doRecurseDir(path, fn: fn)
+        doRecurseDir(path: path, fn: fn)
       }
     }
   }
 
   public static func doRecurseDir(path: String, fn: FileBrowserHandler) {
     do {
-      try scanDir(path) { (name, type) in
+      try scanDir(path: path) { (name, type) in
         if name != ".." && name != "." {
           try fn(name: name, type: type, path: path)
           if type == .D {
-            doRecurseDir("\(path)\(name)/", fn: fn)
+            doRecurseDir(path: "\(path)\(name)/", fn: fn)
           }
         }
       }
@@ -124,6 +124,6 @@ final public class FileBrowser {
 }
 
 
-public enum FileBrowserError: ErrorType {
+public enum FileBrowserError: ErrorProtocol {
   case InvalidDirectory(message: String)
 }

@@ -75,7 +75,7 @@ public struct ByteMatcher {
   var list = [ByteMatcherEntryData]()
 
   public mutating func match(string: String) -> Int {
-    return matchAt(string, startIndex: 0)
+    return matchAt(string: string, startIndex: 0)
   }
 
   // Returns the length of the match, the difference between the last matched
@@ -104,52 +104,52 @@ public struct ByteMatcher {
         return stream.next() != nil
       case .EatOne:
         let c = (data as! UInt8Param).c
-        return stream.eatOne(c)
+        return stream.eatOne(c: c)
       case .EatUntilOne:
         let c = (data as! UInt8Param).c
-        return stream.eatUntilOne(c)
+        return stream.eatUntilOne(c: c)
       case .EatBytes:
         let bytes = (data as! BytesParam).bytes
-        return stream.eatBytes(bytes)
+        return stream.eatBytes(bytes: bytes)
       case .EatUntilBytes:
         let bytes = (data as! BytesParam).bytes
-        return stream.eatUntilBytes(bytes)
+        return stream.eatUntilBytes(bytes: bytes)
       case .EatUntilIncludingBytes:
         let bytes = (data as! BytesParam).bytes
-        return stream.eatUntilIncludingBytes(bytes)
+        return stream.eatUntilIncludingBytes(bytes: bytes)
       case .EatUntil:
         let fn = (data as! UInt8FnParam).fn
-        return stream.eatUntil(fn)
+        return stream.eatUntil(fn: fn)
       case .EatOn:
         let fn = (data as! CtxFnParam).fn
-        return stream.maybeEat(fn)
+        return stream.maybeEat(fn: fn)
       case .EatBytesFromTable:
         let table = (data as! FirstCharTableParam).table
-        return stream.eatBytesFromTable(table)
+        return stream.eatBytesFromTable(firstCharTable: table)
       case .EatOneNotFromTable:
         let table = (data as! FirstCharTableParam).table
-        return stream.eatOneNotFromTable(table)
+        return stream.eatOneNotFromTable(firstCharTable: table)
       case .EatOneFromTable:
         let table = (data as! FirstCharTableParam).table
-        return stream.eatOneFromTable(table)
+        return stream.eatOneFromTable(firstCharTable: table)
       case .EatUntilIncludingBytesFromTable:
         let table = (data as! FirstCharTableParam).table
-        return stream.eatUntilIncludingBytesFromTable(table)
+        return stream.eatUntilIncludingBytesFromTable(firstCharTable: table)
       case .EatWhileBytesFromTable:
         let table = (data as! FirstCharTableParam).table
-        return stream.eatWhileBytesFromTable(table)
+        return stream.eatWhileBytesFromTable(firstCharTable: table)
       case .EatUntilBytesFromTable:
         let table = (data as! FirstCharTableParam).table
-        return stream.eatUntilBytesFromTable(table)
+        return stream.eatUntilBytesFromTable(firstCharTable: table)
       case .EatBytesFromListAtEnd:
         let list = (data as! ListParam).list
-        return stream.eatBytesFromListAtEnd(list)
+        return stream.eatBytesFromListAtEnd(bytes: list)
     }
   }
 
   public mutating func doMatch() -> Bool {
     for data in list {
-      if !doDataMatch(data) { // No success.
+      if !doDataMatch(data: data) { // No success.
         return false
       }
     }
@@ -161,19 +161,19 @@ public struct ByteMatcher {
   }
 
   public mutating func eatWhileDigit() {
-    add(.EatWhileDigit)
+    add(entry: .EatWhileDigit)
   }
 
   public mutating func next() {
-    add(.Next)
+    add(entry: .Next)
   }
 
   public mutating func skipToEnd() {
-    add(.SkipToEnd)
+    add(entry: .SkipToEnd)
   }
 
   public mutating func matchEos() {
-    add(.MatchEos)
+    add(entry: .MatchEos)
   }
 
   public mutating func eatOne(c: UInt8) {
@@ -185,7 +185,7 @@ public struct ByteMatcher {
   }
 
   public mutating func eatString(string: String) {
-    eatBytes(string.bytes)
+    eatBytes(bytes: string.bytes)
   }
 
   public mutating func eatBytes(bytes: [UInt8]) {
@@ -193,7 +193,7 @@ public struct ByteMatcher {
   }
 
   public mutating func eatUntilString(string: String) {
-    eatUntilBytes(string.bytes)
+    eatUntilBytes(bytes: string.bytes)
   }
 
   public mutating func eatUntilBytes(bytes: [UInt8]) {
@@ -201,7 +201,7 @@ public struct ByteMatcher {
   }
 
   public mutating func eatUntilIncludingString(string: String) {
-    eatUntilIncludingBytes(string.bytes)
+    eatUntilIncludingBytes(bytes: string.bytes)
   }
 
   public mutating func eatUntilIncludingBytes(bytes: [UInt8]) {
@@ -217,11 +217,11 @@ public struct ByteMatcher {
   }
 
   public mutating func eatStringFromList(list: [String]) {
-    eatBytesFromTable(ByteStream.makeFirstCharTable(list))
+    eatBytesFromTable(table: ByteStream.makeFirstCharTable(strings: list))
   }
 
   public mutating func eatBytesFromList(list: [[UInt8]]) {
-    eatBytesFromTable(ByteStream.makeFirstCharTable(list))
+    eatBytesFromTable(table: ByteStream.makeFirstCharTable(list: list))
   }
 
   public mutating func eatBytesFromTable(table: FirstCharTable) {
@@ -229,11 +229,11 @@ public struct ByteMatcher {
   }
 
   public mutating func eatOneNotFromStrings(list: [String]) {
-    eatOneNotFromTable(ByteStream.makeFirstCharTable(list))
+    eatOneNotFromTable(table: ByteStream.makeFirstCharTable(strings: list))
   }
 
   public mutating func eatOneNotFromBytes(list: [[UInt8]]) {
-    eatOneNotFromTable(ByteStream.makeFirstCharTable(list))
+    eatOneNotFromTable(table: ByteStream.makeFirstCharTable(list: list))
   }
 
   public mutating func eatOneNotFromTable(table: FirstCharTable) {
@@ -241,11 +241,11 @@ public struct ByteMatcher {
   }
 
   public mutating func eatOneFromStrings(list: [String]) {
-    eatOneFromTable(ByteStream.makeFirstCharTable(list))
+    eatOneFromTable(table: ByteStream.makeFirstCharTable(strings: list))
   }
 
   public mutating func eatOneFromBytes(list: [[UInt8]]) {
-    eatOneFromTable(ByteStream.makeFirstCharTable(list))
+    eatOneFromTable(table: ByteStream.makeFirstCharTable(list: list))
   }
 
   public mutating func eatOneFromTable(table: FirstCharTable) {
@@ -253,11 +253,13 @@ public struct ByteMatcher {
   }
 
   public mutating func eatUntilIncludingStringFromList(list: [String]) {
-    eatUntilIncludingBytesFromTable(ByteStream.makeFirstCharTable(list))
+    eatUntilIncludingBytesFromTable(table:
+        ByteStream.makeFirstCharTable(strings: list))
   }
 
   public mutating func eatUntilIncludingBytesFromList(list: [[UInt8]]) {
-    eatUntilIncludingBytesFromTable(ByteStream.makeFirstCharTable(list))
+    eatUntilIncludingBytesFromTable(table:
+        ByteStream.makeFirstCharTable(list: list))
   }
 
   public mutating func eatUntilIncludingBytesFromTable(table: FirstCharTable) {
@@ -266,11 +268,11 @@ public struct ByteMatcher {
   }
 
   public mutating func eatWhileStringFromList(list: [String]) {
-    eatWhileBytesFromTable(ByteStream.makeFirstCharTable(list))
+    eatWhileBytesFromTable(table: ByteStream.makeFirstCharTable(strings: list))
   }
 
   public mutating func eatWhileBytesFromList(list: [[UInt8]]) {
-    eatWhileBytesFromTable(ByteStream.makeFirstCharTable(list))
+    eatWhileBytesFromTable(table: ByteStream.makeFirstCharTable(list: list))
   }
 
   public mutating func eatWhileBytesFromTable(table: FirstCharTable) {
@@ -279,11 +281,11 @@ public struct ByteMatcher {
   }
 
   public mutating func eatUntilStringFromList(list: [String]) {
-    eatUntilBytesFromTable(ByteStream.makeFirstCharTable(list))
+    eatUntilBytesFromTable(table: ByteStream.makeFirstCharTable(strings: list))
   }
 
   public mutating func eatUntilBytesFromList(list: [[UInt8]]) {
-    eatUntilBytesFromTable(ByteStream.makeFirstCharTable(list))
+    eatUntilBytesFromTable(table: ByteStream.makeFirstCharTable(list: list))
   }
 
   public mutating func eatUntilBytesFromTable(table: FirstCharTable) {
@@ -292,7 +294,7 @@ public struct ByteMatcher {
   }
 
   public mutating func eatStringFromListAtEnd(list: [String]) {
-    eatBytesFromListAtEnd(list.map { $0.bytes })
+    eatBytesFromListAtEnd(list: list.map { $0.bytes })
   }
 
   public mutating func eatBytesFromListAtEnd(list: [[UInt8]]) {

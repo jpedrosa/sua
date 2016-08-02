@@ -24,7 +24,8 @@ public class Mutex {
 var registerThreadMutex = Mutex()
 var threadCallbacks: [pthread_t: () -> Void] = [:]
 
-func runPthread(ctx: UnsafeMutablePointer<Void>) -> UnsafeMutablePointer<Void> {
+func runPthread(ctx: UnsafeMutablePointer<Void>?)
+    -> UnsafeMutablePointer<Void>? {
   let id = pthread_self()
   defer {
     threadCallbacks[id] = nil
@@ -32,14 +33,14 @@ func runPthread(ctx: UnsafeMutablePointer<Void>) -> UnsafeMutablePointer<Void> {
   var fn = threadCallbacks[id]
   while fn == nil {
     // Yield to parent thread so it can set up the callback for us.
-    IO.sleep(0.000000001)
+    IO.sleep(f: 0.000000001)
     fn = threadCallbacks[id]
   }
   fn!()
   return ctx
 }
 
-func createPthread(inout id: UInt, fn: () -> Void) {
+func createPthread(id: inout UInt, fn: () -> Void) {
   registerThreadMutex.lock()
   defer {
     registerThreadMutex.unlock()
@@ -76,11 +77,11 @@ public class Thread {
   public init() { }
 
   public init(fn: () -> Void) {
-    run(fn)
+    run(fn: fn)
   }
 
   public func run(fn: () -> Void) {
-    createPthread(&threadId, fn: fn)
+    createPthread(id: &threadId, fn: fn)
   }
 
   // On the importance of calling join to help to avoid memory leaks, see this
@@ -102,7 +103,7 @@ public class Thread {
 }
 
 
-public enum ThreadError: ErrorType {
+public enum ThreadError: ErrorProtocol {
   case Detach
   case Join
 }

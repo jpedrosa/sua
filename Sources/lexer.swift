@@ -52,7 +52,7 @@ public struct CommonLexerStatus {
 extension LexerToken {
 
   public var string: String {
-    if let s = String.fromCharCodes(bytes, start: startIndex,
+    if let s = String.fromCharCodes(charCodes: bytes, start: startIndex,
         end: endIndex - 1) {
       return s
     }
@@ -64,12 +64,13 @@ extension LexerToken {
   }
 
   public func collectString() -> String? {
-    return String.fromCharCodes(bytes, start: startIndex, end: endIndex - 1)
+    return String.fromCharCodes(charCodes: bytes, start: startIndex,
+        end: endIndex - 1)
   }
 
   public var description: String {
     return "CommonToken(startIndex: \(startIndex), endIndex: \(endIndex), " +
-        "type: \(type), string: \(inspect(string)))"
+        "type: \(type), string: \(inspect(o: string)))"
   }
 
 }
@@ -105,11 +106,11 @@ public class CommonLexer: Lexer, CustomStringConvertible {
     while !stream.isEol {
       var tt: TokenType?
       if let st = status.spaceTokenizer {
-        tt = next(st)
+        tt = next(tokenizer: st)
       }
       if tt == nil {
         if let t = status.tokenizer {
-          tt = next(t)
+          tt = next(tokenizer: t)
         }
       }
       //p([stream.currentTokenString, status.tokenizer]);
@@ -145,7 +146,7 @@ public class CommonLexer: Lexer, CustomStringConvertible {
     let haveNewLineKey = newLineKey != nil
     var si = 0
     repeat {
-      var i = stream.findIndex(UInt8(10), startAt: si)
+      var i = stream.findIndex(c: UInt8(10), startAt: si)
       haveNewLine = i >= 0
       if !haveNewLine {
         i = len
@@ -158,7 +159,7 @@ public class CommonLexer: Lexer, CustomStringConvertible {
       }
       if i - si > 0 {
         stream.lineEndIndex = i
-        try parseLine(fn)
+        try parseLine(fn: fn)
         if stream.currentIndex >= len {
           break
         }
@@ -209,7 +210,7 @@ public class CommonLexer: Lexer, CustomStringConvertible {
 }
 
 
-enum CommonLexerError: ErrorType {
+enum CommonLexerError: ErrorProtocol {
   case TokenType
   case String
 }

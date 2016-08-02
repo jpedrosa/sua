@@ -8,7 +8,7 @@ public struct DirImpl {
 
   public subscript(pattern: String) -> [(String, FileType, String)] {
     do {
-      return try globList(pattern)
+      return try globList(pattern: pattern)
     } catch {
       // Ignore it, since subscript cannot throw. Users can use FileGlobList
       // directly if they want to try to catch the errors.
@@ -21,7 +21,7 @@ public struct DirImpl {
   public func globList(pattern: String, skipDotFiles: Bool = true,
       ignoreCase: Bool = false) throws -> [(String, FileType, String)] {
     var r = [(String, FileType, String)]()
-    try glob(pattern) { name, type, path in
+    try glob(pattern: pattern) { name, type, path in
       r.append((name, type, path))
     }
     return r

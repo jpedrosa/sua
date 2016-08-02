@@ -13,9 +13,9 @@ public struct Header: CustomStringConvertible {
   }
 
   public var description: String {
-    return "Header(method: \(inspect(method)), uri: \(inspect(uri)), " +
-        "httpVersion: \(inspect(httpVersion)), " +
-        "fields: \(inspect(fields)))"
+    return "Header(method: \(inspect(o: method)), uri: \(inspect(o: uri)), " +
+        "httpVersion: \(inspect(o: httpVersion)), " +
+        "fields: \(inspect(o: fields)))"
   }
 
 }
@@ -51,7 +51,7 @@ public struct HeaderParser {
   var linedUpParser: HeaderParserEntry = .Method
   var tokenIndex = -1
   var keyToken = ""
-  var tokenBuffer = [UInt8](count: 1024, repeatedValue: 0)
+  var tokenBuffer = [UInt8](repeating: 0, count: 1024)
   var tokenBufferEnd = 0
   var done = false
   var _bodyIndex = -1
@@ -65,7 +65,7 @@ public struct HeaderParser {
     let blen = tokenBuffer.count
     let ne = tbe + (endIndex - startIndex)
     if ne >= blen {
-      var c = [UInt8](count: ne * 2, repeatedValue: 0)
+      var c = [UInt8](repeating: 0, count: ne * 2)
       for i in 0..<tbe {
         c[i] = tokenBuffer[i]
       }
@@ -122,7 +122,7 @@ public struct HeaderParser {
       try next()
     }
     if tokenIndex >= 0 {
-      addToTokenBuffer(stream, startIndex: tokenIndex, endIndex: length)
+      addToTokenBuffer(a: stream, startIndex: tokenIndex, endIndex: length)
       tokenIndex = 0 // Set it at 0 to continue supporting addToTokenBuffer.
     }
   }
@@ -130,11 +130,13 @@ public struct HeaderParser {
   mutating func collectString(endIndex: Int) -> String? {
     var s: String?
     if tokenBufferEnd > 0 {
-      addToTokenBuffer(stream, startIndex: tokenIndex, endIndex: endIndex)
-      s = String.fromCharCodes(tokenBuffer, start: 0, end: tokenBufferEnd - 1)
+      addToTokenBuffer(a: stream, startIndex: tokenIndex, endIndex: endIndex)
+      s = String.fromCharCodes(charCodes: tokenBuffer, start: 0,
+          end: tokenBufferEnd - 1)
       tokenBufferEnd = 0
     } else {
-      s = String.fromCharCodes(stream, start: tokenIndex, end: endIndex - 1)
+      s = String.fromCharCodes(charCodes: stream, start: tokenIndex,
+          end: endIndex - 1)
     }
     index = endIndex + 1
     tokenIndex = -1
@@ -163,7 +165,7 @@ public struct HeaderParser {
       } else if c == 32 {
         entryParser = .Space
         linedUpParser = .Uri
-        if let m = collectString(i) {
+        if let m = collectString(endIndex: i) {
           header.method = m
         } else {
           throw HeaderParserError.Method
@@ -216,7 +218,7 @@ public struct HeaderParser {
       } else if c == 32 {
         entryParser = .Space
         linedUpParser = .HttpVersion
-        if let u = collectString(i) {
+        if let u = collectString(endIndex: i) {
           header.uri = u
         } else {
           throw HeaderParserError.URI
@@ -247,7 +249,7 @@ public struct HeaderParser {
     var i = index
     let len = length
     func process() throws {
-      if let v = collectString(i) {
+      if let v = collectString(endIndex: i) {
         header.httpVersion = v
       } else {
         throw HeaderParserError.Version
@@ -335,7 +337,7 @@ public struct HeaderParser {
     var i = index
     let len = length
     func process() throws {
-      if let k = collectString(i) {
+      if let k = collectString(endIndex: i) {
         keyToken = k
       } else {
         throw HeaderParserError.Key
@@ -395,11 +397,11 @@ public struct HeaderParser {
         // ignore
       } else if c == 13 {
         entryParser = .LineFeed
-        header[keyToken] = collectString(i)
+        header[keyToken] = collectString(endIndex: i)
         break
       } else if c == 10 {
         entryParser = .Key
-        header[keyToken] = collectString(i)
+        header[keyToken] = collectString(endIndex: i)
         break
       } else {
         throw HeaderParserError.Value
@@ -416,7 +418,7 @@ public struct HeaderParser {
 }
 
 
-enum HeaderParserError: ErrorType {
+enum HeaderParserError: ErrorProtocol {
   case Method
   case URI
   case Version

@@ -8,7 +8,7 @@ public struct BodyFile {
 
   // Handy method that can both rename and move the file to a new directory.
   public func rename(path: String) throws {
-    try File.rename(file.path, newPath: path)
+    try File.rename(oldPath: file.path, newPath: path)
   }
 
 }
@@ -34,7 +34,7 @@ struct BoundaryCharTable {
   let table: [Bool]
 
   init() {
-    var t = [Bool](count: 256, repeatedValue: false)
+    var t = [Bool](repeating: false, count: 256)
     for i in 65..<91 { // A-Z
       t[i] = true
     }
@@ -155,7 +155,7 @@ public struct BodyParser {
   var linedUpParser: BodyParserEntry = .Body
   var tokenIndex = -1
   var keyToken = ""
-  var tokenBuffer = [UInt8](count: 1024, repeatedValue: 0)
+  var tokenBuffer = [UInt8](repeating: 0, count: 1024)
   var tokenBufferEnd = 0
   var done = false
   var boundary = BodyTokenMatcher._EMPTY
@@ -178,7 +178,7 @@ public struct BodyParser {
     let blen = tokenBuffer.count
     let ne = tbe + (endIndex - startIndex)
     if ne >= blen {
-      var c = [UInt8](count: ne * 2, repeatedValue: 0)
+      var c = [UInt8](repeating: 0, count: ne * 2)
       for i in 0..<tbe {
         c[i] = tokenBuffer[i]
       }
@@ -273,12 +273,12 @@ public struct BodyParser {
       try next()
     }
     if tokenIndex >= 0 {
-      addToTokenBuffer(stream, startIndex: tokenIndex, endIndex: length)
+      addToTokenBuffer(a: stream, startIndex: tokenIndex, endIndex: length)
       tokenIndex = 0 // Set it at 0 to continue supporting addToTokenBuffer.
       if let tf = tempFile {
         if tokenBufferEnd >= 4096 {
           let len = tokenBufferEnd - 80
-          tf.writeBytes(tokenBuffer, maxBytes: len)
+          let _ = tf.writeBytes(bytes: tokenBuffer, maxBytes: len)
           for i in 0..<80 {
             tokenBuffer[i] = tokenBuffer[len + i]
           }
@@ -291,7 +291,7 @@ public struct BodyParser {
   mutating func collectToken(endIndex: Int) -> [UInt8] {
     var a: [UInt8]?
     if tokenBufferEnd > 0 {
-      addToTokenBuffer(stream, startIndex: tokenIndex, endIndex: endIndex)
+      addToTokenBuffer(a: stream, startIndex: tokenIndex, endIndex: endIndex)
       a = [UInt8](tokenBuffer[0..<tokenBufferEnd])
       tokenBufferEnd = 0
     } else {
@@ -303,13 +303,13 @@ public struct BodyParser {
   }
 
   mutating func collectString(endIndex: Int) -> String? {
-    return String.fromCharCodes(collectToken(endIndex))
+    return String.fromCharCodes(charCodes: collectToken(endIndex: endIndex))
   }
 
   mutating func collectFormUrlDecodedString(endIndex: Int) -> String? {
-    let a = collectToken(endIndex)
-    if let b = HexaUtils.formUrlDecode(a, maxBytes: a.count) {
-      return String.fromCharCodes(b)
+    let a = collectToken(endIndex: endIndex)
+    if let b = HexaUtils.formUrlDecode(bytes: a, maxBytes: a.count) {
+      return String.fromCharCodes(charCodes: b)
     }
     return nil
   }
@@ -353,7 +353,7 @@ public struct BodyParser {
       if BoundaryCharTable.TABLE[c] {
         // Ignore.
       } else if c == 13 {
-        boundary = BodyTokenMatcher(bytes: collectToken(i))
+        boundary = BodyTokenMatcher(bytes: collectToken(endIndex: i))
         if boundary.count <= 2 {
           throw BodyParserError.Key
         }
@@ -388,7 +388,7 @@ public struct BodyParser {
     var i = index
     let len = length
     func process() throws {
-      if let k = collectFormUrlDecodedString(i) {
+      if let k = collectFormUrlDecodedString(endIndex: i) {
         keyToken = k
       } else {
         throw BodyParserError.Key
@@ -438,12 +438,12 @@ public struct BodyParser {
       let c = stream[i]
       if c == 38 { // &
         entryParser = .NextKey
-        body[keyToken] = collectFormUrlDecodedString(i)
+        body[keyToken] = collectFormUrlDecodedString(endIndex: i)
         break
       } else if c >= 32 {
         // ignore
       } else if c == 0 {
-        body[keyToken] = collectFormUrlDecodedString(i)
+        body[keyToken] = collectFormUrlDecodedString(endIndex: i)
         done = true
         index = length // Done. Exit.
         break
@@ -535,7 +535,7 @@ public struct BodyParser {
     repeat {
       let c = stream[i]
       if c == 34 { // "
-        if let s = collectString(i) {
+        if let s = collectString(endIndex: i) {
           nameValue = s
         } else {
           throw BodyParserError.NameValue
@@ -602,7 +602,7 @@ public struct BodyParser {
     repeat {
       let c = stream[i]
       if c == 34 { // "
-        if let s = collectString(i) {
+        if let s = collectString(endIndex: i) {
           fileNameValue = s
         } else {
           throw BodyParserError.FileNameValue
@@ -667,7 +667,7 @@ public struct BodyParser {
     repeat {
       let c = stream[i]
       if c == 13 {
-        if let s = collectString(i) {
+        if let s = collectString(endIndex: i) {
           contentTypeValue = s
         } else {
           throw BodyParserError.FileNameValue
@@ -742,8 +742,8 @@ public struct BodyParser {
   }
 
   mutating func storeFile(endIndex: Int) {
-    let bb = collectToken(endIndex)
-    tempFile!.writeBytes(bb, maxBytes: bb.count)
+    let bb = collectToken(endIndex: endIndex)
+    let _ = tempFile!.writeBytes(bytes: bb, maxBytes: bb.count)
     if let oldFile = body.files[nameValue] {
       (oldFile.file as! TempFile).closeAndUnlink()
     }
@@ -761,9 +761,9 @@ public struct BodyParser {
       if boundTest3 && c == 13 {
         let ei = i - boundary.count - 5
         if tempFile != nil {
-          storeFile(ei)
+          storeFile(endIndex: ei)
         } else {
-          body.fields[nameValue] = collectString(ei)
+          body.fields[nameValue] = collectString(endIndex: ei)
         }
         index = length // Body exit.
         done = true
@@ -778,9 +778,9 @@ public struct BodyParser {
         if c == 13 {
           let ei = i - boundary.count - 3
           if tempFile != nil {
-            storeFile(ei)
+            storeFile(endIndex: ei)
           } else {
-            body.fields[nameValue] = collectString(ei)
+            body.fields[nameValue] = collectString(endIndex: ei)
           }
           entryParser = .LineFeed
           linedUpParser = .ContentDisposition
@@ -795,7 +795,7 @@ public struct BodyParser {
         var a = [Int]()
         for j in 0..<boundaryMatch.count {
           let m = boundaryMatch[j]
-          if boundary.match(m, c: c) {
+          if boundary.match(index: m, c: c) {
             if m == blasti {
               boundTest1 = true
             } else {
@@ -835,7 +835,7 @@ public struct BodyParser {
 }
 
 
-enum BodyParserError: ErrorType {
+enum BodyParserError: ErrorProtocol {
   case Body
   case Key
   case Value

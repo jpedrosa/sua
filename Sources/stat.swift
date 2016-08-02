@@ -17,11 +17,11 @@ public struct Stat: CustomStringConvertible {
   }
 
   mutating public func stat(path: String) -> Bool {
-    return Sys.stat(path, buffer: &buffer) == 0
+    return Sys.stat(path: path, buffer: &buffer) == 0
   }
 
   mutating public func lstat(path: String) -> Bool {
-    return Sys.lstat(path, buffer: &buffer) == 0
+    return Sys.lstat(path: path, buffer: &buffer) == 0
   }
 
   public var dev: UInt { return buffer.st_dev }
@@ -50,15 +50,15 @@ public struct Stat: CustomStringConvertible {
 
   public var atime: CTimespec { return buffer.st_atim }
 
-  public var atimeAsTime: Time { return tsToTime(buffer.st_atim) }
+  public var atimeAsTime: Time { return tsToTime(ts: buffer.st_atim) }
 
   public var mtime: CTimespec { return buffer.st_mtim }
 
-  public var mtimeAsTime: Time { return tsToTime(buffer.st_mtim) }
+  public var mtimeAsTime: Time { return tsToTime(ts: buffer.st_mtim) }
 
   public var ctime: CTimespec { return buffer.st_ctim }
 
-  public var ctimeAsTime: Time { return tsToTime(buffer.st_ctim) }
+  public var ctimeAsTime: Time { return tsToTime(ts: buffer.st_ctim) }
 
   public var isRegularFile: Bool { return (rawMode & S_IFMT) == S_IFREG }
 
@@ -134,8 +134,8 @@ public struct StatMode: CustomStringConvertible {
   }
 
   public var description: String {
-    return "StatMode(modeTranslated: \(inspect(modeTranslated)), " +
-        "octal: \(inspect(octal)))"
+    return "StatMode(modeTranslated: \(inspect(o: modeTranslated)), " +
+        "octal: \(inspect(o: octal)))"
   }
 
 }

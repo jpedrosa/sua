@@ -10,7 +10,7 @@ public struct TimeBuffer: CustomStringConvertible {
 
   public init(secondsSinceEpoch: Int) {
     var b = Sys.timeBuffer()
-    Sys.localtime_r(secondsSinceEpoch, buffer: &b)
+    Sys.localtime_r(secondsSinceEpoch: secondsSinceEpoch, buffer: &b)
     buffer = b
   }
 
@@ -68,13 +68,13 @@ public struct TimeBuffer: CustomStringConvertible {
 
   static func utc() -> TimeBuffer {
     var b = Sys.timeBuffer()
-    Sys.gmtime_r(Sys.time(), buffer: &b)
+    Sys.gmtime_r(secondsSinceEpoch: Sys.time(), buffer: &b)
     return TimeBuffer(buffer: b, utc: true)
   }
 
-  static func utc(secondsSinceEpoch secondsSinceEpoch: Int) -> TimeBuffer {
+  static func utc(secondsSinceEpoch: Int) -> TimeBuffer {
     var b = Sys.timeBuffer()
-    Sys.gmtime_r(secondsSinceEpoch, buffer: &b)
+    Sys.gmtime_r(secondsSinceEpoch: secondsSinceEpoch, buffer: &b)
     return TimeBuffer(buffer: b, utc: true)
   }
 
@@ -137,7 +137,7 @@ public struct Time: CustomStringConvertible {
 
   public init(year: Int, month: Int, day: Int, hour: Int = 0, minute: Int = 0,
       second: Int = 0) {
-    self.init(secondsSinceEpoch: Time.convertToSecondsSinceEpoch(year,
+    self.init(secondsSinceEpoch: Time.convertToSecondsSinceEpoch(year: year,
         month: month, day: day, hour: hour, minute: minute, second: second) -
         Time.findLocalTimeDifference())
   }
@@ -219,7 +219,7 @@ public struct Time: CustomStringConvertible {
   }
 
   public func strftime(mask: String) -> String {
-    return Time.locale.strftime(self, mask: mask)
+    return Time.locale.strftime(time: self, mask: mask)
   }
 
   public var description: String {
@@ -274,7 +274,7 @@ public struct Time: CustomStringConvertible {
         r += 31
         fallthrough
       case 2: // Feb
-        r += isLeapYear(year) ? 29 : 28
+        r += isLeapYear(year: year) ? 29 : 28
         fallthrough
       case 1: // Jan
         r += 31
@@ -290,7 +290,7 @@ public struct Time: CustomStringConvertible {
     var r = second
     r += minute * 60
     r += hour * 3600
-    r += countYeardays(year, month: month, day: day) * 86400
+    r += countYeardays(year: year, month: month, day: day) * 86400
     let y = year - 1900
     r += (y - 70) * 31536000
     r += ((y - 69) / 4) * 86400
@@ -313,9 +313,9 @@ public struct Time: CustomStringConvertible {
     return Time(buffer: TimeBuffer.utc())
   }
 
-  static public func utc(year year: Int, month: Int, day: Int, hour: Int = 0,
+  static public func utc(year: Int, month: Int, day: Int, hour: Int = 0,
       minute: Int = 0, second: Int = 0) -> Time {
-    return Time(secondsSinceEpoch: convertToSecondsSinceEpoch(year,
+    return Time(secondsSinceEpoch: convertToSecondsSinceEpoch(year: year,
         month: month, day: day, hour: hour, minute: minute, second: second) -
         findLocalTimeDifference())
   }

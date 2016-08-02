@@ -16,7 +16,7 @@ public class RNG {
     clock_gettime(CLOCK_MONOTONIC, &ts)
     seed ^= UInt64(ts.tv_nsec) << 16
     seed ^= UInt64(clock()) << 8
-    setSeed(seed)
+    setSeed(seed: seed)
   }
 
   var state0: UInt64 = 1
@@ -41,12 +41,12 @@ public class RNG {
   public func nextInt(max: Int) -> Int {
 
     // Fast path if max is a power of 2.
-    if isPowerOfTwo(max) {
-      return Int((UInt64(max) &* UInt64(next(31))) >> 31)
+    if isPowerOfTwo(x: max) {
+      return Int((UInt64(max) &* UInt64(next(bits: 31))) >> 31)
     }
 
     while (true) {
-      let rnd = next(31)
+      let rnd = next(bits: 31)
       let val = rnd % max
       if rnd - val + (max - 1) >= 0 {
         return val
@@ -76,8 +76,8 @@ public class RNG {
   }
 
   public func setSeed(seed: UInt64) {
-    state0 = murmurHash3(seed)
-    state1 = murmurHash3(state0)
+    state0 = murmurHash3(hash: seed)
+    state1 = murmurHash3(hash: state0)
   }
 
   func murmurHash3(hash: UInt64) -> UInt64 {

@@ -64,19 +64,19 @@ public class MurmurHash3 {
 
   public static func hash32(key: String, seed: UInt32 = 0) -> UInt32 {
     var a = [UInt8](key.utf8)
-    return doHash32(&a, maxBytes: a.count, seed: seed)
+    return doHash32(key: &a, maxBytes: a.count, seed: seed)
   }
 
   public static func hash32CChar(key: [CChar], maxBytes: Int,
       seed: UInt32 = 0) -> UInt32 {
     let ap = UnsafePointer<UInt8>(key)
-    return doHash32(ap, maxBytes: maxBytes, seed: seed)
+    return doHash32(key: ap, maxBytes: maxBytes, seed: seed)
   }
 
   public static func hash32Bytes(key: [UInt8], maxBytes: Int,
       seed: UInt32 = 0) -> UInt32 {
     var a = key
-    return doHash32(&a, maxBytes: maxBytes, seed: seed)
+    return doHash32(key: &a, maxBytes: maxBytes, seed: seed)
   }
 
   // MurmurHash3 128 bits.
@@ -209,19 +209,19 @@ public class MurmurHash3 {
   public static func hash128(key: String, seed: UInt64 = 0)
       -> (h1: UInt64, h2: UInt64) {
     var a = [UInt8](key.utf8)
-    return doHash128(&a, maxBytes: a.count, seed: seed)
+    return doHash128(key: &a, maxBytes: a.count, seed: seed)
   }
 
   public static func hash128CChar(key: [CChar], maxBytes: Int,
       seed: UInt64 = 0) -> (h1: UInt64, h2: UInt64) {
     let ap = UnsafePointer<UInt8>(key)
-    return doHash128(ap, maxBytes: maxBytes, seed: seed)
+    return doHash128(key: ap, maxBytes: maxBytes, seed: seed)
   }
 
   public static func hash128Bytes(key: [UInt8], maxBytes: Int,
       seed: UInt64 = 0) -> (h1: UInt64, h2: UInt64) {
     var a = key
-    return doHash128(&a, maxBytes: maxBytes, seed: seed)
+    return doHash128(key: &a, maxBytes: maxBytes, seed: seed)
   }
 
 }

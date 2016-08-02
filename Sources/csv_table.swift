@@ -67,7 +67,7 @@ public struct CSVTable {
     stream.bytes = try f.readAllBytes()
     if stream.eatWhileDigit() {
       serialId = Int(stream.collectTokenString()!)!
-      if stream.eatOne(10) { // Newline
+      if stream.eatOne(c: 10) { // Newline
         entryParser = .Column
         _header = []
         columnGroup = .Header
@@ -149,11 +149,11 @@ public struct CSVTable {
     } else if stream.eatComma() {
       columnValue = ""
       entryParser = columnGroup
-    } else if stream.eatUntil(matchCommaOrNewLine) {
+    } else if stream.eatUntil(fn: matchCommaOrNewLine) {
       columnValue = stream.collectTokenString()!
-      stream.eatComma()
+      let _ = stream.eatComma()
       entryParser = columnGroup
-    } else if stream.eatOne(10) {
+    } else if stream.eatOne(c: 10) {
       entryParser = recordExit
     } else {
       throw CSVTableError.Unreachable
@@ -161,18 +161,18 @@ public struct CSVTable {
   }
 
   mutating func inColumnQuoted() throws {
-    if stream.skipTo(34) >= 0 { // "
+    if stream.skipTo(c: 34) >= 0 { // "
       if let s = stream.collectTokenString() {
         unescapedColumnValue += s
       }
-      stream.eatDoubleQuote()
+      let _ = stream.eatDoubleQuote()
       stream.startIndex = stream.currentIndex
       if !stream.eatDoubleQuote() { // Ends if not an escaped quote sequence: ""
         if let s = stream.collectTokenString() {
           unescapedColumnValue += s
         }
         columnValue = unescapedColumnValue
-        stream.eatComma()
+        let _ = stream.eatComma()
         entryParser = columnGroup
       }
     } else {
@@ -205,7 +205,7 @@ public struct CSVTable {
 
   // Alias for insert.
   mutating public func append(row: [String]) throws -> Int {
-    return try insert(row)
+    return try insert(row: row)
   }
 
   // This will insert it if it does not exist, and it will keep whatever index
@@ -215,7 +215,7 @@ public struct CSVTable {
     if row.count + 1 != header.count {
       throw CSVTableError.Update
     }
-    let n = findIndex(index)
+    let n = findIndex(index: index)
     if n >= 0 {
       for i in 0..<row.count {
         _rows[n][i + 1] = row[i]
@@ -241,22 +241,22 @@ public struct CSVTable {
 
   // If the record pointed at by index does not exist, simply ignore it.
   mutating public func delete(index: String) {
-    let n = findIndex(index)
+    let n = findIndex(index: index)
     if n >= 0 {
-      _rows.removeAtIndex(n)
+      _rows.remove(at: n)
     }
   }
 
   mutating public func updateColumn(index: String, columnIndex: Int,
         value: String) {
-    let n = findIndex(index)
+    let n = findIndex(index: index)
     if n >= 0 {
       _rows[n][columnIndex] = value
     }
   }
 
   mutating public func select(index: String) -> [String]? {
-    let n = findIndex(index)
+    let n = findIndex(index: index)
     if n >= 0 {
       return _rows[n]
     }
@@ -268,7 +268,7 @@ public struct CSVTable {
     var comma = false
     for c in _header {
       if comma { s += "," }
-      s += CSVTable.escape(c)
+      s += CSVTable.escape(string: c)
       comma = true
     }
     s += "\n"
@@ -277,7 +277,7 @@ public struct CSVTable {
         var comma = false
         for c in row {
           if comma { s += "," }
-          s += CSVTable.escape(c)
+          s += CSVTable.escape(string: c)
           comma = true
         }
         s += "\n"
@@ -288,7 +288,7 @@ public struct CSVTable {
   }
 
   public func save() throws {
-    try IO.write(path, string: data)
+    let _ = try IO.write(filePath: path, string: data)
   }
 
   // This makes sure the data is escaped for double quote, comma and new line.
@@ -296,24 +296,24 @@ public struct CSVTable {
     let len = string.utf16.count
     var i = 0
     while i < len {
-      let c = string.utf16.codeUnitAt(i)
+      let c = string.utf16.codeUnitAt(index: i)
       if c == 34 || c == 44 || c == 10 { // " , newline
         i += 1
         var s = "\""
-        s += string.utf16.substring(0, endIndex: i) ?? ""
+        s += string.utf16.substring(startIndex: 0, endIndex: i) ?? ""
         if c == 34 {
           s += "\""
         }
         var si = i
         while i < len {
-          if string.utf16.codeUnitAt(i) == 34 {
-            s += string.utf16.substring(si, endIndex: i + 1) ?? ""
+          if string.utf16.codeUnitAt(index: i) == 34 {
+            s += string.utf16.substring(startIndex: si, endIndex: i + 1) ?? ""
             s += "\""
             si = i + 1
           }
           i += 1
         }
-        s += string.utf16.substring(si, endIndex: i) ?? ""
+        s += string.utf16.substring(startIndex: si, endIndex: i) ?? ""
         s += "\""
         return s
       }
@@ -326,17 +326,17 @@ public struct CSVTable {
     var s = "0\nid"
     for c in header {
       s += ","
-      s += escape(c)
+      s += escape(string: c)
     }
     s += "\n"
-    try IO.write(path, string: s)
+    let _ = try IO.write(filePath: path, string: s)
     return try CSVTable(path: path)
   }
 
 }
 
 
-enum CSVTableError: ErrorType {
+enum CSVTableError: ErrorProtocol {
   case SerialId
   case NewLine
   case Header

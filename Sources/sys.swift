@@ -83,11 +83,11 @@ public struct PosixSys {
       case .A: flags = O_RDWR | O_CREAT | O_APPEND
     }
     flags |= O_CLOEXEC
-    return open(filePath, flags: flags, mode: mode)
+    return open(path: filePath, flags: flags, mode: mode)
   }
 
   public func doOpenDir(dirPath: String) -> Int32 {
-    return open(dirPath, flags: O_RDONLY | O_DIRECTORY, mode: 0)
+    return open(path: dirPath, flags: O_RDONLY | O_DIRECTORY, mode: 0)
   }
 
   public func mkdir(dirPath: String, mode: UInt32 = DEFAULT_DIR_MODE) -> Int32 {
@@ -106,20 +106,20 @@ public struct PosixSys {
 
   public func writeString(fd: Int32, string: String) -> Int {
     var a = Array(string.utf8)
-    return write(fd, address: &a, length: a.count)
+    return write(fd: fd, address: &a, length: a.count)
   }
 
   public func writeBytes(fd: Int32, bytes: [UInt8], maxBytes: Int)
       -> Int {
     var a = bytes
-    return write(fd, address: &a, length: maxBytes)
+    return write(fd: fd, address: &a, length: maxBytes)
   }
 
   public func close(fd: Int32) -> Int32 {
     return retry { Glibc.close(fd) }
   }
 
-  public func fflush(stream: CFilePointer = nil) -> Int32 {
+  public func fflush(stream: CFilePointer? = nil) -> Int32 {
     return Glibc.fflush(stream)
   }
 
@@ -140,10 +140,10 @@ public struct PosixSys {
   }
 
   public var cwd: String? {
-    var a = [CChar](count:256, repeatedValue: 0)
+    var a = [CChar](repeating: 0, count:256)
     let i = Glibc.getcwd(&a, 255)
     if i != nil {
-      return String.fromCharCodes(a)
+      return String.fromCharCodes(charCodes: a)
     }
     return nil
   }
@@ -162,24 +162,27 @@ public struct PosixSys {
     return statStruct()
   }
 
-  public func readdir(dirp: COpaquePointer) -> CDirentPointer {
-    return dirp != nil ? Glibc.readdir(dirp) : nil
+  public func readdir(dirp: OpaquePointer?) -> CDirentPointer? {
+    if let dp = dirp {
+      return Glibc.readdir(dp)
+    }
+    return nil
   }
 
-  public func opendir(path: String) -> COpaquePointer {
+  public func opendir(path: String) -> OpaquePointer {
     return Glibc.opendir(path)
   }
 
-  public func opendir(pathBytes: [UInt8]) -> COpaquePointer {
+  public func opendir(pathBytes: [UInt8]) -> OpaquePointer {
     return Glibc.opendir(UnsafePointer<CChar>(pathBytes))
   }
 
-  public func closedir(dirp: COpaquePointer) -> Int32 {
+  public func closedir(dirp: OpaquePointer) -> Int32 {
     return retry { Glibc.closedir(dirp) }
   }
 
   public func fgets(buffer: UnsafeMutablePointer<CChar>, length: Int32,
-      fp: CFilePointer) -> UnsafeMutablePointer<CChar> {
+      fp: CFilePointer) -> UnsafeMutablePointer<CChar>? {
     return Glibc.fgets(buffer, length, fp)
   }
 
@@ -193,7 +196,7 @@ public struct PosixSys {
   }
 
   public func popen(command: String, operation: PopenOperation = .R)
-      -> CFilePointer {
+      -> CFilePointer? {
     return Glibc.popen(command, operation.rawValue)
   }
 
@@ -229,13 +232,13 @@ public struct PosixSys {
   public func localtime_r(secondsSinceEpoch: Int,
       buffer: UnsafeMutablePointer<CTime>) {
     var n = secondsSinceEpoch
-    Glibc.localtime_r(&n, buffer)
+    let _ = Glibc.localtime_r(&n, buffer)
   }
 
   public func gmtime_r(secondsSinceEpoch: Int,
       buffer: UnsafeMutablePointer<CTime>) {
     var n = secondsSinceEpoch
-    Glibc.gmtime_r(&n, buffer)
+    let _ = Glibc.gmtime_r(&n, buffer)
   }
 
   public func abs(n: Int32) -> Int32 {
@@ -251,8 +254,10 @@ public struct PosixSys {
   }
 
   public func getenv(name: String) -> String? {
-    let vp = Glibc.getenv(name)
-    return vp != nil ? String.fromCString(vp) : nil
+    if let vp = Glibc.getenv(name) {
+      return String(cString: vp)
+    }
+    return nil
   }
 
   public func setenv(name: String, value: String) -> Int32 {
@@ -269,13 +274,13 @@ public struct PosixSys {
     var env = [String: String]()
     var i = 0
     while true {
-      let nm = (environ + i).memory
+      let nm = (environ + i).pointee
       if nm == nil {
         break
       }
-      let np = UnsafePointer<CChar>(nm)
-      if let s = String.fromCString(np) {
-        let (name, value) = s.splitOnce("=")
+      if let np = UnsafePointer<CChar>(nm) {
+        let s = String(cString: np)
+        let (name, value) = s.splitOnce(string: "=")
         env[name!] = value ?? ""
       }
       i += 1
@@ -283,7 +288,7 @@ public struct PosixSys {
     return env
   }
 
-  public func getpwnam(name: String) -> UnsafeMutablePointer<passwd> {
+  public func getpwnam(name: String) -> UnsafeMutablePointer<passwd>? {
     return Glibc.getpwnam(name)
   }
 

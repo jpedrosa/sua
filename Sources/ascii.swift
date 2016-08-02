@@ -38,7 +38,7 @@ public class Ascii {
   }
 
   public static func toLowerCase(string: String) -> String? {
-    return String.fromCharCodes(toLowerCase(string.bytes))
+    return String.fromCharCodes(charCodes: toLowerCase(bytes: string.bytes))
   }
 
 }

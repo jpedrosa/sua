@@ -58,7 +58,7 @@ public struct ByteStream {
   }
 
   public mutating func eat(fn: (c: UInt8) -> Bool) -> Bool {
-    return match(true, fn: fn)
+    return match(consume: true, fn: fn)
   }
 
   public mutating func match(consume: Bool = false, fn: (c: UInt8) -> Bool)
@@ -77,7 +77,7 @@ public struct ByteStream {
   }
 
   public mutating func eatOne(c: UInt8) -> Bool {
-    return matchOne(c, consume: true)
+    return matchOne(c: c, consume: true)
   }
 
   public mutating func matchOne(c: UInt8, consume: Bool = false) -> Bool {
@@ -92,7 +92,7 @@ public struct ByteStream {
   }
 
   public mutating func eatWhileOne(c: UInt8) -> Bool {
-    return matchWhileOne(c, consume: true) >= 0
+    return matchWhileOne(c: c, consume: true) >= 0
   }
 
   public mutating func matchWhileOne(c: UInt8, consume: Bool = false) -> Int {
@@ -115,11 +115,11 @@ public struct ByteStream {
   }
 
   public mutating func eatSpace() -> Bool {
-    return matchSpace(true) >= 0
+    return matchSpace(consume: true) >= 0
   }
 
   public mutating func eatWhileSpace() -> Bool {
-    return matchWhileSpace(true) >= 0
+    return matchWhileSpace(consume: true) >= 0
   }
 
   public mutating func matchSpace(consume: Bool = false) -> UInt8? {
@@ -157,11 +157,11 @@ public struct ByteStream {
   }
 
   public mutating func eatSpaceTab() -> Bool {
-    return matchSpaceTab(true) != nil
+    return matchSpaceTab(consume: true) != nil
   }
 
   public mutating func eatWhileSpaceTab() -> Bool {
-    return matchWhileSpaceTab(true) >= 0
+    return matchWhileSpaceTab(consume: true) >= 0
   }
 
   public mutating func matchSpaceTab(consume: Bool = false) -> UInt8? {
@@ -224,7 +224,7 @@ public struct ByteStream {
   }
 
   public mutating func skipTo(c: UInt8) -> Int {
-    let r = findIndex(c, startAt: currentIndex)
+    let r = findIndex(c: c, startAt: currentIndex)
     if r >= startIndex && r < lineEndIndex {
       currentIndex = r
     }
@@ -251,7 +251,7 @@ public struct ByteStream {
   }
 
   public mutating func eatUntil(fn: (c: UInt8) -> Bool) -> Bool {
-    return matchUntil(true, fn: fn) >= 0
+    return matchUntil(consume: true, fn: fn) >= 0
   }
 
   public mutating func matchUntil(consume: Bool = false, fn: (c: UInt8) -> Bool)
@@ -275,7 +275,7 @@ public struct ByteStream {
   }
 
   public mutating func eatWhile(fn: (c: UInt8) -> Bool) -> Bool {
-    return matchWhile(true, fn: fn) >= 0
+    return matchWhile(consume: true, fn: fn) >= 0
   }
 
   public mutating func matchWhile(consume: Bool = false, fn: (c: UInt8) -> Bool)
@@ -299,7 +299,7 @@ public struct ByteStream {
   }
 
   public mutating func seekContext(fn: (c: UInt8) -> Bool) -> Bool {
-    return matchContext(true, fn: fn) >= 0
+    return matchContext(consume: true, fn: fn) >= 0
   }
 
   public mutating func matchContext(consume: Bool = false,
@@ -320,7 +320,7 @@ public struct ByteStream {
   }
 
   public mutating func maybeEat(fn: (inout ctx: ByteStream) -> Bool) -> Bool {
-    return maybeMatch(fn) >= 0
+    return maybeMatch(fn: fn) >= 0
   }
 
   public mutating func maybeMatch(fn: (inout ctx: ByteStream) -> Bool) -> Int {
@@ -337,7 +337,7 @@ public struct ByteStream {
   }
 
   public mutating func nestMatch(fn: (ctx: ByteStream) -> Bool) -> Int {
-    var ctx = ByteStream._cloneFromPool(self)
+    var ctx = ByteStream._cloneFromPool(po: self)
     let savei = currentIndex
     if fn(ctx: ctx) {
       currentIndex = ctx.currentIndex
@@ -346,7 +346,7 @@ public struct ByteStream {
       currentIndex = ctx.milestoneIndex
       ctx.milestoneIndex = 0
     }
-    ByteStream._returnToPool(ctx)
+    ByteStream._returnToPool(o: ctx)
     return -1
   }
 
@@ -392,16 +392,16 @@ public struct ByteStream {
   }
 
   public mutating func eatString(string: String) -> Bool {
-    return matchBytes(string.bytes, consume: true) >= 0
+    return matchBytes(bytes: string.bytes, consume: true) >= 0
   }
 
   public mutating func matchString(string: String, consume: Bool = false)
       -> Int {
-    return matchBytes(string.bytes, consume: consume)
+    return matchBytes(bytes: string.bytes, consume: consume)
   }
 
   public mutating func eatBytes(bytes: [UInt8]) -> Bool {
-    return matchBytes(bytes, consume: true) >= 0
+    return matchBytes(bytes: bytes, consume: true) >= 0
   }
 
   public mutating func matchBytes(bytes: [UInt8], consume: Bool = false)
@@ -424,19 +424,20 @@ public struct ByteStream {
 
   public mutating func eatOnEitherString(string1: String, string2: String)
       -> Bool {
-    return matchOnEitherBytes(string1.bytes, bytes2: string2.bytes,
+    return matchOnEitherBytes(bytes1: string1.bytes, bytes2: string2.bytes,
         consume: true) >= 0
   }
 
   // Used for case insensitive matching.
   public mutating func matchOnEitherString(string1: String, string2: String,
       consume: Bool = false) -> Int {
-    return matchOnEitherBytes(string1.bytes, bytes2: string2.bytes)
+    return matchOnEitherBytes(bytes1: string1.bytes, bytes2: string2.bytes)
   }
 
   public mutating func eatOnEitherBytes(bytes1: [UInt8], bytes2: [UInt8])
       -> Bool {
-    return matchOnEitherBytes(bytes1, bytes2: bytes2, consume: true) >= 0
+    return matchOnEitherBytes(bytes1: bytes1, bytes2: bytes2,
+        consume: true) >= 0
   }
 
   // Used for case insensitive matching.
@@ -460,16 +461,16 @@ public struct ByteStream {
   }
 
   public mutating func eatUntilString(string: String) -> Bool {
-    return matchUntilBytes(string.bytes, consume: true) >= 0
+    return matchUntilBytes(bytes: string.bytes, consume: true) >= 0
   }
 
   public mutating func matchUntilString(string: String, consume: Bool = false)
       -> Int {
-    return matchUntilBytes(string.bytes, consume: consume)
+    return matchUntilBytes(bytes: string.bytes, consume: consume)
   }
 
   public mutating func eatUntilBytes(bytes: [UInt8]) -> Bool {
-    return matchUntilBytes(bytes, consume: true) >= 0
+    return matchUntilBytes(bytes: bytes, consume: true) >= 0
   }
 
   public mutating func matchUntilBytes(bytes: [UInt8], consume: Bool = false)
@@ -499,7 +500,7 @@ public struct ByteStream {
 
   // Triple quotes sequence
   public mutating func eatUntilThree(c1: UInt8, c2: UInt8, c3: UInt8) -> Bool {
-    return matchUntilThree(c1, c2: c2, c3: c3, consume: true) >= 0
+    return matchUntilThree(c1: c1, c2: c2, c3: c3, consume: true) >= 0
   }
 
   public mutating func matchUntilThree(c1: UInt8, c2: UInt8, c3: UInt8,
@@ -527,7 +528,7 @@ public struct ByteStream {
   }
 
   public mutating func eatTwo(c1: UInt8, c2: UInt8) -> Bool {
-    return matchTwo(c1, c2: c2, consume: true)
+    return matchTwo(c1: c1, c2: c2, consume: true)
   }
 
   public mutating func matchTwo(c1: UInt8, c2: UInt8, consume: Bool = false)
@@ -544,7 +545,7 @@ public struct ByteStream {
   }
 
   public mutating func eatThree(c1: UInt8, c2: UInt8, c3: UInt8) -> Bool {
-    return matchThree(c1, c2: c2, c3: c3, consume: true)
+    return matchThree(c1: c1, c2: c2, c3: c3, consume: true)
   }
 
   public mutating func matchThree(c1: UInt8, c2: UInt8, c3: UInt8,
@@ -561,7 +562,7 @@ public struct ByteStream {
   }
 
   public mutating func eatUntilOne(c: UInt8) -> Bool {
-    return matchUntilOne(c, consume: true) >= 0
+    return matchUntilOne(c: c, consume: true) >= 0
   }
 
   public mutating func matchUntilOne(c: UInt8, consume: Bool = false) -> Int {
@@ -584,7 +585,7 @@ public struct ByteStream {
   }
 
   public mutating func eatWhileNeitherTwo(c1: UInt8, c2: UInt8) -> Bool {
-    return matchWhileNeitherTwo(c1, c2: c2, consume: true) >= 0
+    return matchWhileNeitherTwo(c1: c1, c2: c2, consume: true) >= 0
   }
 
   public mutating func matchWhileNeitherTwo(c1: UInt8, c2: UInt8,
@@ -610,7 +611,7 @@ public struct ByteStream {
 
   public mutating func eatWhileNeitherThree(c1: UInt8, c2: UInt8, c3: UInt8)
       -> Bool {
-    return matchWhileNeitherThree(c1, c2: c2, c3: c3, consume: true) >= 0
+    return matchWhileNeitherThree(c1: c1, c2: c2, c3: c3, consume: true) >= 0
   }
 
   public mutating func matchWhileNeitherThree(c1: UInt8, c2: UInt8, c3: UInt8,
@@ -636,7 +637,8 @@ public struct ByteStream {
 
   public mutating func eatWhileNeitherFour(c1: UInt8, c2: UInt8, c3: UInt8,
       c4: UInt8) -> Bool {
-    return matchWhileNeitherFour(c1, c2: c2, c3: c3, c4: c4, consume: true) >= 0
+    return matchWhileNeitherFour(c1: c1, c2: c2, c3: c3, c4: c4,
+        consume: true) >= 0
   }
 
   public mutating func matchWhileNeitherFour(c1: UInt8, c2: UInt8, c3: UInt8,
@@ -662,7 +664,7 @@ public struct ByteStream {
 
   public mutating func eatWhileNeitherFive(c1: UInt8, c2: UInt8, c3: UInt8,
       c4: UInt8, c5: UInt8) -> Bool {
-    return matchWhileNeitherFive(c1, c2: c2, c3: c3, c4: c4, c5: c5,
+    return matchWhileNeitherFive(c1: c1, c2: c2, c3: c3, c4: c4, c5: c5,
         consume: true) >= 0
   }
 
@@ -689,7 +691,7 @@ public struct ByteStream {
 
   public mutating func eatWhileNeitherSix(c1: UInt8, c2: UInt8, c3: UInt8,
       c4: UInt8, c5: UInt8, c6: UInt8) -> Bool {
-    return matchWhileNeitherSix(c1, c2: c2, c3: c3, c4: c4, c5: c5, c6: c6,
+    return matchWhileNeitherSix(c1: c1, c2: c2, c3: c3, c4: c4, c5: c5, c6: c6,
         consume: true) >= 0
   }
 
@@ -716,8 +718,8 @@ public struct ByteStream {
 
   public mutating func eatWhileNeitherSeven(c1: UInt8, c2: UInt8, c3: UInt8,
       c4: UInt8, c5: UInt8, c6: UInt8, c7: UInt8) -> Bool {
-    return matchWhileNeitherSeven(c1, c2: c2, c3: c3, c4: c4, c5: c5, c6: c6,
-        c7: c7, consume: true) >= 0
+    return matchWhileNeitherSeven(c1: c1, c2: c2, c3: c3, c4: c4, c5: c5,
+        c6: c6, c7: c7, consume: true) >= 0
   }
 
   public mutating func matchWhileNeitherSeven(c1: UInt8, c2: UInt8, c3: UInt8,
@@ -750,13 +752,13 @@ public struct ByteStream {
   public var currentTokenString: String? {
     let ei = currentIndex - 1
     return ei < startIndex ? nil :
-        String.fromCharCodes(_bytes, start: startIndex, end: ei)
+        String.fromCharCodes(charCodes: _bytes, start: startIndex, end: ei)
   }
 
   // More specialization
 
   public mutating func eatDigit() -> Bool {
-    return matchDigit(true) != nil
+    return matchDigit(consume: true) != nil
   }
 
   public mutating func matchDigit(consume: Bool = false) -> UInt8? {
@@ -774,7 +776,7 @@ public struct ByteStream {
   }
 
   public mutating func eatWhileDigit() -> Bool {
-    return matchWhileDigit(true) >= 0
+    return matchWhileDigit(consume: true) >= 0
   }
 
   public mutating func matchWhileDigit(consume: Bool = false) -> Int {
@@ -798,7 +800,7 @@ public struct ByteStream {
   }
 
   public mutating func eatLowerCase() -> Bool {
-    return matchLowerCase(true) != nil
+    return matchLowerCase(consume: true) != nil
   }
 
   // a-z
@@ -817,7 +819,7 @@ public struct ByteStream {
   }
 
   public mutating func eatWhileLowerCase() -> Bool {
-    return matchWhileLowerCase(true) >= 0
+    return matchWhileLowerCase(consume: true) >= 0
   }
 
   public mutating func matchWhileLowerCase(consume: Bool = false) -> Int {
@@ -841,7 +843,7 @@ public struct ByteStream {
   }
 
   public mutating func eatUpperCase() -> Bool {
-    return matchUpperCase(true) != nil
+    return matchUpperCase(consume: true) != nil
   }
 
   // A-Z
@@ -860,7 +862,7 @@ public struct ByteStream {
   }
 
   public mutating func eatWhileUpperCase() -> Bool {
-    return matchWhileUpperCase(true) >= 0
+    return matchWhileUpperCase(consume: true) >= 0
   }
 
   public mutating func matchWhileUpperCase(consume: Bool = false) -> Int {
@@ -884,7 +886,7 @@ public struct ByteStream {
   }
 
   public mutating func eatAlpha() -> Bool {
-    return matchAlpha(true) != nil
+    return matchAlpha(consume: true) != nil
   }
 
   // A-Z a-z
@@ -903,7 +905,7 @@ public struct ByteStream {
   }
 
   public mutating func eatWhileAlpha() -> Bool {
-    return matchWhileAlpha(true) >= 0;
+    return matchWhileAlpha(consume: true) >= 0;
   }
 
   public mutating func matchWhileAlpha(consume: Bool = false) -> Int {
@@ -929,7 +931,7 @@ public struct ByteStream {
   }
 
   public mutating func eatAlphaUnderline() -> Bool {
-    return matchAlphaUnderline(true) >= 0
+    return matchAlphaUnderline(consume: true) >= 0
   }
 
   // A-Z a-z _
@@ -948,7 +950,7 @@ public struct ByteStream {
   }
 
   public mutating func eatWhileAlphaUnderline() -> Bool {
-    return matchWhileAlphaUnderline(true) >= 0
+    return matchWhileAlphaUnderline(consume: true) >= 0
   }
 
   public mutating func matchWhileAlphaUnderline(consume: Bool = false) -> Int {
@@ -974,7 +976,7 @@ public struct ByteStream {
   }
 
   public mutating func eatAlphaUnderlineDigit() -> Bool {
-    return matchAlphaUnderlineDigit(true) != nil
+    return matchAlphaUnderlineDigit(consume: true) != nil
   }
 
   // A-Z a-z _ 0-9
@@ -995,7 +997,7 @@ public struct ByteStream {
   }
 
   public mutating func eatWhileAlphaUnderlineDigit() -> Bool {
-    return matchWhileAlphaUnderlineDigit(true) >= 0
+    return matchWhileAlphaUnderlineDigit(consume: true) >= 0
   }
 
   public mutating func matchWhileAlphaUnderlineDigit(consume: Bool = false)
@@ -1023,7 +1025,7 @@ public struct ByteStream {
   }
 
   public mutating func eatAlphaUnderlineDigitMinus() -> Bool {
-    return matchAlphaUnderlineDigitMinus(true) != nil
+    return matchAlphaUnderlineDigitMinus(consume: true) != nil
   }
 
   // A-Z a-z _ 0-9
@@ -1044,7 +1046,7 @@ public struct ByteStream {
   }
 
   public mutating func eatWhileAlphaUnderlineDigitMinus() -> Bool {
-    return matchWhileAlphaUnderlineDigitMinus(true) >= 0
+    return matchWhileAlphaUnderlineDigitMinus(consume: true) >= 0
   }
 
   public mutating func matchWhileAlphaUnderlineDigitMinus(consume: Bool = false)
@@ -1072,7 +1074,7 @@ public struct ByteStream {
   }
 
   public mutating func eatAlphaDigit() -> Bool {
-    return matchAlphaDigit(true) != nil
+    return matchAlphaDigit(consume: true) != nil
   }
 
   // A-Z a-z 0-9
@@ -1092,7 +1094,7 @@ public struct ByteStream {
   }
 
   public mutating func eatWhileAlphaDigit() -> Bool {
-    return matchWhileAlphaDigit(true) >= 0
+    return matchWhileAlphaDigit(consume: true) >= 0
   }
 
   public mutating func matchWhileAlphaDigit(consume: Bool = false) -> Int {
@@ -1119,7 +1121,7 @@ public struct ByteStream {
   }
 
   public mutating func eatHexa() -> Bool {
-    return matchHexa(true) != nil
+    return matchHexa(consume: true) != nil
   }
 
   // A-F a-f 0-9
@@ -1139,7 +1141,7 @@ public struct ByteStream {
   }
 
   public mutating func eatWhileHexa() -> Bool {
-    return matchWhileHexa(true) >= 0
+    return matchWhileHexa(consume: true) >= 0
   }
 
   public mutating func matchWhileHexa(consume: Bool = false) -> Int {
@@ -1168,288 +1170,288 @@ public struct ByteStream {
   // One-off symbols
 
   public mutating func eatOpenParen() -> Bool {
-    return matchOpenParen(true)
+    return matchOpenParen(consume: true)
   }
 
   // (
   public mutating func matchOpenParen(consume: Bool = false) -> Bool {
-    return matchOne(40, consume: consume) // (
+    return matchOne(c: 40, consume: consume) // (
   }
 
   public mutating func eatCloseParen() -> Bool {
-    return matchCloseParen(true)
+    return matchCloseParen(consume: true)
   }
 
   // )
   public mutating func matchCloseParen(consume: Bool = false) -> Bool {
-    return matchOne(41, consume: consume) // )
+    return matchOne(c: 41, consume: consume) // )
   }
 
   public mutating func eatLessThan() -> Bool {
-    return matchLessThan(true)
+    return matchLessThan(consume: true)
   }
 
   // <
   public mutating func matchLessThan(consume: Bool = false) -> Bool {
-    return matchOne(60, consume: consume) // <
+    return matchOne(c: 60, consume: consume) // <
   }
 
   public mutating func eatGreaterThan() -> Bool {
-    return matchGreaterThan(true)
+    return matchGreaterThan(consume: true)
   }
 
   // >
   public mutating func matchGreaterThan(consume: Bool = false) -> Bool {
-    return matchOne(62, consume: consume) // >
+    return matchOne(c: 62, consume: consume) // >
   }
 
   public mutating func eatOpenBracket() -> Bool {
-    return matchOpenBracket(true)
+    return matchOpenBracket(consume: true)
   }
 
   // [
   public mutating func matchOpenBracket(consume: Bool = false) -> Bool {
-    return matchOne(91, consume: consume) // [
+    return matchOne(c: 91, consume: consume) // [
   }
 
   public mutating func eatCloseBracket() -> Bool {
-    return matchCloseBracket(true)
+    return matchCloseBracket(consume: true)
   }
 
   // ]
   public mutating func matchCloseBracket(consume: Bool = false) -> Bool {
-    return matchOne(93, consume: consume) // ]
+    return matchOne(c: 93, consume: consume) // ]
   }
 
   public mutating func eatOpenBrace() -> Bool {
-    return matchOpenBrace(true)
+    return matchOpenBrace(consume: true)
   }
 
   // {
   public mutating func matchOpenBrace(consume: Bool = false) -> Bool {
-    return matchOne(123, consume: consume) // {
+    return matchOne(c: 123, consume: consume) // {
   }
 
   public mutating func eatCloseBrace() -> Bool {
-    return matchCloseBrace(true)
+    return matchCloseBrace(consume: true)
   }
 
   // }
   public mutating func matchCloseBrace(consume: Bool = false) -> Bool {
-    return matchOne(125, consume: consume) // }
+    return matchOne(c: 125, consume: consume) // }
   }
 
   public mutating func eatEqual() -> Bool {
-    return matchEqual(true)
+    return matchEqual(consume: true)
   }
 
   // =
   public mutating func matchEqual(consume: Bool = false) -> Bool {
-    return matchOne(61, consume: consume) // =
+    return matchOne(c: 61, consume: consume) // =
   }
 
   public mutating func eatPlus() -> Bool {
-    return matchPlus(true)
+    return matchPlus(consume: true)
   }
 
   // +
   public mutating func matchPlus(consume: Bool = false) -> Bool {
-    return matchOne(43, consume: consume) // +
+    return matchOne(c: 43, consume: consume) // +
   }
 
   public mutating func eatMinus() -> Bool {
-    return matchMinus(true)
+    return matchMinus(consume: true)
   }
 
   // -
   public mutating func matchMinus(consume: Bool = false) -> Bool {
-    return matchOne(45, consume: consume) // -
+    return matchOne(c: 45, consume: consume) // -
   }
 
   public mutating func eatExclamation() -> Bool {
-    return matchExclamation(true)
+    return matchExclamation(consume: true)
   }
 
   // !
   public mutating func matchExclamation(consume: Bool = false) -> Bool {
-    return matchOne(33, consume: consume) // !
+    return matchOne(c: 33, consume: consume) // !
   }
 
   public mutating func eatQuestionMark() -> Bool {
-    return matchQuestionMark(true)
+    return matchQuestionMark(consume: true)
   }
 
   // ?
   public mutating func matchQuestionMark(consume: Bool = false) -> Bool {
-    return matchOne(63, consume: consume) // ?
+    return matchOne(c: 63, consume: consume) // ?
   }
 
   public mutating func eatAmpersand() -> Bool {
-    return matchAmpersand(true)
+    return matchAmpersand(consume: true)
   }
 
   // &
   public mutating func matchAmpersand(consume: Bool = false) -> Bool {
-    return matchOne(38, consume: consume) // &
+    return matchOne(c: 38, consume: consume) // &
   }
 
   public mutating func eatSemicolon() -> Bool {
-    return matchSemicolon(true)
+    return matchSemicolon(consume: true)
   }
 
   // ;
   public mutating func matchSemicolon(consume: Bool = false) -> Bool {
-    return matchOne(59, consume: consume) // ;
+    return matchOne(c: 59, consume: consume) // ;
   }
 
   public mutating func eatColon() -> Bool {
-    return matchColon(true)
+    return matchColon(consume: true)
   }
 
   // :
   public mutating func matchColon(consume: Bool = false) -> Bool {
-    return matchOne(58, consume: consume) // :
+    return matchOne(c: 58, consume: consume) // :
   }
 
   public mutating func eatPoint() -> Bool {
-    return matchPoint(true)
+    return matchPoint(consume: true)
   }
 
   // .
   public mutating func matchPoint(consume: Bool = false) -> Bool {
-    return matchOne(46, consume: consume) // .
+    return matchOne(c: 46, consume: consume) // .
   }
 
   public mutating func eatComma() -> Bool {
-    return matchComma(true)
+    return matchComma(consume: true)
   }
 
   // ,
   public mutating func matchComma(consume: Bool = false) -> Bool {
-    return matchOne(44, consume: consume) // ,
+    return matchOne(c: 44, consume: consume) // ,
   }
 
   public mutating func eatAsterisk() -> Bool {
-    return matchAsterisk(true)
+    return matchAsterisk(consume: true)
   }
 
   // *
   public mutating func matchAsterisk(consume: Bool = false) -> Bool {
-    return matchOne(42, consume: consume) // *
+    return matchOne(c: 42, consume: consume) // *
   }
 
   public mutating func eatSlash() -> Bool {
-    return matchSlash(true)
+    return matchSlash(consume: true)
   }
 
   // /
   public mutating func matchSlash(consume: Bool = false) -> Bool {
-    return matchOne(47, consume: consume) // /
+    return matchOne(c: 47, consume: consume) // /
   }
 
   public mutating func eatBackslash() -> Bool {
-    return matchBackslash(true)
+    return matchBackslash(consume: true)
   }
 
   // \.
   public mutating func matchBackslash(consume: Bool = false) -> Bool {
-    return matchOne(92, consume: consume) // \.
+    return matchOne(c: 92, consume: consume) // \.
   }
 
   public mutating func eatAt() -> Bool {
-    return matchAt(true)
+    return matchAt(consume: true)
   }
 
   // @
   public mutating func matchAt(consume: Bool = false) -> Bool {
-    return matchOne(64, consume: consume) // @
+    return matchOne(c: 64, consume: consume) // @
   }
 
   public mutating func eatTilde() -> Bool {
-    return matchTilde(true)
+    return matchTilde(consume: true)
   }
 
   // ~
   public mutating func matchTilde(consume: Bool = false) -> Bool {
-    return matchOne(126, consume: consume) // ~
+    return matchOne(c: 126, consume: consume) // ~
   }
 
   public mutating func eatUnderline() -> Bool {
-    return matchUnderline(true)
+    return matchUnderline(consume: true)
   }
 
   // _
   public mutating func matchUnderline(consume: Bool = false) -> Bool {
-    return matchOne(95, consume: consume) // _
+    return matchOne(c: 95, consume: consume) // _
   }
 
   public mutating func eatPercent() -> Bool {
-    return matchPercent(true)
+    return matchPercent(consume: true)
   }
 
   // %
   public mutating func matchPercent(consume: Bool = false) -> Bool {
-    return matchOne(37, consume: consume) // %
+    return matchOne(c: 37, consume: consume) // %
   }
 
   public mutating func eatDollar() -> Bool {
-    return matchDollar(true)
+    return matchDollar(consume: true)
   }
 
   // $
   public mutating func matchDollar(consume: Bool = false) -> Bool {
-    return matchOne(36, consume: consume) // $
+    return matchOne(c: 36, consume: consume) // $
   }
 
   public mutating func eatSingleQuote() -> Bool {
-    return matchSingleQuote(true)
+    return matchSingleQuote(consume: true)
   }
 
   // '
   public mutating func matchSingleQuote(consume: Bool = false) -> Bool {
-    return matchOne(39, consume: consume) // '
+    return matchOne(c: 39, consume: consume) // '
   }
 
   public mutating func eatDoubleQuote() -> Bool {
-    return matchDoubleQuote(true)
+    return matchDoubleQuote(consume: true)
   }
 
   // "
   public mutating func matchDoubleQuote(consume: Bool = false) -> Bool {
-    return matchOne(34, consume: consume) // "
+    return matchOne(c: 34, consume: consume) // "
   }
 
   public mutating func eatHash() -> Bool {
-    return matchHash(true)
+    return matchHash(consume: true)
   }
 
   // #
   public mutating func matchHash(consume: Bool = false) -> Bool {
-    return matchOne(35, consume: consume) // #
+    return matchOne(c: 35, consume: consume) // #
   }
 
   public mutating func eatPipe() -> Bool {
-    return matchPipe(true)
+    return matchPipe(consume: true)
   }
 
   // |
   public mutating func matchPipe(consume: Bool = false) -> Bool {
-    return matchOne(124, consume: consume) // |
+    return matchOne(c: 124, consume: consume) // |
   }
 
   public mutating func eatCircumflex() -> Bool {
-    return matchCircumflex(true)
+    return matchCircumflex(consume: true)
   }
 
   // ^
   public mutating func matchCircumflex(consume: Bool = false) -> Bool {
-    return matchOne(94, consume: consume) // ^
+    return matchOne(c: 94, consume: consume) // ^
   }
 
   // Extended matching
 
   public mutating func eatInQuotes(qc: UInt8) -> Bool {
-    return matchInQuotes(qc, consume: true) >= 0
+    return matchInQuotes(qc: qc, consume: true) >= 0
   }
 
   public mutating func matchInQuotes(qc: UInt8, consume: Bool = false) -> Int {
@@ -1473,7 +1475,7 @@ public struct ByteStream {
   }
 
   public mutating func eatInEscapedQuotes(qc: UInt8) -> Bool {
-    return matchInEscapedQuotes(qc, consume: true) >= 0
+    return matchInEscapedQuotes(qc: qc, consume: true) >= 0
   }
 
   public mutating func matchInEscapedQuotes(qc: UInt8, consume: Bool = false)
@@ -1504,7 +1506,7 @@ public struct ByteStream {
   }
 
   public mutating func eatUntilEscapedString(string: String) -> Bool {
-    return matchUntilEscapedString(string, consume: true) >= 0
+    return matchUntilEscapedString(string: string, consume: true) >= 0
   }
 
   public mutating func matchUntilEscapedString(string: String,
@@ -1554,8 +1556,8 @@ public struct ByteStream {
     return r
   }
 
-  public mutating func eatEscapingUntil(fn: (c: UInt8) -> Bool) -> Bool{
-    return matchEscapingUntil(true, fn: fn) >= 0
+  public mutating func eatEscapingUntil(fn: (c: UInt8) -> Bool) -> Bool {
+    return matchEscapingUntil(consume: true, fn: fn) >= 0
   }
 
   public mutating func matchEscapingUntil(consume: Bool = false,
@@ -1582,7 +1584,7 @@ public struct ByteStream {
   }
 
   public mutating func eatKeyword(string: String) -> Bool {
-    return matchKeyword(string, consume: true) >= 0
+    return matchKeyword(string: string, consume: true) >= 0
   }
 
   public mutating func matchKeyword(string: String, consume: Bool = false)
@@ -1595,7 +1597,7 @@ public struct ByteStream {
       currentIndex = i + len
       if matchAlphaUnderlineDigit() < 0 {
         currentIndex = i
-        r = matchString(string)
+        r = matchString(string: string)
         if r >= 0 && consume {
           currentIndex += len
         }
@@ -1608,7 +1610,8 @@ public struct ByteStream {
 
   public mutating func eatKeywordFromList(firstCharTable: FirstCharTable)
       -> Bool {
-    return matchKeywordFromList(firstCharTable, consume: true) >= 0
+    return matchKeywordFromList(firstCharTable: firstCharTable,
+        consume: true) >= 0
   }
 
   public mutating func matchKeywordFromList(firstCharTable: FirstCharTable,
@@ -1661,7 +1664,7 @@ public struct ByteStream {
   // Triple quotes sequence
   public mutating func eatEscapingUntilThree(c1: UInt8, c2: UInt8, c3: UInt8)
       -> Bool {
-    return matchEscapingUntilThree(c1, c2: c2, c3: c3, consume: true) >= 0
+    return matchEscapingUntilThree(c1: c1, c2: c2, c3: c3, consume: true) >= 0
   }
 
   public mutating func matchEscapingUntilThree(c1: UInt8, c2: UInt8, c3: UInt8,
@@ -1698,12 +1701,12 @@ public struct ByteStream {
 
   public static func makeFirstCharTable(strings: [String]) -> FirstCharTable {
     let a: [[UInt8]] = strings.map { $0.bytes }
-    return makeFirstCharTable(a)
+    return makeFirstCharTable(list: a)
   }
 
   public static func makeFirstCharTable(list: [[UInt8]]) -> FirstCharTable {
     let len = list.count
-    var a = FirstCharTable(count: 256, repeatedValue: nil)
+    var a = FirstCharTable(repeating: nil, count: 256)
     for i in 0..<len {
       let za = list[i]
       let cint = Int(za[0])
@@ -1718,7 +1721,8 @@ public struct ByteStream {
 
   public mutating func eatBytesFromTable(firstCharTable: FirstCharTable)
       -> Bool {
-    return matchBytesFromTable(firstCharTable, consume: true) >= 0
+    return matchBytesFromTable(firstCharTable: firstCharTable,
+        consume: true) >= 0
   }
 
   public mutating func matchBytesFromTable(firstCharTable: FirstCharTable,
@@ -1756,7 +1760,8 @@ public struct ByteStream {
 
   public mutating func eatUntilIncludingBytesFromTable(
       firstCharTable: FirstCharTable) -> Bool {
-    return matchUntilIncludingBytesFromTable(firstCharTable, consume: true) >= 0
+    return matchUntilIncludingBytesFromTable(firstCharTable: firstCharTable,
+        consume: true) >= 0
   }
 
   public mutating func matchUntilIncludingBytesFromTable(
@@ -1797,16 +1802,16 @@ public struct ByteStream {
   }
 
   public mutating func eatUntilIncludingString(string: String) -> Bool {
-    return matchUntilIncludingBytes(string.bytes, consume: true) >= 0
+    return matchUntilIncludingBytes(bytes: string.bytes, consume: true) >= 0
   }
 
   public mutating func matchUntilIncludingString(string: String,
       consume: Bool = false) -> Int {
-    return matchUntilIncludingBytes(string.bytes, consume: consume)
+    return matchUntilIncludingBytes(bytes: string.bytes, consume: consume)
   }
 
   public mutating func eatUntilIncludingBytes(bytes: [UInt8]) -> Bool {
-    return matchUntilIncludingBytes(bytes, consume: true) >= 0
+    return matchUntilIncludingBytes(bytes: bytes, consume: true) >= 0
   }
 
   public mutating func matchUntilIncludingBytes(bytes: [UInt8],
@@ -1837,7 +1842,8 @@ public struct ByteStream {
 
   public mutating func eatOneNotFromTable(firstCharTable: FirstCharTable)
       -> Bool {
-    return matchOneNotFromTable(firstCharTable, consume: true) != nil
+    return matchOneNotFromTable(firstCharTable: firstCharTable,
+        consume: true) != nil
   }
 
   public mutating func matchOneNotFromTable(firstCharTable: FirstCharTable,
@@ -1857,7 +1863,8 @@ public struct ByteStream {
 
   public mutating func eatOneFromTable(firstCharTable: FirstCharTable)
       -> Bool {
-    return matchOneFromTable(firstCharTable, consume: true) != nil
+    return matchOneFromTable(firstCharTable: firstCharTable,
+        consume: true) != nil
   }
 
   public mutating func matchOneFromTable(firstCharTable: FirstCharTable,
@@ -1877,7 +1884,8 @@ public struct ByteStream {
 
   public mutating func eatUntilBytesFromTable(firstCharTable: FirstCharTable)
       -> Bool {
-    return matchUntilBytesFromTable(firstCharTable, consume: true) >= 0
+    return matchUntilBytesFromTable(firstCharTable: firstCharTable,
+        consume: true) >= 0
   }
 
   public mutating func matchUntilBytesFromTable(
@@ -1918,7 +1926,8 @@ public struct ByteStream {
 
   public mutating func eatWhileBytesFromTable(firstCharTable: FirstCharTable)
       -> Bool {
-    return matchWhileBytesFromTable(firstCharTable, consume: true) >= 0
+    return matchWhileBytesFromTable(firstCharTable: firstCharTable,
+        consume: true) >= 0
   }
 
   // For byte lists of different sizes, the first byte list added to the table
@@ -1964,17 +1973,17 @@ public struct ByteStream {
 
   public mutating func eatStringFromListAtEnd(strings: [String]) -> Bool {
     let bytes = strings.map { $0.bytes }
-    return matchBytesFromListAtEnd(bytes, consume: true) >= 0
+    return matchBytesFromListAtEnd(bytes: bytes, consume: true) >= 0
   }
 
   public mutating func matchStringFromListAtEnd(strings: [String],
       consume: Bool = false) -> Int {
     let bytes = strings.map { $0.bytes }
-    return matchBytesFromListAtEnd(bytes, consume: false)
+    return matchBytesFromListAtEnd(bytes: bytes, consume: false)
   }
 
   public mutating func eatBytesFromListAtEnd(bytes: [[UInt8]]) -> Bool {
-    return matchBytesFromListAtEnd(bytes, consume: true) >= 0
+    return matchBytesFromListAtEnd(bytes: bytes, consume: true) >= 0
   }
 
   public mutating func matchBytesFromListAtEnd(bytes: [[UInt8]],
@@ -2016,12 +2025,12 @@ public struct ByteStream {
 
   public static func printAscii(bytes: [UInt8]) {
     let len = bytes.count
-    var a = [UInt8](count: len, repeatedValue: 0)
+    var a = [UInt8](repeating: 0, count: len)
     for i in 0..<len {
       let c = bytes[i]
       a[i] = (c == 10 || c == 13 || (c >= 32 && c <= 126)) ? c : 46
     }
-    Stdout.writeBytes(a, maxBytes: len)
+    let _ = Stdout.writeBytes(a: a, maxBytes: len)
     if a[len - 1] != 10 {
       print("")
     }

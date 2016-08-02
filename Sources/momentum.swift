@@ -7,7 +7,7 @@ public class Momentum {
 
   public static func listen(port: UInt16, hostName: String = "127.0.0.1",
       handler: MomentumHandler) throws {
-    try doListen(port, hostName: hostName) { socket in
+    try doListen(port: port, hostName: hostName) { socket in
       defer { socket.close() }
       do {
         let request = try Request(socket: socket)
@@ -46,7 +46,7 @@ public class Momentum {
       handler: (socket: Socket) -> Void) throws {
     let server = try ServerSocket(hostName: hostName, port: port)
     while true {
-      try server.spawnAccept(handler)
+      try server.spawnAccept(fn: handler)
     }
   }
 
@@ -78,11 +78,11 @@ public class Request: CustomStringConvertible {
     var headerParser = HeaderParser()
     header = headerParser.header
     let len = 1024
-    var buffer = [UInt8](count: len, repeatedValue: 0)
+    var buffer = [UInt8](repeating: 0, count: len)
     var n = 0
     repeat {
-      n = socket.read(&buffer, maxBytes: len)
-      try headerParser.parse(buffer, maxBytes: n)
+      n = socket.read(buffer: &buffer, maxBytes: len)
+      try headerParser.parse(bytes: buffer, maxBytes: n)
     } while n > 0 && !headerParser.isDone
 
     header = headerParser.header
@@ -91,12 +91,12 @@ public class Request: CustomStringConvertible {
       var bodyParser = BodyParser()
       let bi = headerParser.bodyIndex
       if bi != -1 && buffer[bi] != 0 {
-        try bodyParser.parse(buffer, index: bi, maxBytes: len)
+        try bodyParser.parse(bytes: buffer, index: bi, maxBytes: len)
       }
       if !bodyParser.isDone {
         repeat {
-          n = socket.read(&buffer, maxBytes: len)
-          try bodyParser.parse(buffer, index: 0, maxBytes: n)
+          n = socket.read(buffer: &buffer, maxBytes: len)
+          try bodyParser.parse(bytes: buffer, index: 0, maxBytes: n)
         } while n > 0 && !bodyParser.isDone
       }
       _body = bodyParser.body
@@ -116,11 +116,11 @@ public class Request: CustomStringConvertible {
   public var body: Body? { return _body }
 
   public var description: String {
-    return "Request(method: \(inspect(method)), " +
-        "uri: \(inspect(uri)), " +
-        "httpVersion: \(inspect(httpVersion)), " +
-        "fields: \(inspect(fields)), " +
-        "body: \(inspect(_body)))"
+    return "Request(method: \(inspect(o: method)), " +
+        "uri: \(inspect(o: uri)), " +
+        "httpVersion: \(inspect(o: httpVersion)), " +
+        "fields: \(inspect(o: fields)), " +
+        "body: \(inspect(o: _body)))"
   }
 
 }
@@ -145,7 +145,7 @@ public class Response {
   }
 
   public func write(string: String) {
-    writeBytes([UInt8](string.utf8))
+    writeBytes(bytes: [UInt8](string.utf8))
   }
 
   public func writeBytes(bytes: [UInt8]) {
@@ -154,7 +154,7 @@ public class Response {
   }
 
   public func sendFile(path: String) throws {
-    writeBytes(try IO.readAllBytes(path))
+    writeBytes(bytes: try IO.readAllBytes(filePath: path))
   }
 
   func concatFields() -> String {
@@ -167,10 +167,11 @@ public class Response {
 
   public func doFlush() {
     if flushed { return }
-    socket.write("HTTP/1.1 \(statusCode) \(STATUS_CODE[statusCode])" +
+    let _ = socket.write(string:
+        "HTTP/1.1 \(statusCode) \(STATUS_CODE[statusCode])" +
         "\r\n\(concatFields())Content-Length: \(contentLength)\r\n\r\n")
     for a in contentQueue {
-      socket.writeBytes(a, maxBytes: a.count)
+      let _ = socket.writeBytes(bytes: a, maxBytes: a.count)
     }
     flushed = true
   }

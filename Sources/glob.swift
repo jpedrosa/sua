@@ -88,7 +88,7 @@ public class GlobLexer: CommonLexer {
       status.tokenizer = T.Body
       return .SymCBOptionalName
     }
-    stream.eatWhileNeitherThree(125, c2: 44, c3: 92)
+    let _ = stream.eatWhileNeitherThree(c1: 125, c2: 44, c3: 92)
     return .OptionalName
   }
 
@@ -100,7 +100,7 @@ public class GlobLexer: CommonLexer {
     } else if stream.eatCloseBrace() {
       status.tokenizer = T.Body
       return .SymCBOptionalName
-    } else if stream.eatWhileNeitherThree(125, c2: 44, c3: 92) { // } , \.
+    } else if stream.eatWhileNeitherThree(c1: 125, c2: 44, c3: 92) { // } , \.
       status.tokenizer = T.OptionalNameComma
       return .OptionalName
     }
@@ -141,7 +141,7 @@ public class GlobLexer: CommonLexer {
       }
       return .SetChar
     }
-    stream.next()
+    let _ = stream.next()
     return .SetChar
   }
 
@@ -163,7 +163,7 @@ public class GlobLexer: CommonLexer {
 
   func inEscapeCharacter() -> GlobTokenType {
     status.tokenizer = escapeExitTokenizer
-    stream.next()
+    let _ = stream.next()
     return escapeTokenType
   }
 
@@ -184,7 +184,7 @@ public class GlobLexer: CommonLexer {
       escapeTokenType = .Name
       return .Name
     } else if stream.eatAsterisk() {
-      stream.eatAsterisk()
+      let _ = stream.eatAsterisk()
       return .SymAsterisk
     } else if stream.eatQuestionMark() {
       return .SymQuestionMark
@@ -195,12 +195,12 @@ public class GlobLexer: CommonLexer {
       status.tokenizer = T.SetMaybeEmpty
       return .SymOBSet
     }
-    stream.eatUntil(isContextChar)
+    let _ = stream.eatUntil(fn: isContextChar)
     return .Name
   }
 
   func inText() -> GlobTokenType {
-    stream.skipToEnd()
+    let _ = stream.skipToEnd()
     status.tokenizer = T.Text
     return .Text
   }
@@ -296,9 +296,9 @@ public struct GlobMatcherSetPart: GlobMatcherPart {
   }
 
   public func makeComparisonTable() -> FirstCharTable {
-    var table = FirstCharTable(count: 256, repeatedValue: nil)
+    var table = FirstCharTable(repeating: nil, count: 256)
     for c in chars {
-      let n = Int(ignoreCase ? Ascii.toLowerCase(c) : c)
+      let n = Int(ignoreCase ? Ascii.toLowerCase(c: c) : c)
       table[n] = FirstCharTableValue
     }
     var i = 0
@@ -307,8 +307,8 @@ public struct GlobMatcherSetPart: GlobMatcherPart {
       var n = ranges[i]
       var n2 = ranges[i + 1]
       if ignoreCase {
-        n = Ascii.toLowerCase(n)
-        n2 = Ascii.toLowerCase(n2)
+        n = Ascii.toLowerCase(c: n)
+        n2 = Ascii.toLowerCase(c: n2)
       }
       while n <= n2 {
         table[Int(n)] = FirstCharTableValue
@@ -374,11 +374,11 @@ public struct GlobMatcher {
   }
 
   public mutating func addSetChar(c: UInt8) {
-    currentSet!.addChar(c)
+    currentSet!.addChar(c: c)
   }
 
   public mutating func addSetRange(c1: UInt8, c2: UInt8) {
-    currentSet!.addRange(c1, c2: c2)
+    currentSet!.addRange(c1: c1, c2: c2)
   }
 
   public mutating func negateSet() {
@@ -398,7 +398,7 @@ public struct GlobMatcher {
   }
 
   public mutating func addAlternativeName(bytes: [UInt8]) {
-    currentAlternative!.addBytes(bytes)
+    currentAlternative!.addBytes(bytes: bytes)
   }
 
   public mutating func saveAlternative() {
@@ -414,12 +414,12 @@ public struct GlobMatcher {
       switch part.type {
         case .Name:
           let namePart = part as! GlobMatcherNamePart
-          let bytes = ignoreCase ? Ascii.toLowerCase(namePart.bytes) :
+          let bytes = ignoreCase ? Ascii.toLowerCase(bytes: namePart.bytes) :
               namePart.bytes
           if lastType == .Any {
-            m.eatUntilIncludingBytes(bytes)
+            m.eatUntilIncludingBytes(bytes: bytes)
           } else {
-            m.eatBytes(bytes)
+            m.eatBytes(bytes: bytes)
           }
         case .Any: ()
         case .One:
@@ -429,18 +429,18 @@ public struct GlobMatcher {
           setPart.ignoreCase = ignoreCase
           let table = setPart.makeComparisonTable()
           if setPart.isNegated {
-            m.eatOneNotFromTable(table)
+            m.eatOneNotFromTable(table: table)
           } else {
-            m.eatBytesFromTable(table)
+            m.eatBytesFromTable(table: table)
           }
         case .Alternative:
           let altPart = part as! GlobMatcherAlternativePart
-          let bytes = ignoreCase ? Ascii.toLowerCase(altPart.bytes) :
+          let bytes = ignoreCase ? Ascii.toLowerCase(bytes: altPart.bytes) :
               altPart.bytes
           if lastType == .Any {
-            m.eatBytesFromListAtEnd(bytes)
+            m.eatBytesFromListAtEnd(list: bytes)
           } else {
-            m.eatBytesFromList(bytes)
+            m.eatBytesFromList(list: bytes)
           }
       }
       lastType = part.type
@@ -464,7 +464,7 @@ public struct GlobMatcher {
         let token = tokens[i]
         switch token.globType {
           case .Name:
-            m.addName(token.collect())
+            m.addName(bytes: token.collect())
           case .SymAsterisk:
             m.addAny()
           case .SymQuestionMark:
@@ -476,9 +476,9 @@ public struct GlobMatcher {
               let t = tokens[i]
               switch t.globType {
                 case .SetChar:
-                  m.addSetChar(t.bytes[t.startIndex])
+                  m.addSetChar(c: t.bytes[t.startIndex])
                 case .SetRange:
-                  m.addSetRange(t.bytes[t.startIndex],
+                  m.addSetRange(c1: t.bytes[t.startIndex],
                       c2: t.bytes[t.startIndex + 2])
                 case .SymCBSet:
                   break SET
@@ -498,7 +498,7 @@ public struct GlobMatcher {
             while i < len {
               let t = tokens[i]
               if t.globType == .OptionalName {
-                m.addAlternativeName(t.collect())
+                m.addAlternativeName(bytes: t.collect())
                 i += 1
                 if i < len {
                   let gt = tokens[i].globType
@@ -516,7 +516,7 @@ public struct GlobMatcher {
             }
             m.saveAlternative()
           default:
-            GlobMatcherError.Unreachable
+            throw GlobMatcherError.Unreachable
         }
         i += 1
       }
@@ -561,14 +561,14 @@ public struct Glob {
   }
 
   public mutating func match(string: String) -> Bool {
-    let z = ignoreCase ? Ascii.toLowerCase(string) ?? "" : string
-    return matcher.match(z) > 0
+    let z = ignoreCase ? Ascii.toLowerCase(string: string) ?? "" : string
+    return matcher.match(string: z) > 0
   }
 
   public static func parse(string: String, ignoreCase: Bool = false) throws
       -> Glob {
     let tokens = try GlobLexer(bytes: string.bytes).parseAllGlobTokens()
-    var m = try GlobMatcher.doParse(tokens)
+    var m = try GlobMatcher.doParse(tokens: tokens)
     m.ignoreCase = ignoreCase
     return Glob(matcher: m.assembleMatcher(), ignoreCase: ignoreCase)
   }
@@ -576,7 +576,7 @@ public struct Glob {
 }
 
 
-public enum GlobMatcherError: ErrorType {
+public enum GlobMatcherError: ErrorProtocol {
   case Parse
   case Unreachable
 }

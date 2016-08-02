@@ -36,7 +36,7 @@ public class HexaUtils {
         i += 1
       } else if c == 37 {
         if i + 2 < maxBytes {
-          if let n = hexaToInt(bytes[i + 1], c2: bytes[i + 2]) {
+          if let n = hexaToInt(c1: bytes[i + 1], c2: bytes[i + 2]) {
             a.append(n)
             i += 3
           } else {
@@ -77,11 +77,11 @@ public class HexaUtils {
     if c >= 16 {
       let n = c % 16
       let rest = c - (n * 16)
-      return "\(toLiteral(n))\(toLiteral(rest))"
+      return "\(toLiteral(f: n))\(toLiteral(f: rest))"
     } else if pad {
-      return "0\(toLiteral(c))"
+      return "0\(toLiteral(f: c))"
     }
-    return toLiteral(c)
+    return toLiteral(f: c)
   }
 
 }

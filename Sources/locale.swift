@@ -25,9 +25,10 @@ public class Locale {
     var sb = ""
     var tokenIndex = -1
     var i = 0
-    func process(z: String, padding: Int = 0) {
+    func process(_ z: String, padding: Int = 0) {
       if tokenIndex >= 0 {
-        sb += mask.utf16.substring(tokenIndex, endIndex: i - 1) ?? ""
+        sb += mask.utf16.substring(startIndex: tokenIndex,
+            endIndex: i - 1) ?? ""
         tokenIndex = -1
       }
       var j = z.utf16.count - padding
@@ -40,14 +41,14 @@ public class Locale {
     let len = mask.utf16.count
     let lasti = len - 1
     while i < len {
-      if mask.utf16.codeUnitAt(i) == 37 && i < lasti { // %
+      if mask.utf16.codeUnitAt(index: i) == 37 && i < lasti { // %
         i += 1
-        switch mask.utf16.codeUnitAt(i) {
+        switch mask.utf16.codeUnitAt(index: i) {
         case 37: // %
           sb += "%"
         case 45: // -
           if i < lasti {
-            if mask.utf16.codeUnitAt(i + 1) == 100 { // d
+            if mask.utf16.codeUnitAt(index: i + 1) == 100 { // d
               process("\(time.day)")
               i += 1
             } else {
@@ -93,7 +94,7 @@ public class Locale {
       i += 1
     }
     if tokenIndex >= 0 {
-      sb += mask.utf16.substring(tokenIndex, endIndex: i) ?? ""
+      sb += mask.utf16.substring(startIndex: tokenIndex, endIndex: i) ?? ""
     }
     return sb
   }
