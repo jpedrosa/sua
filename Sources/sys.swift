@@ -169,16 +169,19 @@ public struct PosixSys {
     return nil
   }
 
-  public func opendir(path: String) -> OpaquePointer {
+  public func opendir(path: String) -> OpaquePointer? {
     return Glibc.opendir(path)
   }
 
-  public func opendir(pathBytes: [UInt8]) -> OpaquePointer {
+  public func opendir(pathBytes: [UInt8]) -> OpaquePointer? {
     return Glibc.opendir(UnsafePointer<CChar>(pathBytes))
   }
 
-  public func closedir(dirp: OpaquePointer) -> Int32 {
-    return retry { Glibc.closedir(dirp) }
+  public func closedir(dirp: OpaquePointer?) -> Int32 {
+    if let dp = dirp {
+      return retry { Glibc.closedir(dp) }
+    }
+    return 0 // Ignore the nil pointer and consider it a success.
   }
 
   public func fgets(buffer: UnsafeMutablePointer<CChar>, length: Int32,

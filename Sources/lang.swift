@@ -11,7 +11,7 @@ public func inspect(o: Any) -> String {
   return z
 }
 
-public func p(a: Any...) {
+public func p(_ a: Any...) {
   for e in a {
     debugPrint(e)
   }

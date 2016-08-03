@@ -11,39 +11,39 @@ p(buf.self)
 var i = stat("/home/dewd/t_/sample.txt", &buf)
 p("iiii \(i) \(buf)")
 
-var o = Sys.stat("/home/dewd/t_/sample.txt", buffer: &buf)
+var o = Sys.stat(path: "/home/dewd/t_/sample.txt", buffer: &buf)
 p("oooo \(o)")
 
-var h = Sys.lstat("/home/dewd/t_/sample.txt", buffer: &buf)
+var h = Sys.lstat(path: "/home/dewd/t_/sample.txt", buffer: &buf)
 p("hhhh \(h)")
 
-p("exists: \(File.exists("/home/dewd/t_/sample.txt"))")
+p("exists: \(File.exists(path: "/home/dewd/t_/sample.txt"))")
 
-p("exists: \(File.exists("/home/dewd/t_/nosample.txt"))")
+p("exists: \(File.exists(path: "/home/dewd/t_/nosample.txt"))")
 
 p(buf.st_dev)
 
 var sb = Stat()
-sb.stat("/home/dewd/t_/sample.txt")
+let _ = sb.stat(path: "/home/dewd/t_/sample.txt")
 p("\(sb.dev) \(sb.ino) \(sb.mode) \(sb.atime)")
 p(sb)
 
-var rd = Sys.opendir("/home/dewd/t_")
+var rd = Sys.opendir(path: "/home/dewd/t_")
 p(rd)
-p(rd.self) // COpaquePointer
+p(rd.self) // OpaquePointer
 p(rd == nil)
-var gr = Sys.readdir(rd)
+var gr = Sys.readdir(dirp: rd)
 while gr != nil {
-  p(gr.memory)
-  var dirName = gr.memory.d_name
+  p(gr!.pointee)
+  var dirName = gr!.pointee.d_name
   let name = withUnsafePointer(&dirName) { (ptr) -> String in
-    return String.fromCString(UnsafePointer<CChar>(ptr)) ?? ""
+    return String(cString: UnsafePointer<CChar>(ptr)) ?? ""
   }
   p(name)
-  gr = Sys.readdir(rd)
+  gr = Sys.readdir(dirp: rd)
 }
-p(Sys.closedir(rd))
+p(Sys.closedir(dirp: rd))
 
-FileBrowser.recurseDir("/home/dewd/t_") { (name, type, path) in
+FileBrowser.recurseDir(path: "/home/dewd/t_") { (name, type, path) in
   p("\(path)\(name)")
 }
