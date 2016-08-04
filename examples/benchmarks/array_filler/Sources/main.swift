@@ -11,6 +11,6 @@ func countIt() {
 fillArray(&a);
 countIt()
 
-a = [Int](count: ITERATIONS, repeatedValue: 0)
+a = [Int](repeating: 0, count: ITERATIONS)
 fillArray2(&a);
 countIt()
