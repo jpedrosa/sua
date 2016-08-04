@@ -63,11 +63,11 @@ class Strength {
   }
 
   static func weakest(s1: Strength, s2: Strength) -> Strength {
-    return Strength.weaker(s1, s2: s2) ? s1 : s2
+    return Strength.weaker(s1: s1, s2: s2) ? s1 : s2
   }
 
   static func strongest(s1: Strength, s2: Strength) -> Strength {
-    return Strength.stronger(s1, s2: s2) ? s1 : s2
+    return Strength.stronger(s1: s1, s2: s2) ? s1 : s2
   }
 
 }
@@ -106,7 +106,7 @@ class Constraint {
   // Activate this constraint and attempt to satisfy it.
   func addConstraint() {
     addToGraph()
-    planner.incrementalAdd(self)
+    planner.incrementalAdd(constraint: self)
   }
 
   // Override me.
@@ -134,7 +134,7 @@ class Constraint {
   // there is one, or nil, if there isn't.
   // Assume: I am not already satisfied.
   func satisfy(mark: Int) -> Constraint? {
-    chooseMethod(mark)
+    chooseMethod(mark: mark)
     if (!isSatisfied) {
       if (strength === REQUIRED) {
         print("Could not satisfy a required constraint!")
@@ -142,12 +142,12 @@ class Constraint {
       return nil
     }
 
-    markInputs(mark)
+    markInputs(mark: mark)
     let out = output
     let overridden = out.determinedBy
     overridden?.markUnsatisfied()
     out.determinedBy = self
-    if (!planner.addPropagate(self, mark: mark)) {
+    if (!planner.addPropagate(constraint: self, mark: mark)) {
       print("Cycle encountered")
     }
     out.mark = mark
@@ -156,7 +156,7 @@ class Constraint {
 
   func destroyConstraint() {
     if (isSatisfied) {
-      planner.incrementalRemove(self)
+      planner.incrementalRemove(constraint: self)
     }
     removeFromGraph()
   }
@@ -193,14 +193,14 @@ class UnaryConstraint: Constraint {
 
   // Adds this constraint to the constraint graph.
   override func addToGraph() {
-    output.addConstraint(self)
+    output.addConstraint(constraint: self)
     satisfied = false
   }
 
   // Decides if this constraint can be satisfied and records that decision.
   override func chooseMethod(mark: Int) {
     satisfied = (output.mark != mark) &&
-        Strength.stronger(strength, s2: output.walkStrength)
+        Strength.stronger(s1: strength, s2: output.walkStrength)
   }
 
   // Returns true if this constraint is satisfied in the current solution.
@@ -233,7 +233,7 @@ class UnaryConstraint: Constraint {
   }
 
   override func removeFromGraph() {
-    output.removeConstraint(self)
+    output.removeConstraint(constraint: self)
     satisfied = false
   }
 
@@ -293,7 +293,7 @@ class BinaryConstraint: Constraint {
   override func chooseMethod(mark: Int) {
     if (v1.mark == mark) {
       if (v2.mark != mark &&
-          Strength.stronger(strength, s2: v2.walkStrength)) {
+          Strength.stronger(s1: strength, s2: v2.walkStrength)) {
         direction = FORWARD
       } else {
         direction = NONE
@@ -302,21 +302,21 @@ class BinaryConstraint: Constraint {
 
     if (v2.mark == mark) {
       if (v1.mark != mark &&
-          Strength.stronger(strength, s2: v1.walkStrength)) {
+          Strength.stronger(s1: strength, s2: v1.walkStrength)) {
         direction = BACKWARD
       } else {
         direction = NONE
       }
     }
 
-    if (Strength.weaker(v1.walkStrength, s2: v2.walkStrength)) {
-      if (Strength.stronger(strength, s2: v1.walkStrength)) {
+    if (Strength.weaker(s1: v1.walkStrength, s2: v2.walkStrength)) {
+      if (Strength.stronger(s1: strength, s2: v1.walkStrength)) {
         direction = BACKWARD
       } else {
         direction = NONE
       }
     } else {
-      if (Strength.stronger(strength, s2: v2.walkStrength)) {
+      if (Strength.stronger(s1: strength, s2: v2.walkStrength)) {
         direction = FORWARD
       } else {
         direction = BACKWARD
@@ -326,8 +326,8 @@ class BinaryConstraint: Constraint {
 
   // Add this constraint to the constraint graph.
   override func addToGraph() {
-    v1.addConstraint(self)
-    v2.addConstraint(self)
+    v1.addConstraint(constraint: self)
+    v2.addConstraint(constraint: self)
     direction = NONE
   }
 
@@ -357,7 +357,7 @@ class BinaryConstraint: Constraint {
   override func recalculate() {
     let ihn = input
     let out = output
-    out.walkStrength = Strength.weakest(strength, s2: ihn.walkStrength)
+    out.walkStrength = Strength.weakest(s1: strength, s2: ihn.walkStrength)
     out.stay = ihn.stay
     if (out.stay) {
       execute()
@@ -375,8 +375,8 @@ class BinaryConstraint: Constraint {
   }
 
   override func removeFromGraph() {
-    v1.removeConstraint(self)
-    v2.removeConstraint(self)
+    v1.removeConstraint(constraint: self)
+    v2.removeConstraint(constraint: self)
     direction = NONE
   }
 
@@ -401,18 +401,18 @@ class ScaleConstraint: BinaryConstraint {
   // Adds this constraint to the constraint graph.
   override func addToGraph() {
     super.addToGraph()
-    scale.addConstraint(self)
-    offset.addConstraint(self)
+    scale.addConstraint(constraint: self)
+    offset.addConstraint(constraint: self)
   }
 
   override func removeFromGraph() {
     super.removeFromGraph()
-    scale.removeConstraint(self)
-    offset.removeConstraint(self)
+    scale.removeConstraint(constraint: self)
+    offset.removeConstraint(constraint: self)
   }
 
   override func markInputs(mark: Int) {
-    super.markInputs(mark)
+    super.markInputs(mark: mark)
     scale.mark = mark
     offset.mark = mark
   }
@@ -432,7 +432,7 @@ class ScaleConstraint: BinaryConstraint {
   override func recalculate() {
     let ihn = input
     let out = output
-    out.walkStrength = Strength.weakest(strength, s2: ihn.walkStrength)
+    out.walkStrength = Strength.weakest(s1: strength, s2: ihn.walkStrength)
     out.stay = ihn.stay && scale.stay && offset.stay
     if (out.stay) {
       execute()
@@ -528,9 +528,9 @@ class Planner {
   // constraint graph has an inadvertent cycle.
   func incrementalAdd(constraint: Constraint) {
     let mark = newMark()
-    var overridden = constraint.satisfy(mark)
+    var overridden = constraint.satisfy(mark: mark)
     while overridden != nil {
-      overridden = overridden?.satisfy(mark)
+      overridden = overridden?.satisfy(mark: mark)
     }
   }
 
@@ -547,12 +547,12 @@ class Planner {
     let out = constraint.output
     constraint.markUnsatisfied()
     constraint.removeFromGraph()
-    let unsatisfied = removePropagateFrom(out)
+    let unsatisfied = removePropagateFrom(out: out)
     var strength = REQUIRED
     while (true) {
       for u in unsatisfied {
         if (u.strength === strength) {
-          incrementalAdd(u)
+          incrementalAdd(constraint: u)
         }
       }
       strength = strength.nextWeaker
@@ -591,10 +591,10 @@ class Planner {
     var todo = sources
     while todo.count > 0 {
       let constraint = todo.removeLast()
-      if constraint.output.mark != mark && constraint.inputsKnown(mark) {
-        plan.addConstraint(constraint)
+      if constraint.output.mark != mark && constraint.inputsKnown(mark: mark) {
+        plan.addConstraint(constraint: constraint)
         constraint.output.mark = mark
-        addConstraintsConsumingTo(constraint.output, coll: &todo)
+        addConstraintsConsumingTo(v: constraint.output, coll: &todo)
       }
     }
     return plan
@@ -610,7 +610,7 @@ class Planner {
         sources.append(constraint)
       }
     }
-    return makePlan(sources)
+    return makePlan(sources: sources)
   }
 
   // Recompute the walkabout strengths and stay flags of all variables
@@ -629,12 +629,12 @@ class Planner {
     while todo.count > 0 {
       let d = todo.removeLast()
       if d.output.mark == mark {
-        incrementalRemove(constraint)
+        incrementalRemove(constraint: constraint)
         return false
       }
 
       d.recalculate()
-      addConstraintsConsumingTo(d.output, coll: &todo)
+      addConstraintsConsumingTo(v: d.output, coll: &todo)
     }
 
     return true
@@ -669,7 +669,7 @@ class Planner {
     return unsatisfied
   }
 
-  func addConstraintsConsumingTo(v: Variable, inout coll: [Constraint]) {
+  func addConstraintsConsumingTo(v: Variable, coll: inout [Constraint]) {
     if let determining = v.determinedBy {
       for constraint in v.constraints {
         if constraint !== determining && constraint.isSatisfied {
@@ -719,7 +719,7 @@ func chainTest(n: Int) {
 
   let _ = StayConstraint(variable: last, strength: STRONG_DEFAULT)
   let edit = EditConstraint(variable: first, strength: PREFERRED)
-  let plan = planner.extractPlanFromConstraints([edit])
+  let plan = planner.extractPlanFromConstraints(constraints: [edit])
   for i in 0..<100 {
     first.value = i
     plan.execute()
@@ -729,7 +729,7 @@ func chainTest(n: Int) {
 
 func change(v: Variable, newValue: Int) {
   let edit = EditConstraint(variable: v, strength: PREFERRED)
-  let plan = planner.extractPlanFromConstraints([edit])
+  let plan = planner.extractPlanFromConstraints(constraints: [edit])
   for _ in 0..<10 {
     v.value = newValue
     plan.execute()
@@ -762,20 +762,20 @@ func projectionTest(n: Int) {
   let src = vsrc!
   let dst = vdst!
 
-  change(src, newValue: 17)
+  change(v: src, newValue: 17)
   total = total + dst.value
   if dst.value != 1170 {
     print("Projection 1 failed")
   }
 
-  change(dst, newValue: 1050)
+  change(v: dst, newValue: 1050)
 
   total = total + src.value
   if src.value != 5 {
     print("Projection 2 failed")
   }
 
-  change(scale, newValue: 5)
+  change(v: scale, newValue: 5)
   for i in 0..<n - 1 {
     total = total + dests[i].value
     if dests[i].value != i * 5 + 1000 {
@@ -783,7 +783,7 @@ func projectionTest(n: Int) {
     }
   }
 
-  change(offset, newValue: 2000)
+  change(v: offset, newValue: 2000)
   for i in 0..<n - 1 {
     total = total + dests[i].value
     if dests[i].value != i * 5 + 2000 {
@@ -795,8 +795,8 @@ func projectionTest(n: Int) {
 func runDeltaBlue() {
   //var start = System.clock
   for _ in 0..<40 {
-    chainTest(100)
-    projectionTest(100)
+    chainTest(n: 100)
+    projectionTest(n: 100)
   }
 
   print(total)
