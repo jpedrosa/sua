@@ -239,7 +239,7 @@ public class TempFile: File {
       if attempts >= 100 {
         throw TempFileError.Create(message: "Too many attempts.")
       } else if attempts % 10 == 0 {
-        IO.sleep(f: 0.00000001)
+        IO.sleep(0.00000001)
       }
       attempts += 1
     }

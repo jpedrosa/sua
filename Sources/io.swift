@@ -2,7 +2,7 @@
 
 public class IO {
 
-  public static func sleep(f: Double) {
+  public static func sleep(_ f: Double) {
     let sec = Int(f)
     let nsec = sec > 0 ?
         Int(f.truncatingRemainder(dividingBy: Double(sec)) * 1e9) :
@@ -10,9 +10,9 @@ public class IO {
     let _ = Sys.nanosleep(seconds: sec, nanoseconds: nsec)
   }
 
-  public static func sleep(n: Int) {
+  public static func sleep(_ n: Int) {
     if n >= 0 {
-      let _ = Sys.sleep(n: UInt32(n))
+      let _ = Sys.sleep(UInt32(n))
     }
   }
 

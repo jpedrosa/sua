@@ -215,7 +215,7 @@ public struct PosixSys {
     return Glibc.strlen(sp)
   }
 
-  public func sleep(n: UInt32) -> UInt32 {
+  public func sleep(_ n: UInt32) -> UInt32 {
     return Glibc.sleep(n)
   }
 
