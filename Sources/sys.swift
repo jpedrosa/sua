@@ -215,8 +215,8 @@ public struct PosixSys {
     return Glibc.strlen(sp)
   }
 
-  public func sleep(_ n: UInt32) -> UInt32 {
-    return Glibc.sleep(n)
+  public func sleep(seconds: UInt32) -> UInt32 {
+    return Glibc.sleep(seconds)
   }
 
   public func nanosleep(seconds: Int, nanoseconds: Int = 0) -> Int32 {

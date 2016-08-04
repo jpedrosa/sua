@@ -18,7 +18,7 @@ func label(c: Character) {
 for _ in 0..<10 {
   for c in a {
     label(c: c)
-    IO.sleep(0.08)
+    IO.sleep(seconds: 0.08)
   }
 }
 

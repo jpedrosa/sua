@@ -2,17 +2,17 @@
 
 public class IO {
 
-  public static func sleep(_ f: Double) {
-    let sec = Int(f)
+  public static func sleep(seconds: Double) {
+    let sec = Int(seconds)
     let nsec = sec > 0 ?
-        Int(f.truncatingRemainder(dividingBy: Double(sec)) * 1e9) :
-        Int(f * 1e9)
+        Int(seconds.truncatingRemainder(dividingBy: Double(sec)) * 1e9) :
+        Int(seconds * 1e9)
     let _ = Sys.nanosleep(seconds: sec, nanoseconds: nsec)
   }
 
-  public static func sleep(_ n: Int) {
-    if n >= 0 {
-      let _ = Sys.sleep(UInt32(n))
+  public static func sleep(seconds: Int) {
+    if seconds >= 0 {
+      let _ = Sys.sleep(seconds: UInt32(seconds))
     }
   }
 
