@@ -2,6 +2,7 @@
 import Glibc
 import Sua
 
+
 if !Stdin.isTerminal {
 
   var stream = ByteStream()
@@ -9,7 +10,7 @@ if !Stdin.isTerminal {
   var newLineCount = 0
   var wordCount = 0
 
-  try Stdin.readByteLines() { line in
+  let _ = try Stdin.readByteLines() { line in
     let len = line.count
     bytesCount += len
     if len > 0 && line[len - 1] == 10 {
@@ -21,10 +22,10 @@ if !Stdin.isTerminal {
     while !stream.isEol {
       // 32 - space; 10 - new line; 9 - tab; 13 - carriage return
       // 160 - unicode space: \u00a0
-      stream.eatWhile { (c: UInt8) in
+      let _ = stream.eatWhile { (c: UInt8) in
         return c == 32 || c == 10 || c == 9 || c == 13 || c == 160
       }
-      if stream.eatWhileNeitherFive(32, c2: 10, c3: 9, c4: 13, c5: 160) {
+      if stream.eatWhileNeitherFive(c1: 32, c2: 10, c3: 9, c4: 13, c5: 160) {
         wordCount += 1
       }
     }
