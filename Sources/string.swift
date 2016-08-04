@@ -131,7 +131,7 @@ public extension String.UTF16View {
     return self[self.index(startIndex, offsetBy: index)]
   }
 
-  public func endsWith(string: String) -> Bool {
+  public func endsWith(_ string: String) -> Bool {
     let a = string.utf16
     let alen = a.count
     let len = self.count
