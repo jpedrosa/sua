@@ -11,7 +11,7 @@ let NI = 30
 
 sw.start()
 for _ in 0..<NI {
-  p(rng.nextInt(10))
+  p(rng.nextInt(under: 10))
 }
 p("It took \(sw.millis)ms to generate these \(NI) random ints.")
 

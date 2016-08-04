@@ -37,18 +37,18 @@ public class RNG {
     return ((x) != 0 && (((x) & ((x) - 1)) == 0))
   }
 
-  // Returns an int between 0 and max.
-  public func nextInt(_ max: Int) -> Int {
+  // Returns an int between 0 and under.
+  public func nextInt(under: Int) -> Int {
 
-    // Fast path if max is a power of 2.
-    if isPowerOfTwo(max) {
-      return Int((UInt64(max) &* UInt64(next(31))) >> 31)
+    // Fast path if under is a power of 2.
+    if isPowerOfTwo(under) {
+      return Int((UInt64(under) &* UInt64(next(31))) >> 31)
     }
 
     while (true) {
       let rnd = next(31)
-      let val = rnd % max
-      if rnd - val + (max - 1) >= 0 {
+      let val = rnd % under
+      if rnd - val + (under - 1) >= 0 {
         return val
       }
     }
