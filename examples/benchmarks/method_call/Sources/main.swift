@@ -89,7 +89,4 @@ for i in 0..<n {
 
 print(ntoggle.value)
 sw.stop()
-p(sw)
-p("xxxxxx \(sw.elapsedMilliseconds)")
-p("yyyyyy \(sw.elapsedSeconds)")
-print("elapsed: \(Double(sw.elapsedMilliseconds) / 1000)")
+print("elapsed: \(sw.elapsedSeconds)")
