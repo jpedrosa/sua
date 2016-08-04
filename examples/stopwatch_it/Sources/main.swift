@@ -3,6 +3,7 @@ import Glibc
 import Sua
 import CSua
 
+
 var sw = Stopwatch()
 
 var rng = RNG()
@@ -26,14 +27,14 @@ var m = [String: String]()
 
 sw.start()
 var filesCount = 0
-FileBrowser.recurseDir("/home/dewd/t_") { (name, type, path) in
+FileBrowser.recurseDir(path: "/home/dewd/t_") { (name, type, path) in
   if type == .F {
     filesCount += 1
     var fp = "\(path)\(name)"
-    try! File.open(fp) { f in
+    try! File.open(path: fp) { f in
       do {
         var a = try f.readAllBytes()
-        m[fp] = String(MurmurHash3.hash32Bytes(a, maxBytes: a.count))
+        m[fp] = String(MurmurHash3.hash32Bytes(key: a, maxBytes: a.count))
       } catch {
         p("(failed to read file: \(fp))")
       }
