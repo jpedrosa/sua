@@ -3,6 +3,8 @@
 // project here:
 // https://github.com/munificent/wren/blob/master/test/benchmark/method_call.dart
 
+import Sua
+
 
 class Toggle {
 
@@ -38,7 +40,7 @@ class NthToggle: Toggle {
   override func activate() -> Toggle {
     count = count + 1
     if (count >= countMax) {
-      super.activate()
+      let _ = super.activate()
       count = 0
     }
 
@@ -47,8 +49,8 @@ class NthToggle: Toggle {
 }
 
 
-//  Stopwatch watch = new Stopwatch();
-//  watch.start();
+var sw = Stopwatch()
+sw.start()
 
 let n = 100000
 var val = true
@@ -86,4 +88,8 @@ for i in 0..<n {
 }
 
 print(ntoggle.value)
-//print("elapsed: ${watch.elapsedMilliseconds / 1000}");
+sw.stop()
+p(sw)
+p("xxxxxx \(sw.elapsedMilliseconds)")
+p("yyyyyy \(sw.elapsedSeconds)")
+print("elapsed: \(Double(sw.elapsedMilliseconds) / 1000)")

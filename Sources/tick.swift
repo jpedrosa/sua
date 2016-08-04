@@ -49,6 +49,10 @@ public class Stopwatch: CustomStringConvertible {
     return millis
   }
 
+  public var elapsedSeconds: Double {
+    return Double(millis) / 1000
+  }
+
   public var millis: Int {
     if (!stopped) {
       doSlice()
