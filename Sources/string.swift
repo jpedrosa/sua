@@ -81,17 +81,17 @@ public extension String {
     var left: String?
     var right: String?
     if !string.isEmpty {
-      let sfc = string.utf16.codeUnitAt(index: 0)
+      let sfc = string.utf16[0]
       let jlen = string.utf16.count
       let len = utf16.count
       let validLen = len - jlen + 1
       for i in 0..<validLen {
-        if utf16.codeUnitAt(index: i) == sfc {
+        if utf16[i] == sfc {
           var ok = true
           var j = 1
           while j < jlen {
-            if utf16.codeUnitAt(index: i + j) !=
-                string.utf16.codeUnitAt(index: j) {
+            if utf16[i + j] !=
+                string.utf16[j] {
               ok = false
               break
             }
@@ -127,7 +127,7 @@ public extension String.UTF16View {
   }
 
   // Handy method for obtaining a UTF16 code unit to compare with.
-  public func codeUnitAt(index: Int) -> UInt16 {
+  public subscript(index: Int) -> UInt16 {
     return self[self.index(startIndex, offsetBy: index)]
   }
 
@@ -138,7 +138,7 @@ public extension String.UTF16View {
     if len >= alen && alen > 0 {
       let j = len - alen
       for i in 0..<alen {
-        if a.codeUnitAt(index: i) != self.codeUnitAt(index: j + i) {
+        if a[i] != self[j + i] {
           return false
         }
       }

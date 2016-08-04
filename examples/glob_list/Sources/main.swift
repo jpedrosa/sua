@@ -32,7 +32,7 @@ func parseOpt() -> String? {
 
 if let s = parseOpt() {
   var z = s
-  if s.utf16.codeUnitAt(index: 0) == 126 { // ~
+  if s.utf16[0] == 126 { // ~
     z = try File.expandPath(path: s)
   }
   try Dir.glob(pattern: z) { name, type, path in

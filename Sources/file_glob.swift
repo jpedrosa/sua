@@ -222,7 +222,7 @@ public struct FileGlobList {
       if baseDir.isEmpty {
         baseDir = Dir.cwd ?? ""
       }
-      if baseDir.utf16.codeUnitAt(index: baseDir.utf16.count - 1) != 47 { // /
+      if baseDir.utf16[baseDir.utf16.count - 1] != 47 { // /
         baseDir += "/"
       }
       if parts.count == 0 {
@@ -313,7 +313,7 @@ public struct FileGlobList {
   }
 
   public func matchFileName(name: String, partIndex: Int) -> Bool {
-    if self.skipDotFiles && name.utf16.codeUnitAt(index: 0) == 46 { // .
+    if self.skipDotFiles && name.utf16[0] == 46 { // .
       return false
     }
     let part = parts[partIndex]
@@ -343,7 +343,7 @@ public struct FileGlobList {
         try self.handler(name: name, type: type, path: path)
       }
       if type == .D {
-        if self.skipDotFiles && name.utf16.codeUnitAt(index: 0) == 46 { // .
+        if self.skipDotFiles && name.utf16[0] == 46 { // .
           return
         }
         try self.recurseAndMatch(path: "\(path)\(name)/", partIndex: partIndex)
@@ -356,7 +356,7 @@ public struct FileGlobList {
   public func recurseAndAddDirectories(path: String) throws {
     try FileBrowser.scanDir(path: path) { name, type in
       if type == .D {
-        if self.skipDotFiles && name.utf16.codeUnitAt(index: 0) == 46 { // .
+        if self.skipDotFiles && name.utf16[0] == 46 { // .
           return
         }
         try self.handler(name: name, type: type, path: path)
@@ -399,7 +399,7 @@ public struct FileGlobList {
         try self.handler(name: name, type: type, path: path)
       }
       if type == .D && (!self.skipDotFiles ||
-          name.utf16.codeUnitAt(index: 0) != 46) {
+          name.utf16[0] != 46) {
         let haveMatch = self.matchFileName(name: name, partIndex: partIndex + 1)
         var freshIndexList = [Int]()
         if haveIndexList {
@@ -451,8 +451,7 @@ public struct FileGlobList {
     var that = self
     let lookIndexList = indexList
     try FileBrowser.scanDir(path: path) { name, type in
-      if type == .D && (!that.skipDotFiles ||
-          name.utf16.codeUnitAt(index: 0) != 46) {
+      if type == .D && (!that.skipDotFiles || name.utf16[0] != 46) {
         let haveMatch = that.matchFileName(name: name, partIndex: partIndex + 1)
         if (haveMatch && (partIndex + 1 == lastMatchIndex)) ||
             (haveFinalMatcher && that.matchFileName(name: name,

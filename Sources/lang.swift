@@ -26,7 +26,7 @@ public func p(_ a: Any...) {
 public func printList(_ string: String) {
   // 10 - new line
   if string.isEmpty ||
-      string.utf16.codeUnitAt(index: string.utf16.count - 1) != 10 {
+      string.utf16[string.utf16.count - 1] != 10 {
     print(string)
   } else {
     Stdout.write(s: string)

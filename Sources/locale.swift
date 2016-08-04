@@ -41,14 +41,14 @@ public class Locale {
     let len = mask.utf16.count
     let lasti = len - 1
     while i < len {
-      if mask.utf16.codeUnitAt(index: i) == 37 && i < lasti { // %
+      if mask.utf16[i] == 37 && i < lasti { // %
         i += 1
-        switch mask.utf16.codeUnitAt(index: i) {
+        switch mask.utf16[i] {
         case 37: // %
           sb += "%"
         case 45: // -
           if i < lasti {
-            if mask.utf16.codeUnitAt(index: i + 1) == 100 { // d
+            if mask.utf16[i + 1] == 100 { // d
               process("\(time.day)")
               i += 1
             } else {

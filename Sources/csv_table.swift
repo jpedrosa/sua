@@ -296,7 +296,7 @@ public struct CSVTable {
     let len = string.utf16.count
     var i = 0
     while i < len {
-      let c = string.utf16.codeUnitAt(index: i)
+      let c = string.utf16[i]
       if c == 34 || c == 44 || c == 10 { // " , newline
         i += 1
         var s = "\""
@@ -306,7 +306,7 @@ public struct CSVTable {
         }
         var si = i
         while i < len {
-          if string.utf16.codeUnitAt(index: i) == 34 {
+          if string.utf16[i] == 34 {
             s += string.utf16.substring(startIndex: si, endIndex: i + 1) ?? ""
             s += "\""
             si = i + 1

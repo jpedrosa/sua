@@ -98,7 +98,7 @@ final public class FileBrowser {
   public static func recurseDir(path: String, fn: FileBrowserHandler) {
     let lasti = path.utf16.count - 1
     if lasti >= 0 {
-      if path.utf16.codeUnitAt(index: lasti) != 47 { // /
+      if path.utf16[lasti] != 47 { // /
         doRecurseDir(path: "\(path)/", fn: fn)
       } else {
         doRecurseDir(path: path, fn: fn)

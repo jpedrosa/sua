@@ -25,7 +25,7 @@ public class File: CustomStringConvertible {
     // 10 - new line
     let _ = write(string: string)
     if string.isEmpty ||
-        string.utf16.codeUnitAt(index: string.utf16.count - 1) != 10 {
+        string.utf16[string.utf16.count - 1] != 10 {
       let a: [UInt8] = [10]
       let _ = writeBytes(bytes: a, maxBytes: a.count)
     }
@@ -224,7 +224,7 @@ public class TempFile: File {
     if let ad = directory {
       d = ad
       let len = d.utf16.count
-      if len == 0 || d.utf16.codeUnitAt(index: len - 1) != 47 { // /
+      if len == 0 || d.utf16[len - 1] != 47 { // /
         d += "/"
       }
     }
@@ -270,7 +270,7 @@ public class FilePath {
     let fpa = firstPath.bytes
     let i = skipTrailingSlashes(bytes: fpa, lastIndex: fpa.count - 1)
     let fps = String.fromCharCodes(charCodes: fpa, start: 0, end: i) ?? ""
-    if !secondPath.isEmpty && secondPath.utf16.codeUnitAt(index: 0) == 47 { // /
+    if !secondPath.isEmpty && secondPath.utf16[0] == 47 { // /
       return "\(fps)\(secondPath)"
     }
     return "\(fps)/\(secondPath)"
