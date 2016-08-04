@@ -70,7 +70,7 @@ extension LexerToken {
 
   public var description: String {
     return "CommonToken(startIndex: \(startIndex), endIndex: \(endIndex), " +
-        "type: \(type), string: \(inspect(o: string)))"
+        "type: \(type), string: \(inspect( string)))"
   }
 
 }

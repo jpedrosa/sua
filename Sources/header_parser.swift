@@ -13,9 +13,9 @@ public struct Header: CustomStringConvertible {
   }
 
   public var description: String {
-    return "Header(method: \(inspect(o: method)), uri: \(inspect(o: uri)), " +
-        "httpVersion: \(inspect(o: httpVersion)), " +
-        "fields: \(inspect(o: fields)))"
+    return "Header(method: \(inspect( method)), uri: \(inspect( uri)), " +
+        "httpVersion: \(inspect( httpVersion)), " +
+        "fields: \(inspect( fields)))"
   }
 
 }

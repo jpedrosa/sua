@@ -116,11 +116,11 @@ public class Request: CustomStringConvertible {
   public var body: Body? { return _body }
 
   public var description: String {
-    return "Request(method: \(inspect(o: method)), " +
-        "uri: \(inspect(o: uri)), " +
-        "httpVersion: \(inspect(o: httpVersion)), " +
-        "fields: \(inspect(o: fields)), " +
-        "body: \(inspect(o: _body)))"
+    return "Request(method: \(inspect( method)), " +
+        "uri: \(inspect( uri)), " +
+        "httpVersion: \(inspect( httpVersion)), " +
+        "fields: \(inspect( fields)), " +
+        "body: \(inspect( _body)))"
   }
 
 }

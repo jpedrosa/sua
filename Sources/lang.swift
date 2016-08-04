@@ -1,11 +1,11 @@
 
-public func escapeString(s: String) -> String {
+public func escapeString(_ s: String) -> String {
   var z = ""
   debugPrint(s, terminator: "", to: &z)
   return z
 }
 
-public func inspect(o: Any) -> String {
+public func inspect(_ o: Any) -> String {
   var z = ""
   debugPrint(o, terminator: "", to: &z)
   return z
@@ -23,7 +23,7 @@ public func p(_ a: Any...) {
 //
 // Since importing Glibc already imports the "puts" command found in C which
 // would conflict with this command, we've given it a unique name instead.
-public func printList(string: String) {
+public func printList(_ string: String) {
   // 10 - new line
   if string.isEmpty ||
       string.utf16.codeUnitAt(index: string.utf16.count - 1) != 10 {

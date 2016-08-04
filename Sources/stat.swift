@@ -134,8 +134,8 @@ public struct StatMode: CustomStringConvertible {
   }
 
   public var description: String {
-    return "StatMode(modeTranslated: \(inspect(o: modeTranslated)), " +
-        "octal: \(inspect(o: octal)))"
+    return "StatMode(modeTranslated: \(inspect( modeTranslated)), " +
+        "octal: \(inspect( octal)))"
   }
 
 }

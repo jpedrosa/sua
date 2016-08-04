@@ -146,7 +146,7 @@ public class File: CustomStringConvertible {
     }
   }
 
-  public var description: String { return "File(path: \(inspect(o: path)))" }
+  public var description: String { return "File(path: \(inspect( path)))" }
 
   public static func open(path: String, mode: FileOperation = .R,
       fn: (f: File) throws -> Void) throws {
