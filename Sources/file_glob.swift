@@ -330,7 +330,7 @@ public struct FileGlobList {
       case .EndsWith:
         let stringPart = part as! FileGlobStringPart
         let s = ignoreCase ? Ascii.toLowerCase(string: name) ?? "" : name
-        return s.utf16.endsWith(string: stringPart.value)
+        return s.utf16.endsWith(stringPart.value)
       default:
         return false
     }
