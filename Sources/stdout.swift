@@ -7,7 +7,7 @@ public class Stdout {
   }
 
   public static func write(bytes: [UInt8], max: Int) -> Int {
-    var r = a
+    var r = bytes
     let n = Sys.write(fd: PosixSys.STDOUT_FD, address: &r, length: max)
     IO.flush()
     return n
