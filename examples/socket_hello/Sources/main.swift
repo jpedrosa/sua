@@ -17,8 +17,8 @@ func printHostIP(hostName: String) {
 
 
 var addressName = "google.com"
-printHostIP(addressName)
-printHostIP("reddit.com")
+printHostIP(hostName: addressName)
+printHostIP(hostName: "reddit.com")
 
 var sa = SocketAddress(hostName: addressName)
 p(sa.ip4ToUInt32())
@@ -38,7 +38,7 @@ for _ in 0..<1000 {
   var sample = "GET / HTTP/1.1\r\nHost: 127.0.0.1:9123\r\nUser-Agent: curl/7.43.0\r\nAccept: */*\r\n\r\n"
   var a = [UInt8](sample.utf8)
   var parser = HeaderParser()
-  try parser.parse(a)
+  try parser.parse(bytes: a)
   if parser.header.method == "GET" {
     count += 1
   }
@@ -53,14 +53,14 @@ defer {
   serverSocket.close()
 }
 
-var buffer = [UInt8](count: 1024, repeatedValue: 0)
+var buffer = [UInt8](repeating: 0, count: 1024)
 
 while true {
   if let socket = serverSocket.accept() {
     defer {
       socket.close()
     }
-    var n = socket.read(&buffer, maxBytes: buffer.count)
-    socket.write("Hello World\n")
+    var n = socket.read(buffer: &buffer, maxBytes: buffer.count)
+    let _ = socket.write(string: "Hello World\n")
   }
 }
