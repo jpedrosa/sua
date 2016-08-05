@@ -8,7 +8,7 @@ class SocketAll {
 
   let serverSocket: ServerSocket
 
-  var buffer = [UInt8](count: 1024, repeatedValue: 0)
+  var buffer = [UInt8](repeating: 0, count: 1024)
 
   init(hostName: String, port: UInt16) throws {
     serverSocket = try ServerSocket(hostName: hostName, port: port)
@@ -25,11 +25,11 @@ class SocketAll {
           defer {
             socket.close()
           }
-          var buffer = [UInt8](count: 1024, repeatedValue: 0)
-          var _ = socket.read(&buffer, maxBytes: buffer.count)
-          socket.write("Hello World\n")
+          var buffer = [UInt8](repeating: 0, count: 1024)
+          var _ = socket.read(buffer: &buffer, maxBytes: buffer.count)
+          let _ = socket.write(string: "Hello World\n")
         }
-        try tb.join()
+        let _ = try tb.join()
       }
     }
   }
@@ -37,7 +37,7 @@ class SocketAll {
   func runForked() throws {
     while true {
       try serverSocket.spawnAccept() { socket in
-        self.answer(socket)
+        self.answer(socket: socket)
       }
     }
   }
@@ -45,7 +45,7 @@ class SocketAll {
   func runSingle() {
     while true {
       if let socket = serverSocket.accept() {
-        answer(socket)
+        answer(socket: socket)
       }
     }
   }
@@ -54,8 +54,8 @@ class SocketAll {
     defer {
       socket.close()
     }
-    let _ = socket.read(&buffer, maxBytes: buffer.count)
-    socket.write("Hello World\n")
+    let _ = socket.read(buffer: &buffer, maxBytes: buffer.count)
+    let _ = socket.write(string: "Hello World\n")
   }
 
 }
@@ -95,7 +95,7 @@ func processArguments() -> SocketAllOptions? {
   var stream = ByteStream()
   var type: SocketAllType?
   var port: UInt16?
-  func error(ti: Int = -1) {
+  func error(_ ti: Int = -1) {
     type = nil
     let t = args[ti < 0 ? i : ti]
     print("\u{1b}[1m\u{1b}[31mError:\u{1b}[0m Error while parsing the " +
@@ -105,7 +105,7 @@ func processArguments() -> SocketAllOptions? {
   func eatPortDigits() -> Bool {
     if stream.eatWhileDigit() {
       let s = stream.collectTokenString()
-      stream.eatSpace()
+      let _ = stream.eatSpace()
       if stream.isEol {
         let n = Int(s!)!
         if n >= 0 && n <= 65535 {
@@ -156,7 +156,7 @@ func processArguments() -> SocketAllOptions? {
         }
       default:
         stream.bytes = Array(args[i].utf8)
-        if stream.eatString("-port") {
+        if stream.eatString(string: "-port") {
           stream.startIndex = stream.currentIndex
           if !eatPortDigits() {
             error()
