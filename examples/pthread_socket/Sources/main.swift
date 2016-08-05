@@ -10,31 +10,34 @@ defer {
   serverSocket.close()
 }
 
-//var buffer = [UInt8](count: 1024, repeatedValue: 0)
+//var buffer = [UInt8](repeating: 0, count: 1024)
 
 // while true {
 //   try serverSocket.spawnAccept() { socket in
 //     defer {
 //       socket.close()
 //     }
-//     var n = socket.read(&buffer, maxBytes: buffer.count)
+//     var n = socket.read(buffer: &buffer, maxBytes: buffer.count)
 //     socket.write("Hello World\n")
 //   }
 // }
 
 var socketMutex = Mutex()
 
-func runSocket(ctx: UnsafeMutablePointer<Void>) -> UnsafeMutablePointer<Void> {
-  pthread_detach(pthread_self())
-  socketMutex.lock()
-  let socket = UnsafePointer<Socket>(ctx).memory
-  defer {
-    socket.close()
-    socketMutex.unlock()
+func runSocket(ctx: UnsafeMutablePointer<Void>?)
+    -> UnsafeMutablePointer<Void>? {
+  if let ectx = ctx {
+    pthread_detach(pthread_self())
+    socketMutex.lock()
+    let socket = UnsafePointer<Socket>(ectx).pointee
+    defer {
+      socket.close()
+      socketMutex.unlock()
+    }
+    var b = [UInt8](repeating: 0, count: 1024)
+    let _ = socket.read(buffer: &b, maxBytes: b.count)
+    let _ = socket.write(string: "Hello World\n")
   }
-  var b = [UInt8](count: 1024, repeatedValue: 0)
-  let _ = socket.read(&b, maxBytes: b.count)
-  socket.write("Hello World\n")
   return ctx
 }
 
@@ -53,8 +56,8 @@ while true {
 //       defer {
 //         socket.close()
 //       }
-//       var buffer = [UInt8](count: 1024, repeatedValue: 0)
-//       var n = socket.read(&buffer, maxBytes: buffer.count)
+//       var buffer = [UInt8](repeating: 0, count: 1024)
+//       var n = socket.read(buffer: &buffer, maxBytes: buffer.count)
 //       socket.write("Hello World\n")
 //     }
 // //    try tb.join()
@@ -67,7 +70,7 @@ while true {
 //     defer {
 //       socket.close()
 //     }
-//     let _ = socket.read(&buffer, maxBytes: buffer.count)
+//     let _ = socket.read(buffer: &buffer, maxBytes: buffer.count)
 //     socket.write("Hello World\n")
 //   }
 // }
