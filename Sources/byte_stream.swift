@@ -2030,7 +2030,7 @@ public struct ByteStream {
       let c = bytes[i]
       a[i] = (c == 10 || c == 13 || (c >= 32 && c <= 126)) ? c : 46
     }
-    let _ = Stdout.writeBytes(a: a, maxBytes: len)
+    let _ = Stdout.write(bytes: a, max: len)
     if a[len - 1] != 10 {
       print("")
     }

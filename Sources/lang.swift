@@ -29,6 +29,6 @@ public func printList(_ string: String) {
       string.utf16[string.utf16.count - 1] != 10 {
     print(string)
   } else {
-    Stdout.write(s: string)
+    Stdout.write(string)
   }
 }

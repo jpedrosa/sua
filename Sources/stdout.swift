@@ -1,14 +1,14 @@
 
 public class Stdout {
 
-  public static func write(s: String) {
+  public static func write(_ s: String) {
     print(s, terminator: "")
     IO.flush()
   }
 
-  public static func writeBytes(a: [UInt8], maxBytes: Int) -> Int {
+  public static func write(bytes: [UInt8], max: Int) -> Int {
     var r = a
-    let n = Sys.write(fd: PosixSys.STDOUT_FD, address: &r, length: maxBytes)
+    let n = Sys.write(fd: PosixSys.STDOUT_FD, address: &r, length: max)
     IO.flush()
     return n
   }
