@@ -46,14 +46,15 @@ class Richards {
 
   func run() throws {
     let scheduler = Scheduler()
-    scheduler.addIdleTask(Richards.ID_IDLE, priority: 0, queue: nil,
+    scheduler.addIdleTask(id: Richards.ID_IDLE, priority: 0, queue: nil,
         count: Richards.COUNT)
 
     var queue = Packet(link: nil, id: Richards.ID_WORKER,
         kind: Richards.KIND_WORK)
     queue = Packet(link: queue, id: Richards.ID_WORKER,
         kind: Richards.KIND_WORK)
-    scheduler.addWorkerTask(Richards.ID_WORKER, priority: 1000, queue: queue)
+    scheduler.addWorkerTask(id: Richards.ID_WORKER, priority: 1000,
+        queue: queue)
 
     queue = Packet(link: nil, id: Richards.ID_DEVICE_A,
         kind: Richards.KIND_DEVICE)
@@ -61,7 +62,7 @@ class Richards {
         kind: Richards.KIND_DEVICE)
     queue = Packet(link: queue, id: Richards.ID_DEVICE_A,
         kind: Richards.KIND_DEVICE)
-    scheduler.addHandlerTask(Richards.ID_HANDLER_A, priority: 2000,
+    scheduler.addHandlerTask(id: Richards.ID_HANDLER_A, priority: 2000,
         queue: queue)
 
     queue = Packet(link: nil, id: Richards.ID_DEVICE_B,
@@ -70,12 +71,14 @@ class Richards {
         kind: Richards.KIND_DEVICE)
     queue = Packet(link: queue, id: Richards.ID_DEVICE_B,
         kind: Richards.KIND_DEVICE)
-    scheduler.addHandlerTask(Richards.ID_HANDLER_B, priority: 3000,
+    scheduler.addHandlerTask(id: Richards.ID_HANDLER_B, priority: 3000,
         queue: queue)
 
-    scheduler.addDeviceTask(Richards.ID_DEVICE_A, priority: 4000, queue: nil)
+    scheduler.addDeviceTask(id: Richards.ID_DEVICE_A, priority: 4000,
+        queue: nil)
 
-    scheduler.addDeviceTask(Richards.ID_DEVICE_B, priority: 5000, queue: nil)
+    scheduler.addDeviceTask(id: Richards.ID_DEVICE_B, priority: 5000,
+        queue: nil)
 
     scheduler.schedule()
 
@@ -130,38 +133,36 @@ class Scheduler {
   var currentTcb: TaskControlBlock?
   var currentId = 0
   var list: TaskControlBlock?
-  var blocks = [TaskControlBlock?](count: Richards.NUMBER_OF_IDS,
-      repeatedValue: nil)
+  var blocks = [TaskControlBlock?](repeating: nil,
+      count: Richards.NUMBER_OF_IDS)
 
   /// Add an idle task to this scheduler.
   func addIdleTask(id: Int, priority: Int, queue: Packet?, count: Int) {
-    addRunningTask(id, priority: priority, queue: queue,
+    addRunningTask(id: id, priority: priority, queue: queue,
         task: IdleTask(scheduler: self, v1: 1, count: count))
   }
 
   /// Add a work task to this scheduler.
   func addWorkerTask(id: Int, priority: Int, queue: Packet) {
-    addTask(id,
-            priority: priority,
-            queue: queue,
+    addTask(id: id, priority: priority, queue: queue,
             task: WorkerTask(scheduler: self, v1: Richards.ID_HANDLER_A, v2: 0))
   }
 
   /// Add a handler task to this scheduler.
   func addHandlerTask(id: Int, priority: Int, queue: Packet) {
-    addTask(id, priority: priority, queue: queue,
+    addTask(id: id, priority: priority, queue: queue,
         task: HandlerTask(scheduler: self))
   }
 
   /// Add a handler task to this scheduler.
   func addDeviceTask(id: Int, priority: Int, queue: Packet?) {
-    addTask(id, priority: priority, queue: queue,
+    addTask(id: id, priority: priority, queue: queue,
         task: DeviceTask(scheduler: self))
   }
 
   /// Add the specified task and mark it as running.
   func addRunningTask(id: Int, priority: Int, queue: Packet?, task: Task) {
-    addTask(id, priority: priority, queue: queue, task: task)
+    addTask(id: id, priority: priority, queue: queue, task: task)
     currentTcb!.setRunning()
   }
 
@@ -227,7 +228,7 @@ class Scheduler {
     queueCount += 1
     packet.link = nil
     packet.id = currentId
-    return t.checkPriorityAdd(currentTcb!, packet: packet)
+    return t.checkPriorityAdd(task: currentTcb!, packet: packet)
   }
 
 }
@@ -309,7 +310,7 @@ class TaskControlBlock: CustomStringConvertible {
       state = queue == nil ? TaskControlBlock.STATE_RUNNING :
           TaskControlBlock.STATE_RUNNABLE
     }
-    return task!.run(packet)
+    return task!.run(packet: packet)
   }
 
   /**
@@ -326,7 +327,7 @@ class TaskControlBlock: CustomStringConvertible {
         return self
       }
     } else {
-      queue = packet.addTo(queue)
+      queue = packet.addTo(queue: queue)
     }
     return task
   }
@@ -373,10 +374,10 @@ class IdleTask: Task, CustomStringConvertible {
     }
     if (v1 & 1) == 0 {
       v1 = v1 >> 1
-      return scheduler.release(Richards.ID_DEVICE_A)
+      return scheduler.release(id: Richards.ID_DEVICE_A)
     }
     v1 = (v1 >> 1) ^ 0xD008
-    return scheduler.release(Richards.ID_DEVICE_B)
+    return scheduler.release(id: Richards.ID_DEVICE_B)
   }
 
   var description: String { return "IdleTask" }
@@ -396,7 +397,7 @@ class DeviceTask: Task, CustomStringConvertible {
     if packet == nil {
       guard let v = v1 else { return scheduler.suspendCurrent() }
       v1 = nil
-      return scheduler.queue(v)
+      return scheduler.queue(packet: v)
     }
     v1 = packet
     return scheduler.holdCurrent()
@@ -439,7 +440,7 @@ class WorkerTask: Task, CustomStringConvertible {
       }
       packet.a2[i] = v2
     }
-    return scheduler.queue(packet)
+    return scheduler.queue(packet: packet)
   }
 
   var description: String { return "WorkerTask" }
@@ -458,9 +459,9 @@ class HandlerTask: Task, CustomStringConvertible {
   override func run(packet: Packet?) -> TaskControlBlock? {
     if let packet = packet {
       if packet.kind == Richards.KIND_WORK {
-        v1 = packet.addTo(v1)
+        v1 = packet.addTo(queue: v1)
       } else {
-        v2 = packet.addTo(v2)
+        v2 = packet.addTo(queue: v2)
       }
     }
     if let v1 = v1 {
@@ -471,12 +472,12 @@ class HandlerTask: Task, CustomStringConvertible {
           self.v2 = v2.link
           v.a1 = v1.a2[count]
           v1.a1 = count + 1
-          return scheduler.queue(v)
+          return scheduler.queue(packet: v)
         }
       } else {
         let v = v1
         self.v1 = v1.link
-        return scheduler.queue(v)
+        return scheduler.queue(packet: v)
       }
     }
     return scheduler.suspendCurrent()
@@ -501,7 +502,7 @@ class Packet: CustomStringConvertible {
   var kind = 0    // The type of this packet.
   var a1 = 0
 
-  var a2 = [Int](count: Richards.DATA_SIZE, repeatedValue: 0)
+  var a2 = [Int](repeating: 0, count: Richards.DATA_SIZE)
 
   init(link: Packet?, id: Int, kind: Int) {
     self.link = link
@@ -527,7 +528,7 @@ class Packet: CustomStringConvertible {
 
 }
 
-enum SchedulerError: ErrorType {
+enum SchedulerError: ErrorProtocol {
   case WrongQueueCount
   case WrongHoldCount
 }
