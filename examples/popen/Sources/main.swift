@@ -21,18 +21,18 @@ try Popen.readLines(command: "cd /home/dewd/t_ && grep -ir a.*b") { s in
 }
 
 try Popen.readByteLines(command: "ls -l /home/dewd/t_") { a, len in
-  Stdout.write(bytes: a, max: len)
+  let _ = Stdout.write(bytes: a, max: len)
 }
 
 try Popen.readByteLines(command: "lssdsdsd -l /home/dewd/t_") { a, len in
-  Stdout.write(bytes: a, max: len)
+  let _ = Stdout.write(bytes: a, max: len)
 }
 
 try Popen.readByteLines(command: "find /home/dewd/t_ -type f") { a, len in
-  Stdout.write(bytes: a, max: len)
+  let _ = Stdout.write(bytes: a, max: len)
 }
 
 try Popen.readByteLines(command: "cd /home/dewd/t_ && grep -ir a.*b") {
     a, len in
-  Stdout.write(bytes: a, max: len)
+  let _ = Stdout.write(bytes: a, max: len)
 }
