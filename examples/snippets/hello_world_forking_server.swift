@@ -48,7 +48,7 @@ if bindResult == -1 {
   exit(1)
 }
 
-var buffer = [UInt8](count: 1024, repeatedValue: 0)
+var buffer = [UInt8](repeating: 0, count: 1024)
 
 var clientAddr = sockaddr_in()
 var clientAddrLen = UInt32(sizeofValue(clientAddr))
@@ -59,7 +59,7 @@ func process(cfd: Int32) {
   defer {
     close(cfd)
   }
-  var buffer = [UInt8](count: 1024, repeatedValue: 0)
+  var buffer = [UInt8](repeating: 0, count: 1024)
   recv(cfd, &buffer, 1024, 0)
   write(cfd, "Hello World\n", 12)
 }
@@ -88,7 +88,7 @@ while true {
     defer {
       exit(0)
     }
-    process(cfd)
+    process(cfd: cfd)
   } else {
     close(cfd)
   }

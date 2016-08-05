@@ -1,7 +1,7 @@
 
 import Glibc
 
-func formatDouble(f: Double, precision: Int = 2) -> String{
+func formatDouble(_ f: Double, precision: Int = 2) -> String{
   var p = 1
   for _ in 0..<precision {
     p *= 10
@@ -33,12 +33,12 @@ func formatDouble(f: Double, precision: Int = 2) -> String{
   return s
 }
 
-func tp(f: Double, precision: Int = 2) {
+func tp(_ f: Double, precision: Int = 2) {
   print("\(f) (precision: \(precision)) -> " +
       "\(formatDouble(f, precision: precision))")
 }
 
-func runBatch(f: Double) {
+func runBatch(_ f: Double) {
   tp(f, precision: 0)
   tp(f, precision: 1)
   tp(f)

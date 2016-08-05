@@ -48,7 +48,7 @@ if bindResult == -1 {
   exit(1)
 }
 
-var buffer = [UInt8](count: 1024, repeatedValue: 0)
+var buffer = [UInt8](repeating: 0, count: 1024)
 
 var clientAddr = sockaddr_in()
 var clientAddrLen = UInt32(sizeofValue(clientAddr))
